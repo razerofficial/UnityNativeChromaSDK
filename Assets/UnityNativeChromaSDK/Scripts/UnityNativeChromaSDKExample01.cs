@@ -123,14 +123,22 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
     }
     private void Init()
     {
-        int result = UnityNativeChromaSDK.PluginInit();
-        _mStatus = string.Format("Status: Init result={0}", result);
+        bool isInitialized = UnityNativeChromaSDK.PluginIsInitialized();
+        if (!isInitialized)
+        {
+            int result = UnityNativeChromaSDK.PluginInit();
+            _mStatus = string.Format("Status: Init result={0}", result);
+        }
     }
     void Uninit()
     {
-        int result = UnityNativeChromaSDK.PluginUninit();
-        _mStatus = string.Format("Status: Unit result={0}", result);
-        _mLoadedAnimations.Clear();
+        bool isInitialized = UnityNativeChromaSDK.PluginIsInitialized();
+        if (isInitialized)
+        {
+            int result = UnityNativeChromaSDK.PluginUninit();
+            _mStatus = string.Format("Status: Unit result={0}", result);
+            _mLoadedAnimations.Clear();
+        }
     }
 
     private void Awake()
