@@ -15,6 +15,13 @@ namespace ChromaSDK
         const string DLL_NAME = "UnityNativeChromaSDK";
 #endif
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+
+        /// <summary>
+        /// Is the plugin initialized
+        /// </summary>
+        [DllImport(DLL_NAME)]
+        public static extern bool PluginIsInitialized();
+
         /// <summary>
         /// Is the editor dialog open?
         /// </summary>

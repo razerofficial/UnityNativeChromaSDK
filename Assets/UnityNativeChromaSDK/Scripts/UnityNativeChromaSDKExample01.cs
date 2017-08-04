@@ -52,10 +52,17 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
     }   
     private void OnGUI()
     {
+        bool isInitialized = UnityNativeChromaSDK.PluginIsInitialized();
         GUILayout.BeginVertical(GUILayout.Height(Screen.height));
         GUILayout.FlexibleSpace();
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
         GUILayout.FlexibleSpace();
+        GUI.enabled = !isInitialized;
+        if (GUILayout.Button("Init", GUILayout.Height(30)))
+        {
+            UnityNativeChromaSDK.PluginInit();
+        }
+        GUI.enabled = isInitialized;
         if (GUILayout.Button("PLAY", GUILayout.Height(30)))
         {
             foreach (string animation in _mAnimations)
@@ -63,6 +70,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
                 PlayAnimation(animation);
             }
         }
+        GUI.enabled = isInitialized;
         if (GUILayout.Button("STOP", GUILayout.Height(30)))
         {
             foreach (string animation in _mAnimations)
@@ -70,6 +78,13 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
                 StopAnimation(animation);
             }
         }
+        GUI.enabled = isInitialized;
+        if (GUILayout.Button("Uninit", GUILayout.Height(30)))
+        {
+            UnityNativeChromaSDK.PluginUninit();
+            _mLoadedAnimations.Clear();
+        }
+        GUI.enabled = true;
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         foreach (string animation in _mAnimations)
@@ -77,6 +92,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
             GUILayout.FlexibleSpace();
             GUILayout.Label(animation);
+            GUI.enabled = isInitialized;
             if (GUILayout.Button("Play", GUILayout.Height(30)))
             {
                 PlayAnimation(animation);
@@ -85,6 +101,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             {
                 StopAnimation(animation);
             }
+            GUI.enabled = true;
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
