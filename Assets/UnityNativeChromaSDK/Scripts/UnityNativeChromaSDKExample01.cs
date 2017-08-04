@@ -15,6 +15,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         "RandomMousepadEffect.chroma",
     };
     Dictionary<string, int> _mLoadedAnimations = new Dictionary<string, int>();
+    private string _mStatus = "Status: ";
     string GetPath(string animation)
     {
         return string.Format("{0}/{1}", Application.streamingAssetsPath, animation);
@@ -57,10 +58,15 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.FlexibleSpace();
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
         GUILayout.FlexibleSpace();
+        GUILayout.Label(_mStatus);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+        GUILayout.FlexibleSpace();
         GUI.enabled = !isInitialized;
         if (GUILayout.Button("Init", GUILayout.Height(30)))
         {
-            UnityNativeChromaSDK.PluginInit();
+            Init();
         }
         GUI.enabled = isInitialized;
         if (GUILayout.Button("PLAY", GUILayout.Height(30)))
@@ -81,8 +87,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUI.enabled = isInitialized;
         if (GUILayout.Button("Uninit", GUILayout.Height(30)))
         {
-            UnityNativeChromaSDK.PluginUninit();
-            _mLoadedAnimations.Clear();
+            Uninit();
         }
         GUI.enabled = true;
         GUILayout.FlexibleSpace();
@@ -116,15 +121,26 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.FlexibleSpace();
         GUILayout.EndVertical();
     }
+    private void Init()
+    {
+        int result = UnityNativeChromaSDK.PluginInit();
+        _mStatus = string.Format("Status: Init result={0}", result);
+    }
+    void Uninit()
+    {
+        int result = UnityNativeChromaSDK.PluginUninit();
+        _mStatus = string.Format("Status: Unit result={0}", result);
+        _mLoadedAnimations.Clear();
+    }
 
     private void Awake()
     {
-        UnityNativeChromaSDK.PluginInit();
+        Init();
     }
 
     private void OnApplicationQuit()
     {
-        UnityNativeChromaSDK.PluginUninit();
+        Uninit();
     }
 #endif
 }
