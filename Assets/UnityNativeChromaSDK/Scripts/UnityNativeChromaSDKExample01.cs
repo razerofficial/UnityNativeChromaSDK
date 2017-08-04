@@ -49,16 +49,9 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         {
             UnityNativeChromaSDK.PluginStopAnimation(animationId);
         }
-    }
-    int EditAnimation(string animation)
-    {
-        string path = GetPath(animation);
-        return UnityNativeChromaSDK.EditAnimation(path);
-    }
-    
+    }   
     private void OnGUI()
     {
-        bool dialogIsOpen = UnityNativeChromaSDK.PluginIsDialogOpen();
         GUILayout.BeginVertical(GUILayout.Height(Screen.height));
         GUILayout.FlexibleSpace();
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
@@ -92,12 +85,6 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             {
                 StopAnimation(animation);
             }
-            GUI.enabled = !dialogIsOpen;
-            if (GUILayout.Button("Edit", GUILayout.Height(30)))
-            {
-                EditAnimation(animation);
-            }
-            GUI.enabled = true;
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
