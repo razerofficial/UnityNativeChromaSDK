@@ -112,5 +112,15 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.FlexibleSpace();
         GUILayout.EndVertical();
     }
+
+    private void Awake()
+    {
+        UnityNativeChromaSDK.PluginInit();
+    }
+
+    private void OnApplicationQuit()
+    {
+        UnityNativeChromaSDK.PluginUninit();
+    }
 #endif
 }

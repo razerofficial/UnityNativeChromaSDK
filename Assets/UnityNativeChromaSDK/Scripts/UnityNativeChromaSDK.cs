@@ -79,6 +79,20 @@ namespace ChromaSDK
         public static extern int PluginCloseAnimation(int animationId);
 
         /// <summary>
+        /// Init the plugin
+        /// </summary>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        public static extern int PluginInit();
+
+        /// <summary>
+        /// Uninit the plugin
+        /// </summary>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        public static extern int PluginUninit();
+
+        /// <summary>
         /// Open an animation file
         /// Returns -1 if animation not found
         /// Returns >= 0 if animation has opened
