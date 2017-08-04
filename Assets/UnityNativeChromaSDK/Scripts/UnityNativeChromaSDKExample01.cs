@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class UnityNativeChromaSDKExample01 : MonoBehaviour
 {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
     readonly string[] _mAnimations =
     {
         "RandomChromaLinkEffect.chroma",
@@ -100,7 +101,16 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
+        GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("QUIT", GUILayout.Height(30)))
+        {
+            Application.Quit();
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
         GUILayout.FlexibleSpace();
         GUILayout.EndVertical();
     }
+#endif
 }
