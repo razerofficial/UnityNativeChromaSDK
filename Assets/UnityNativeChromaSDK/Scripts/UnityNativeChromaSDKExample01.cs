@@ -6,15 +6,6 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
 {
     readonly string[] _mAnimations =
     {
-        "ChromaLinkEffect.chroma",
-        "HeadsetEffect.chroma",
-        "KeyboardCoolFireAnimation.chroma",
-        "KeyboardEffect.chroma",
-        "KeyboardParticleAnimation.chroma",
-        "KeyboardParticleAnimation2.chroma",
-        "KeypadEffect.chroma",
-        "MouseEffect.chroma",
-        "MousepadEffect.chroma",
         "RandomChromaLinkEffect.chroma",
         "RandomHeadsetEffect.chroma",
         "RandomKeyboardEffect.chroma",

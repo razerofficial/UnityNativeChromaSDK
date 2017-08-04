@@ -12,7 +12,7 @@ namespace ChromaSDK
         const string DLL_NAME = "UnityNativeChromaSDK3";
 
 #else
-    const string DLL_NAME = "UnityNativeChromaSDK";
+        const string DLL_NAME = "UnityNativeChromaSDK";
 #endif
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         /// <summary>
