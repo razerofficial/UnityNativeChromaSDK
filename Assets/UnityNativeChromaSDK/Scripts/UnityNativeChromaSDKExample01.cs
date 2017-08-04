@@ -33,16 +33,51 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         }
         return animationid;
     }
+    void PlayAnimation(string animation)
+    {
+        int animationId = GetAnimation(animation);
+        if (animationId >= 0)
+        {
+            UnityNativeChromaSDK.PluginPlayAnimation(animationId);
+        }
+    }
+    void StopAnimation(string animation)
+    {
+        int animationId = GetAnimation(animation);
+        if (animationId >= 0)
+        {
+            UnityNativeChromaSDK.PluginStopAnimation(animationId);
+        }
+    }
     int EditAnimation(string animation)
     {
         string path = GetPath(animation);
         return UnityNativeChromaSDK.EditAnimation(path);
     }
+    
     private void OnGUI()
     {
         bool dialogIsOpen = UnityNativeChromaSDK.PluginIsDialogOpen();
         GUILayout.BeginVertical(GUILayout.Height(Screen.height));
         GUILayout.FlexibleSpace();
+        GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("PLAY", GUILayout.Height(30)))
+        {
+            foreach (string animation in _mAnimations)
+            {
+                PlayAnimation(animation);
+            }
+        }
+        if (GUILayout.Button("STOP", GUILayout.Height(30)))
+        {
+            foreach (string animation in _mAnimations)
+            {
+                StopAnimation(animation);
+            }
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
         foreach (string animation in _mAnimations)
         {
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
@@ -50,19 +85,11 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             GUILayout.Label(animation);
             if (GUILayout.Button("Play", GUILayout.Height(30)))
             {
-                int animationId = GetAnimation(animation);
-                if (animationId >= 0)
-                {
-                    UnityNativeChromaSDK.PluginPlayAnimation(animationId);
-                }                
+                PlayAnimation(animation);
             }
             if (GUILayout.Button("Stop", GUILayout.Height(30)))
             {
-                int animationId = GetAnimation(animation);
-                if (animationId >= 0)
-                {
-                    UnityNativeChromaSDK.PluginStopAnimation(animationId);
-                }
+                StopAnimation(animation);
             }
             GUI.enabled = !dialogIsOpen;
             if (GUILayout.Button("Edit", GUILayout.Height(30)))
