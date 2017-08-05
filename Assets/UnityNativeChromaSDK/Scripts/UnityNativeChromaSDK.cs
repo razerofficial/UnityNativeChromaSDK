@@ -147,6 +147,41 @@ namespace ChromaSDK
             }
             return -1;
         }
+
+        #region Handle Debug.Log from unmanged code
+
+        [DllImport(DLL_NAME)]
+        private static extern void PluginSetLogDelegate(IntPtr logDelegate);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void DebugLogDelegate(string text);
+
+        private static IntPtr _sLogDelegate = IntPtr.Zero;
+
+        private static void LogCallBack(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+            Debug.Log(string.Format(":C++: {0}", text));
+        }
+
+        private static void SetupLogMechanism()
+        {
+            DebugLogDelegate logCallback = new DebugLogDelegate(LogCallBack);
+            _sLogDelegate = Marshal.GetFunctionPointerForDelegate(logCallback);
+
+            // Call the API passing along the function pointer.
+            PluginSetLogDelegate(_sLogDelegate);
+        }
+
+        #endregion
+
+        static UnityNativeChromaSDK()
+        {
+            SetupLogMechanism();
+        }
     }
 }
 
