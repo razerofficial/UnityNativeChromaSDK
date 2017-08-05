@@ -139,6 +139,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
                 StopAnimation(animation);
             }
         }
+#if VERBOSE_LOGGING
         if (GUILayout.Button("CLOSE", GUILayout.Height(30)))
         {
             ClearStatus();
@@ -147,6 +148,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
                 CloseAnimation(animation);
             }
         }
+#endif
         GUI.enabled = true;
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -164,10 +166,12 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             {
                 StopAnimation(animation);
             }
+#if VERBOSE_LOGGING
             if (GUILayout.Button("Close", GUILayout.Height(30)))
             {
                 CloseAnimation(animation);
             }
+#endif
             if (GUILayout.Button("Edit", GUILayout.Height(30)))
             {
                 EditAnimation(animation);
@@ -219,4 +223,4 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         Uninit();
     }
 #endif
-}
+        }
