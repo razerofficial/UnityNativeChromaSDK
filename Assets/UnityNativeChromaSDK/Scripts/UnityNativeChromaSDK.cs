@@ -1,3 +1,5 @@
+//#define VERBOSE_LOGGING
+
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -112,7 +114,9 @@ namespace ChromaSDK
             {
                 return - 1;
             }
+#if VERBOSE_LOGGING
             Debug.Log(string.Format("OpenAnimation: {0}", path));
+#endif
             FileInfo fi = new FileInfo(path);
             if (fi.Exists)
             {
@@ -142,11 +146,14 @@ namespace ChromaSDK
                 Marshal.FreeHGlobal(lpData);
                 return animationId;
             }
+#if VERBOSE_LOGGING
             Debug.LogError(string.Format("EditAnimation: Animation does not exist! {0}", path));
+#endif
             return -1;
         }
 
-        #region Handle Debug.Log from unmanged code
+#if VERBOSE_LOGGING
+#region Handle Debug.Log from unmanged code
 
         [DllImport(DLL_NAME)]
         private static extern void PluginSetLogDelegate(IntPtr logDelegate);
@@ -174,12 +181,13 @@ namespace ChromaSDK
             PluginSetLogDelegate(_sLogDelegate);
         }
 
-        #endregion
+#endregion
 
         static UnityNativeChromaSDK()
         {
             SetupLogMechanism();
         }
+#endif
     }
 }
 
