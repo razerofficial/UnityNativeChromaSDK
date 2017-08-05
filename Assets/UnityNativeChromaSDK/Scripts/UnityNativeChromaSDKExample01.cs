@@ -1,5 +1,7 @@
 using ChromaSDK;
+using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public class UnityNativeChromaSDKExample01 : MonoBehaviour
@@ -15,7 +17,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         "RandomMousepadEffect.chroma",
     };
     Dictionary<string, int> _mLoadedAnimations = new Dictionary<string, int>();
-    private string _mStatus = "Status: ";
+    private StringBuilder _mStatus = new StringBuilder();
     string GetPath(string animation)
     {
         return string.Format("{0}/{1}", Application.streamingAssetsPath, animation);
@@ -27,7 +29,12 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         if (!_mLoadedAnimations.ContainsKey(animation))
         {
             animationid = UnityNativeChromaSDK.OpenAnimation(path);
-            _mLoadedAnimations[animation] = animationid;
+            _mStatus.AppendFormat("OpenAnimation {0} id={1}", animation, animationid);
+            _mStatus.AppendLine();
+            if (animationid >= 0)
+            {
+                _mLoadedAnimations[animation] = animationid;
+            }
         }
         else
         {
@@ -40,7 +47,23 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         int animationId = GetAnimation(animation);
         if (animationId >= 0)
         {
-            UnityNativeChromaSDK.PluginPlayAnimation(animationId);
+            int result = UnityNativeChromaSDK.PluginPlayAnimation(animationId);
+            _mStatus.AppendFormat("PlayAnimation name={0} id={1} result={2}", animation, animationId, result);
+            _mStatus.AppendLine();
+        }
+    }
+    void CloseAnimation(string animation)
+    {
+        int animationId = GetAnimation(animation);
+        if (animationId >= 0)
+        {
+            int result = UnityNativeChromaSDK.PluginCloseAnimation(animationId);
+            _mStatus.AppendFormat("CloseAnimation name={0} id={1} result={2}", animation, animationId, result);
+            _mStatus.AppendLine();
+            if (_mLoadedAnimations.ContainsKey(animation))
+            {
+                _mLoadedAnimations.Remove(animation);
+            }
         }
     }
     void StopAnimation(string animation)
@@ -48,7 +71,9 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         int animationId = GetAnimation(animation);
         if (animationId >= 0)
         {
-            UnityNativeChromaSDK.PluginStopAnimation(animationId);
+            int result = UnityNativeChromaSDK.PluginStopAnimation(animationId);
+            _mStatus.AppendFormat("StopAnimation id={0} result={1}", animationId, result);
+            _mStatus.AppendLine();
         }
     }   
     private void OnGUI()
@@ -58,19 +83,19 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.FlexibleSpace();
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
         GUILayout.FlexibleSpace();
-        GUILayout.Label(_mStatus);
+        GUILayout.Label(_mStatus.ToString());
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
         GUILayout.FlexibleSpace();
         GUI.enabled = !isInitialized;
-        if (GUILayout.Button("Init", GUILayout.Height(30)))
-        {
-            Init();
-        }
         GUI.enabled = isInitialized;
         if (GUILayout.Button("PLAY", GUILayout.Height(30)))
         {
+            if (_mStatus.Length > 0)
+            {
+                _mStatus.Remove(0, _mStatus.Length);
+            }
             foreach (string animation in _mAnimations)
             {
                 PlayAnimation(animation);
@@ -79,15 +104,25 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUI.enabled = isInitialized;
         if (GUILayout.Button("STOP", GUILayout.Height(30)))
         {
+            if (_mStatus.Length > 0)
+            {
+                _mStatus.Remove(0, _mStatus.Length);
+            }
             foreach (string animation in _mAnimations)
             {
                 StopAnimation(animation);
             }
         }
-        GUI.enabled = isInitialized;
-        if (GUILayout.Button("Uninit", GUILayout.Height(30)))
+        if (GUILayout.Button("CLOSE", GUILayout.Height(30)))
         {
-            Uninit();
+            if (_mStatus.Length > 0)
+            {
+                _mStatus.Remove(0, _mStatus.Length);
+            }
+            foreach (string animation in _mAnimations)
+            {
+                CloseAnimation(animation);
+            }
         }
         GUI.enabled = true;
         GUILayout.FlexibleSpace();
@@ -105,6 +140,10 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             if (GUILayout.Button("Stop", GUILayout.Height(30)))
             {
                 StopAnimation(animation);
+            }
+            if (GUILayout.Button("Close", GUILayout.Height(30)))
+            {
+                CloseAnimation(animation);
             }
             GUI.enabled = true;
             GUILayout.FlexibleSpace();
@@ -127,7 +166,12 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         if (!isInitialized)
         {
             int result = UnityNativeChromaSDK.PluginInit();
-            _mStatus = string.Format("Status: Init result={0}", result);
+            if (_mStatus.Length > 0)
+            {
+                _mStatus.Remove(0, _mStatus.Length);
+            }
+            _mStatus.AppendFormat("Status: Init result={0}", result);
+            _mStatus.AppendLine();
         }
     }
     void Uninit()
@@ -136,9 +180,14 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         if (isInitialized)
         {
             int result = UnityNativeChromaSDK.PluginUninit();
-            _mStatus = string.Format("Status: Unit result={0}", result);
-            _mLoadedAnimations.Clear();
+            if (_mStatus.Length > 0)
+            {
+                _mStatus.Remove(0, _mStatus.Length);
+            }
+            _mStatus.AppendFormat("Status: Unit result={0}", result);
+            _mStatus.AppendLine();
         }
+        _mLoadedAnimations.Clear();
     }
 
     private void Awake()
@@ -151,4 +200,4 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         Uninit();
     }
 #endif
-}
+    }
