@@ -66,6 +66,13 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             }
         }
     }
+    void EditAnimation(string animation)
+    {
+        string path = GetPath(animation);
+        int result = UnityNativeChromaSDK.EditAnimation(path);
+        _mStatus.AppendFormat("EditAnimation name={0} result={1}", animation, result);
+        _mStatus.AppendLine();
+    }
     void StopAnimation(string animation)
     {
         int animationId = GetAnimation(animation);
@@ -144,6 +151,10 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
             if (GUILayout.Button("Close", GUILayout.Height(30)))
             {
                 CloseAnimation(animation);
+            }
+            if (GUILayout.Button("Edit", GUILayout.Height(30)))
+            {
+                EditAnimation(animation);
             }
             GUI.enabled = true;
             GUILayout.FlexibleSpace();

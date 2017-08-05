@@ -112,10 +112,11 @@ namespace ChromaSDK
             {
                 return - 1;
             }
+            Debug.Log(string.Format("OpenAnimation: {0}", path));
             FileInfo fi = new FileInfo(path);
             if (fi.Exists)
             {
-                byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName);
+                byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName+"\0");
                 IntPtr lpData = Marshal.AllocHGlobal(array.Length);
                 Marshal.Copy(array, 0, lpData, array.Length);
                 int animationId = PluginOpenAnimation(lpData);
@@ -127,10 +128,6 @@ namespace ChromaSDK
 
         public static int EditAnimation(string path)
         {
-            if (PluginIsDialogOpen())
-            {
-                return -1;
-            }
             if (string.IsNullOrEmpty(path))
             {
                 return -1;
@@ -138,13 +135,14 @@ namespace ChromaSDK
             FileInfo fi = new FileInfo(path);
             if (fi.Exists)
             {
-                byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName);
+                byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName+"\0");
                 IntPtr lpData = Marshal.AllocHGlobal(array.Length);
                 Marshal.Copy(array, 0, lpData, array.Length);
                 int animationId = PluginOpenEditorDialog(lpData);
                 Marshal.FreeHGlobal(lpData);
                 return animationId;
             }
+            Debug.LogError(string.Format("EditAnimation: Animation does not exist! {0}", path));
             return -1;
         }
 
