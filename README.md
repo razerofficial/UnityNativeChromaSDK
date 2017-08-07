@@ -135,6 +135,10 @@ int result = UnityNativeChromaSDK.EditAnimation(path);
 <a name="examples"></a>
 ## Examples
 
-[UnityNativeChromaSDKExample01.cs](Assets/UnityNativeChromaSDK/Scripts/UnityNativeChromaSDKExample01.cs) has a GUI example to play/stop/edit `Chroma` animations at runtime. 
+[UnityNativeChromaSDKExample01.cs](Assets/UnityNativeChromaSDK/Scripts/UnityNativeChromaSDKExample01.cs) has a GUI example to play/stop/edit `Chroma` animations at runtime.
+ 
+ ![image_3](images/image_3.png)
 
 [UnityNativeChromaSDKExample02.cs](Assets/UnityNativeChromaSDK/Scripts/UnityNativeChromaSDKExample02.cs) has a GUI button to load scene 1 to show animations work with multiple scenes.
+
+![image_4](images/image_4.png)
