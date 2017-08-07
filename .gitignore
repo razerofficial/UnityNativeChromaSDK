@@ -5,3 +5,4 @@ Temp/
 *.sln
 obj/
 .vs/
+*.unitypackage
