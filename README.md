@@ -67,7 +67,7 @@ The `API` is only available on the `Windows Editor` and `Windows Standalone` pla
 #endif
 ```
 
-The native plugin should be initialized on `Awake`. `-1` indicates failure, otherwise success. In the case for multiple scenes, [`DontDestroyOnLoad`](https://docs.unity3d.com/ScriptReference/Object.DontDestroyOnLoad.html) should be used to avoid attempting to reinit the native plugin when scene changes happen.
+The native plugin should be initialized on `Awake`. `-1` indicates failure, otherwise success.
 
 ```charp
 private void Awake()
@@ -136,3 +136,5 @@ int result = UnityNativeChromaSDK.EditAnimation(path);
 ## Examples
 
 [UnityNativeChromaSDKExample01.cs](Assets/UnityNativeChromaSDK/Scripts/UnityNativeChromaSDKExample01.cs) has a GUI example to play/stop/edit `Chroma` animations at runtime. 
+
+[UnityNativeChromaSDKExample02.cs](Assets/UnityNativeChromaSDK/Scripts/UnityNativeChromaSDKExample02.cs) has a GUI button to load scene 1 to show animations work with multiple scenes.

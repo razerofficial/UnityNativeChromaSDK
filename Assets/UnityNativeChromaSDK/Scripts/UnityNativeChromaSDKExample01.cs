@@ -112,6 +112,14 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.FlexibleSpace();
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
         GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Load Scene 2"))
+        {
+            Application.LoadLevel(1);
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+        GUILayout.FlexibleSpace();
         if (UseLogging())
         {
             GUILayout.Label(_mStatus.ToString());
