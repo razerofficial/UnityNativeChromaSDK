@@ -22,7 +22,7 @@
 <a name="packaging"></a>
 ## Packaging
 
-Import [UnityNativeChromaSDK.unitypackage](https://github.com/tgraupmann/UnityNativeChromaSDK) into your project. @todo
+Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/UnityNativeChromaSDK/releases/tag/1.0) into your project.
 
 <a name="getting-started"></a>
 ## Getting Started
