@@ -4,6 +4,9 @@ using ChromaSDK;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+#if !UNITY_3 && !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_2 && !UNITY_3_3 && !UNITY_3_4 && !UNITY_3_5
+using UnityEngine.SceneManagement;
+#endif
 
 public class UnityNativeChromaSDKExample01 : MonoBehaviour
 {
@@ -114,7 +117,11 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Load Scene 2"))
         {
+#if UNITY_3 || UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5
             Application.LoadLevel(1);
+#else
+            SceneManager.LoadScene(1);
+#endif
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
