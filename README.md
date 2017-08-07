@@ -1,4 +1,4 @@
-# ChromaSDK - the Unity C# library for the Chroma Rest API
+# UnityNativeChromaSDK - Unity native library for the ChromaSDK
 
 **Table of Contents**
 
