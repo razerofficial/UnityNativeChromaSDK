@@ -17,7 +17,7 @@
 
 <a name="dependencies"></a>
 ## Dependencies
-- [CChromaEditor](https://github.com/tgraupmann/CChromaEditor) - C++ Native MFC Library for playing and editing Chroma animations
+- [CChromaEditor](https://github.com/RazerOfficial/CChromaEditor) - C++ Native MFC Library for playing and editing Chroma animations
 
 <a name="packaging"></a>
 ## Packaging
