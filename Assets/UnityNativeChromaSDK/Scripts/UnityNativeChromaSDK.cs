@@ -1,6 +1,7 @@
 //#define VERBOSE_LOGGING
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,6 +17,21 @@ namespace ChromaSDK
 #else
         const string DLL_NAME = "UnityNativeChromaSDK";
 #endif
+
+        /// <summary>
+        /// Returns true if the platform is supported
+        /// false if not supported
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsPlatformSupported()
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            return true;
+#else
+            return false;
+#endif
+        }
+
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 
         /// <summary>
@@ -130,7 +146,14 @@ namespace ChromaSDK
             return -1;
         }
 
-        public static int EditAnimation(string path)
+        /// <summary>
+        /// Edit an animation file
+        /// Returns -1 if animation nott found
+        /// Returns 0 on success
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static int PluginEditAnimation(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -153,7 +176,7 @@ namespace ChromaSDK
         }
 
 #if VERBOSE_LOGGING
-#region Handle Debug.Log from unmanged code
+        #region Handle Debug.Log from unmanged code
 
         [DllImport(DLL_NAME)]
         private static extern void PluginSetLogDelegate(IntPtr logDelegate);
@@ -181,14 +204,160 @@ namespace ChromaSDK
             PluginSetLogDelegate(_sLogDelegate);
         }
 
-#endregion
+        #endregion
 
         static UnityNativeChromaSDK()
         {
             SetupLogMechanism();
         }
-#endif
-    }
-}
 
 #endif
+
+        /// <summary>
+        /// Get the streaming path for the animation given the relative path from Assets/StreamingAssets
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public static string GetStreamingPath(string animation)
+        {
+            return string.Format("{0}/{1}", Application.streamingAssetsPath, animation);
+        }
+
+        /// <summary>
+        /// Dictionary of loaded animation, key is animation name, value is animation id
+        /// </summary>
+        private static Dictionary<string, int> _sLoadedAnimations = new Dictionary<string, int>();
+
+        /// <summary>
+        /// Initialize and clear the loaded animations dictionary
+        /// </summary>
+        public static int Init()
+        {
+            bool isInitialized = PluginIsInitialized();
+            if (!isInitialized)
+            {
+                int result = PluginInit();
+                _sLoadedAnimations.Clear();
+                return result;
+            }
+            //ignore: already initialized
+            return 0;
+        }
+
+        /// <summary>
+        /// Uninitialize and clear the loaded animations dictionary
+        /// </summary>
+        /// <returns></returns>
+        public static int Uninit()
+        {
+            _sLoadedAnimations.Clear();
+            bool isInitialized = PluginIsInitialized();
+            if (isInitialized)
+            {
+                int result = PluginUninit();
+                return result;
+            }
+            //ignore: already uninitialized
+            return 0;
+        }
+
+        /// <summary>
+        /// Get the animation id given an animation name,
+        /// Store the opened animation and reference by animation name
+        /// Returns -1 if failure occurred
+        /// else returns the animation id
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public static int GetAnimation(string animation)
+        {
+            string path = GetStreamingPath(animation);
+            int animationid;
+            if (!_sLoadedAnimations.ContainsKey(animation))
+            {
+                animationid = OpenAnimation(path);
+                if (animationid >= 0)
+                {
+                    _sLoadedAnimations[animation] = animationid;
+                }
+            }
+            else
+            {
+                animationid = _sLoadedAnimations[animation];
+            }
+            return animationid;
+        }
+
+        /// <summary>
+        /// Play the animation,
+        /// returns animation id upon success
+        /// returns -1 on failure
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public static int PlayAnimation(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                int result = PluginPlayAnimation(animationId);
+                return result;
+            }
+            return animationId;
+        }
+
+        /// <summary>
+        /// Close the animation,
+        /// returns animation id upon success
+        /// returns -1 on failure
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public static int CloseAnimation(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                int result = PluginCloseAnimation(animationId);
+                if (result >= 0)
+                {
+                    if (_sLoadedAnimations.ContainsKey(animation))
+                    {
+                        _sLoadedAnimations.Remove(animation);
+                    }
+                }
+                return result;
+            }
+            return animationId;
+        }
+
+        /// <summary>
+        /// Stop the animation,
+        /// returns animation id upon success
+        /// returns -1 on failure
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public static int StopAnimation(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                int result = PluginStopAnimation(animationId);
+                return result;
+            }
+            return animationId;
+        }
+
+        /// Edit the animation,
+        /// returns -1 on failure
+        /// returns 0 on success
+        public static int EditAnimation(string animation)
+        {
+            string path = GetStreamingPath(animation);
+            int result = PluginEditAnimation(path);
+            return result;
+        }
+    }
+#endif
+}
