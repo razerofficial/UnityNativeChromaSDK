@@ -8,6 +8,12 @@ public class UnityNativeChromaSDKMenu : MonoBehaviour
     private const int VERSION = 1;
     private const string KEY_SAVE_PATH = "CHROMA_SDK_SAVE_PATH";
 
+    [MenuItem("Assets/ChromaSDK/Open Docs")]
+    private static void OpenDocs()
+    {
+        Application.OpenURL("https://github.com/RazerOfficial/UnityNativeChromaSDK");
+    }
+
     [MenuItem("Assets/ChromaSDK/Create Chroma Animation")]
     private static void CreateAnimation()
     {

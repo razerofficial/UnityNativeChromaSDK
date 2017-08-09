@@ -96,7 +96,7 @@ private void OnApplicationQuit()
 `Chroma` animations are initially loaded by path. Be sure to reference the [`StreamingAssets`](https://docs.unity3d.com/Manual/StreamingAssets.html) folder.
 
 ```csharp
-string GetPath(string animation)
+string GetStreamingPath(string animation)
 {
    return string.Format("{0}/{1}", Application.streamingAssetsPath, animation);
 }

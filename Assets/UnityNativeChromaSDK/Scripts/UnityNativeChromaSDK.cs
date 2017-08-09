@@ -32,6 +32,15 @@ namespace ChromaSDK
 #endif
         }
 
+        /// <summary>
+        /// Get the plugin version
+        /// </summary>
+        /// <returns></returns>
+        public static string GetVersion()
+        {
+            return "1.0";
+        }
+
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 
         /// <summary>
