@@ -178,9 +178,7 @@ namespace ChromaSDK
                 Marshal.FreeHGlobal(lpData);
                 return animationId;
             }
-#if VERBOSE_LOGGING
             Debug.LogError(string.Format("EditAnimation: Animation does not exist! {0}", path));
-#endif
             return -1;
         }
 

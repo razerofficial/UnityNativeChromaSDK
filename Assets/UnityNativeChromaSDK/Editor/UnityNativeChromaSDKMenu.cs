@@ -45,7 +45,7 @@ public class UnityNativeChromaSDKMenu : MonoBehaviour
                     bw.Flush();
                 }
             }
-            UnityNativeChromaSDK.EditAnimation(path);
+            UnityNativeChromaSDK.PluginEditAnimation(path);
             AssetDatabase.Refresh();
         }
     }
@@ -63,7 +63,7 @@ public class UnityNativeChromaSDKMenu : MonoBehaviour
                 //Debug.Log(fi.Extension);
                 if (fi.Extension == ".chroma")
                 {
-                    UnityNativeChromaSDK.EditAnimation(path);
+                    UnityNativeChromaSDK.PluginEditAnimation(path);
                 }
             }
         }
