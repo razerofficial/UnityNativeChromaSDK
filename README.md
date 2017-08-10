@@ -135,10 +135,28 @@ int result = UnityNativeChromaSDK.EditAnimation(path);
 <a name="examples"></a>
 ## Examples
 
+**Example01**
+
 [UnityNativeChromaSDKExample01.cs](Assets/UnityNativeChromaSDK/Examples/Scripts/UnityNativeChromaSDKExample01.cs) has a GUI example to play/stop/edit `Chroma` animations at runtime.
  
  ![image_3](images/image_3.png)
 
+**Example02**
+
 [UnityNativeChromaSDKExample02.cs](Assets/UnityNativeChromaSDK/Examples/Scripts/UnityNativeChromaSDKExample02.cs) has a GUI button to load scene 1 to show animations work with multiple scenes.
 
 ![image_4](images/image_4.png)
+
+**UnityNativeChromaSDKPlayOnEnable**
+
+The [UnityNativeChromaSDKPlayOnEnable.cs](Assets/UnityNativeChromaSDK/Scripts/UnityNativeChromaSDKPlayOnEnable.cs) script will automatically open and play a `Chroma` animation by name.
+
+The `AnimationName` field references a `.chroma` asset `filename` from the [`StreamingAssets`](https://docs.unity3d.com/Manual/StreamingAssets.html) folder.
+
+The `.chroma` extension on the `AnimationName` field is optional.
+
+The `UnityNativeChromaSDKPlayOnEnable.cs` script will play the animation when the `OnEnable` event fires.
+ 
+The `UnityNativeChromaSDKPlayOnEnable.cs` script will stop the animation when the `OnDisable` event fires.
+
+![image_5](images/image_5.png)
