@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/UnityNativeChromaSDK/Scenes/Scene01.unity
+    path: Assets/UnityNativeChromaSDK/Examples/Scenes/Scene01.unity
   - enabled: 1
-    path: Assets/UnityNativeChromaSDK/Scenes/Scene02.unity
+    path: Assets/UnityNativeChromaSDK/Examples/Scenes/Scene02.unity
