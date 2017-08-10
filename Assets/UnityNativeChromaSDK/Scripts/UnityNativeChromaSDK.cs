@@ -164,6 +164,7 @@ namespace ChromaSDK
         /// <returns></returns>
         public static int PluginEditAnimation(string path)
         {
+            Init();
             if (string.IsNullOrEmpty(path))
             {
                 return -1;
