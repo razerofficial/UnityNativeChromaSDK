@@ -10,7 +10,7 @@ using DateTime = System.DateTime;
 using TimeSpan = System.TimeSpan;
 using Type = System.Type;
 
-class ChromaParticleWindow : EditorWindow
+class ChromaCaptureWindow : EditorWindow
 {
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
     private const string KEY_ANIMATION = "ChromaSDKAnimationPath";
@@ -31,13 +31,13 @@ class ChromaParticleWindow : EditorWindow
 
     protected static Texture2D _sTextureClear = null;
 
-    [MenuItem("Window/ChromaSDK/Open Chroma Particle Window")]
+    [MenuItem("Window/ChromaSDK/Open Capture Chroma Window")]
     private static void OpenPanel()
     {
-        ChromaParticleWindow window = GetWindow<ChromaParticleWindow>();
+        ChromaCaptureWindow window = GetWindow<ChromaCaptureWindow>();
         if (null == window)
         {
-            window.name = "Chroma Particle Window";
+            window.name = "Capture Chroma Window";
         }
     }
 
@@ -417,28 +417,21 @@ class ChromaParticleWindow : EditorWindow
             {
                 UnityNativeChromaSDK.PluginStopAnimation(animationId);
             }
-            /*
-            if (GUILayout.Button("First"))
-            {
-                UnityNativeChromaSDK.PluginPreviewFrame(animationId, 0);
-            }
-            if (GUILayout.Button("Last"))
-            {
-                PreviewLastFrame();
-            }
-            if (GUILayout.Button("Delete"))
-            {
-                DeleteFrame();
-            }
-            */
-            if (GUILayout.Button("Reset"))
-            {
-                ResetAnimation();
-            }
-            if (GUILayout.Button("Close"))
-            {
-                UnityNativeChromaSDK.CloseAnimation(GetAnimationName());
-            }
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+        if (GUILayout.Button("Reset"))
+        {
+            ResetAnimation();
+        }
+        if (GUILayout.Button("Close"))
+        {
+            UnityNativeChromaSDK.CloseAnimation(GetAnimationName());
+        }
+        if (GUILayout.Button("Edit"))
+        {
+            UnityNativeChromaSDK.EditAnimation(GetAnimationName());
         }
         GUILayout.EndHorizontal();
 
@@ -472,14 +465,6 @@ class ChromaParticleWindow : EditorWindow
             }
         }
         GUI.enabled = true;
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        if (GUILayout.Button("Reinit"))
-        {
-            UnityNativeChromaSDK.Uninit();
-            UnityNativeChromaSDK.Init();
-        }
         GUILayout.EndHorizontal();
 
         Rect rect = GUILayoutUtility.GetLastRect();
@@ -520,6 +505,16 @@ class ChromaParticleWindow : EditorWindow
                     }
                 }
             }
+        }
+
+        rect.y += 50;
+        rect.width = 200;
+        rect.height = 40;
+
+        if (GUI.Button(rect, "Reinit"))
+        {
+            UnityNativeChromaSDK.Uninit();
+            UnityNativeChromaSDK.Init();
         }
 
         Repaint();

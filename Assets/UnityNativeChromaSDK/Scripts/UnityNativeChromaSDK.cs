@@ -1,4 +1,4 @@
-#define VERBOSE_LOGGING
+//#define VERBOSE_LOGGING
 
 using System;
 using System.Collections.Generic;

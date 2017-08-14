@@ -6,7 +6,6 @@ using UnityEngine;
 public class UnityNativeChromaSDKMenu : MonoBehaviour
 {
     private const int VERSION = 1;
-    private const string KEY_SAVE_PATH = "CHROMA_SDK_SAVE_PATH";
 
     [MenuItem("Assets/ChromaSDK/Open Docs")]
     private static void OpenDocs()
@@ -18,18 +17,9 @@ public class UnityNativeChromaSDKMenu : MonoBehaviour
     private static void CreateAnimation()
     {
         string path = Application.streamingAssetsPath;
-        if (EditorPrefs.HasKey(KEY_SAVE_PATH))
-        {
-            path = EditorPrefs.GetString(KEY_SAVE_PATH);
-        }
-        if (string.IsNullOrEmpty(path))
-        {
-            path = Application.streamingAssetsPath;
-        }
         path = EditorUtility.SaveFilePanel("Chroma Animation", path, "Animation", "chroma");
         if (!string.IsNullOrEmpty(path))
         {
-            EditorPrefs.SetString(KEY_SAVE_PATH, path);
             UnityNativeChromaSDK.CreateAnimation(path, UnityNativeChromaSDK.Device.ChromaLink);
             UnityNativeChromaSDK.PluginEditAnimation(path);
             AssetDatabase.Refresh();
