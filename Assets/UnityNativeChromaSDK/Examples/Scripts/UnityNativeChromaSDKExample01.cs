@@ -140,6 +140,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
                 AppendStatus("EditAnimation name={0} result={1}", animation, result);
             }
             GUI.enabled = true;
+            GUILayout.Label(string.Format("({0}) {1}", UnityNativeChromaSDK.GetFrameCount(animation), UnityNativeChromaSDK.GetDevice(animation)));
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }

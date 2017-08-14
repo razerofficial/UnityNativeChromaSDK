@@ -30,21 +30,7 @@ public class UnityNativeChromaSDKMenu : MonoBehaviour
         if (!string.IsNullOrEmpty(path))
         {
             EditorPrefs.SetString(KEY_SAVE_PATH, path);
-            using (FileStream fs = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
-            {
-                using (BinaryWriter bw = new BinaryWriter(fs))
-                {
-                    //version
-                    bw.Write((int)VERSION);
-                    //devicetype
-                    bw.Write((int)0);
-                    //device
-                    bw.Write((int)0);
-                    //framecount
-                    bw.Write((int)0);
-                    bw.Flush();
-                }
-            }
+            UnityNativeChromaSDK.CreateAnimation(path, UnityNativeChromaSDK.Device.ChromaLink);
             UnityNativeChromaSDK.PluginEditAnimation(path);
             AssetDatabase.Refresh();
         }

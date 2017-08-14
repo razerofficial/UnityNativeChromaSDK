@@ -1,4 +1,4 @@
-//#define VERBOSE_LOGGING
+#define VERBOSE_LOGGING
 
 using System;
 using System.Collections.Generic;
@@ -120,11 +120,85 @@ namespace ChromaSDK
         public static extern int PluginInit();
 
         /// <summary>
+        /// Create a chroma animation, returns -1 if failed to create, otherwise returns the id of the animation
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginCreateAnimation(IntPtr path, int deviceType, int device);
+
+        /// <summary>
         /// Uninit the plugin
         /// </summary>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
         public static extern int PluginUninit();
+
+        /// <summary>
+        /// Save a chroma animation, returns -1 if failed to save, otherwise returns the id of the animation
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginSaveAnimation(int animationId, IntPtr path);
+
+        /// <summary>
+        /// Reset a chroma animation, returns -1 if failed to reset, otherwise returns the id of the animation
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        public static extern int PluginResetAnimation(int animationId);
+
+        /// <summary>
+        /// Get the device type of a chroma animation, returns -1 if failed to get data, otherwise returns the device type
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginGetDeviceType(int animationId);
+
+        /// <summary>
+        /// Get the device of a chroma animation, returns -1 if failed to get data, otherwise returns the device type
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginGetDevice(int animationId);
+
+        /// <summary>
+        /// Get the frame count of a chroma animation, returns -1 if failed to get data, otherwise returns the number of frames
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        public static extern int PluginGetFrameCount(int animationId);
+
+        /// <summary>
+        /// Add a frame to the end of a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginAddFrame(int animationId, float duration, IntPtr colors, int length);
+
+        /// <summary>
+        /// Update a frame in a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginUpdateFrame(int animationId, int frameIndex, float duration, IntPtr colors, int length);
+
+        /// <summary>
+        /// Preview a frame in a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        public static extern int PluginPreviewFrame(int animationId, int frameIndex);
+
+        #region Helpers (handle path conversions)
 
         /// <summary>
         /// Open an animation file
@@ -133,7 +207,7 @@ namespace ChromaSDK
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static int OpenAnimation(string path)
+        private static int OpenAnimation(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -182,6 +256,199 @@ namespace ChromaSDK
             Debug.LogError(string.Format("EditAnimation: Animation does not exist! {0}", path));
             return -1;
         }
+
+        private static int PluginSaveAnimation(int animationId, string path)
+        {
+            Init();
+            if (string.IsNullOrEmpty(path))
+            {
+                return -1;
+            }
+            FileInfo fi = new FileInfo(path);
+            if (fi.Exists)
+            {
+                byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName + "\0");
+                IntPtr lpData = Marshal.AllocHGlobal(array.Length);
+                Marshal.Copy(array, 0, lpData, array.Length);
+                int result = PluginSaveAnimation(animationId, lpData);
+                Marshal.FreeHGlobal(lpData);
+                return result;
+            }
+            Debug.LogError(string.Format("SaveAnimation: Animation does not exist! {0}", path));
+            return -1;
+        }
+
+        public enum DeviceType
+        {
+            DE_1D = 0,
+            DE_2D,
+            Invalid,
+        }
+
+        public enum Device
+        {
+            ChromaLink,
+            Headset,
+            Keyboard,
+            Keypad,
+            Mouse,
+            Mousepad,
+            Invalid,
+        }
+
+        public static int CreateAnimation(string path, Device device)
+        {
+            Init();
+            if (string.IsNullOrEmpty(path))
+            {
+                return -1;
+            }
+            int dt = 0;
+            int d = 0;
+            switch (device)
+            {
+                case Device.ChromaLink:
+                    dt = 0;
+                    d = 0;
+                    break;
+                case Device.Headset:
+                    dt = 0;
+                    d = 1;
+                    break;
+                case Device.Keyboard:
+                    dt = 1;
+                    d = 0;
+                    break;
+                case Device.Keypad:
+                    dt = 1;
+                    d = 1;
+                    break;
+                case Device.Mouse:
+                    dt = 1;
+                    d = 2;
+                    break;
+                case Device.Mousepad:
+                    dt = 0;
+                    d = 2;
+                    break;
+            }
+            FileInfo fi = new FileInfo(path);
+            byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName + "\0");
+            IntPtr lpData = Marshal.AllocHGlobal(array.Length);
+            Marshal.Copy(array, 0, lpData, array.Length);
+            int result = PluginCreateAnimation(lpData, dt, d);
+            Marshal.FreeHGlobal(lpData);
+            return result;
+        }
+
+        /// <summary>
+        /// Get the device type given the animation id
+        /// </summary>
+        /// <param name="animationId"></param>
+        /// <returns></returns>
+        public static DeviceType GetDeviceType(int animationId)
+        {
+            switch (PluginGetDeviceType(animationId))
+            {
+                case 0:
+                    return DeviceType.DE_1D;
+                case 1:
+                    return DeviceType.DE_2D;
+                default:
+                    return DeviceType.Invalid;
+            }
+        }
+
+        /// <summary>
+        /// Get the device given the animation id
+        /// </summary>
+        /// <param name="animationId"></param>
+        /// <returns></returns>
+        public static Device GetDevice(int animationId)
+        {
+            switch (GetDeviceType(animationId))
+            {
+                case DeviceType.DE_1D:
+                    switch (PluginGetDevice(animationId))
+                    {
+                        case 0:
+                            return Device.ChromaLink;
+                        case 1:
+                            return Device.Headset;
+                        case 2:
+                            return Device.Mousepad;
+                    }
+                    break;
+                case DeviceType.DE_2D:
+                    switch (PluginGetDevice(animationId))
+                    {
+                        case 0:
+                            return Device.Keyboard;
+                        case 1:
+                            return Device.Keypad;
+                        case 2:
+                            return Device.Mouse;
+                    }
+                    break;
+            }
+            return Device.Invalid;
+        }
+
+        public static Device GetDevice(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                return GetDevice(animationId);
+            }
+            return Device.Invalid;
+        }
+
+        public static int GetFrameCount(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                int result = PluginGetFrameCount(animationId);
+                return result;
+            }
+            return animationId;
+        }
+
+        /// <summary>
+        /// Add a frame to the end of a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        /// </summary>
+        /// <param name="animationId"></param>
+        /// <param name="duration"></param>
+        /// <param name="colors"></param>
+        /// <returns></returns>
+        public static int AddFrame(int animationId, float duration, int[] colors)
+        {
+            IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * colors.Length);
+            Marshal.Copy(colors, 0, p, colors.Length);
+            int result = PluginAddFrame(animationId, duration, p, colors.Length);
+            Marshal.FreeHGlobal(p);
+            return result;
+        }
+
+        /// <summary>
+        /// Update a frame in a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        /// </summary>
+        /// <param name="animationId"></param>
+        /// <param name="frameIndex"></param>
+        /// <param name="duration"></param>
+        /// <param name="colors"></param>
+        /// <returns></returns>
+        public static int UpdateFrame(int animationId, int frameIndex, float duration, int[] colors)
+        {
+            IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * colors.Length);
+            Marshal.Copy(colors, 0, p, colors.Length);
+            int result = PluginUpdateFrame(animationId, frameIndex, duration, p, colors.Length);
+            Marshal.FreeHGlobal(p);
+            return result;
+        }
+
+        #endregion
 
 #if VERBOSE_LOGGING
         #region Handle Debug.Log from unmanged code
