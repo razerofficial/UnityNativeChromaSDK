@@ -175,6 +175,30 @@ namespace ChromaSDK
         public static extern int PluginGetFrameCount(int animationId);
 
         /// <summary>
+        /// Get the Max Leds for 1D Devices
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginGetMaxLeds(int device);
+
+        /// <summary>
+        /// Get the Max Row for 2D Devices
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginGetMaxRow(int device);
+
+        /// <summary>
+        /// Get the Max Column for 2D Devices
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginGetMaxColumn(int device);
+
+        /// <summary>
         /// Add a frame to the end of a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
         /// </summary>
         /// <param name="path"></param>
@@ -257,7 +281,7 @@ namespace ChromaSDK
             return -1;
         }
 
-        private static int PluginSaveAnimation(int animationId, string path)
+        public static int PluginSaveAnimation(int animationId, string path)
         {
             Init();
             if (string.IsNullOrEmpty(path))
@@ -281,8 +305,8 @@ namespace ChromaSDK
         public enum DeviceType
         {
             DE_1D = 0,
-            DE_2D,
-            Invalid,
+            DE_2D = 1,
+            Invalid = -1,
         }
 
         public enum Device
@@ -293,7 +317,53 @@ namespace ChromaSDK
             Keypad,
             Mouse,
             Mousepad,
-            Invalid,
+            Invalid = -1,
+        }
+
+        public enum Device1D
+        {
+            ChromaLink = 0,
+            Headset = 1,
+            Mousepad = 2,
+            Invalid = -1,
+        }
+
+        public enum Device2D
+        {
+            Keyboard = 0,
+            Keypad = 1,
+            Mouse = 2,
+            Invalid = -1,
+        }
+
+        /// <summary>
+        /// Get the maxmimum LEDs for the given device
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public static int GetMaxLeds(Device1D device)
+        {
+            return PluginGetMaxLeds((int)device);
+        }
+
+        /// <summary>
+        /// Get the max rows for the given device
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public static int GetMaxRow(Device2D device)
+        {
+            return PluginGetMaxRow((int)device);
+        }
+
+        /// <summary>
+        /// Get the max columns for the given device
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public static int GetMaxColumn(Device2D device)
+        {
+            return PluginGetMaxColumn((int)device);
         }
 
         public static int CreateAnimation(string path, Device device)
@@ -358,12 +428,16 @@ namespace ChromaSDK
                     return DeviceType.Invalid;
             }
         }
+        public static DeviceType GetDeviceType(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                return GetDeviceType(animationId);
+            }
+            return DeviceType.Invalid;
+        }
 
-        /// <summary>
-        /// Get the device given the animation id
-        /// </summary>
-        /// <param name="animationId"></param>
-        /// <returns></returns>
         public static Device GetDevice(int animationId)
         {
             switch (GetDeviceType(animationId))
@@ -371,29 +445,28 @@ namespace ChromaSDK
                 case DeviceType.DE_1D:
                     switch (PluginGetDevice(animationId))
                     {
-                        case 0:
+                        case (int)Device1D.ChromaLink:
                             return Device.ChromaLink;
-                        case 1:
+                        case (int)Device1D.Headset:
                             return Device.Headset;
-                        case 2:
+                        case (int)Device1D.Mousepad:
                             return Device.Mousepad;
                     }
                     break;
                 case DeviceType.DE_2D:
                     switch (PluginGetDevice(animationId))
                     {
-                        case 0:
+                        case (int)Device2D.Keyboard:
                             return Device.Keyboard;
-                        case 1:
+                        case (int)Device2D.Keypad:
                             return Device.Keypad;
-                        case 2:
+                        case (int)Device2D.Mouse:
                             return Device.Mouse;
                     }
                     break;
             }
             return Device.Invalid;
         }
-
         public static Device GetDevice(string animation)
         {
             int animationId = GetAnimation(animation);
@@ -402,6 +475,44 @@ namespace ChromaSDK
                 return GetDevice(animationId);
             }
             return Device.Invalid;
+        }
+
+        public static Device1D GetDevice1D(int animationId)
+        {
+            switch (GetDeviceType(animationId))
+            {
+                case DeviceType.DE_1D:
+                    switch (PluginGetDevice(animationId))
+                    {
+                        case (int)Device1D.ChromaLink:
+                            return Device1D.ChromaLink;
+                        case (int)Device1D.Headset:
+                            return Device1D.Headset;
+                        case (int)Device1D.Mousepad:
+                            return Device1D.Mousepad;
+                    }
+                    break;
+            }
+            return Device1D.Invalid;
+        }
+
+        public static Device2D GetDevice2D(int animationId)
+        {
+            switch (GetDeviceType(animationId))
+            {
+                case DeviceType.DE_2D:
+                    switch (PluginGetDevice(animationId))
+                    {
+                        case (int)Device2D.Keyboard:
+                            return Device2D.Keyboard;
+                        case (int)Device2D.Keypad:
+                            return Device2D.Keypad;
+                        case (int)Device2D.Mouse:
+                            return Device2D.Mouse;
+                    }
+                    break;
+            }
+            return Device2D.Invalid;
         }
 
         public static int GetFrameCount(string animation)
@@ -537,6 +648,23 @@ namespace ChromaSDK
         }
 
         /// <summary>
+        /// Get the animation name with the .chroma extension
+        /// </summary>
+        /// <returns></returns>
+        public static string GetAnimationNameWithExtension(string animation)
+        {
+            if (string.IsNullOrEmpty(animation))
+            {
+                return string.Empty;
+            }
+            if (animation.EndsWith(".chroma"))
+            {
+                return animation;
+            }
+            return string.Format("{0}.chroma", animation);
+        }
+
+        /// <summary>
         /// Get the animation id given an animation name,
         /// Store the opened animation and reference by animation name
         /// Returns -1 if failure occurred
@@ -546,6 +674,10 @@ namespace ChromaSDK
         /// <returns></returns>
         public static int GetAnimation(string animation)
         {
+            if (string.IsNullOrEmpty(animation))
+            {
+                return -1;
+            }
             string path = GetStreamingPath(animation);
             int animationid;
             if (!_sLoadedAnimations.ContainsKey(animation))
@@ -632,6 +764,19 @@ namespace ChromaSDK
             string path = GetStreamingPath(animation);
             int result = PluginEditAnimation(path);
             return result;
+        }
+
+        /// <summary>
+        /// Convert Unity Color to BGR int
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static int ToBGR(Color color)
+        {
+            int red = (int)(Mathf.Clamp01(color.r) * 255);
+            int green = (int)(Mathf.Clamp01(color.g) * 255) << 8;
+            int blue = (int)(Mathf.Clamp01(color.b) * 255) << 16;
+            return blue | green | red;
         }
     }
 #endif

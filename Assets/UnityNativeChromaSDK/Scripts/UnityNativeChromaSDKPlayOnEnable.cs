@@ -8,35 +8,10 @@ public class UnityNativeChromaSDKPlayOnEnable : MonoBehaviour
     /// </summary>
     public string AnimationName = string.Empty;
 
-    /// <summary>
-    /// Get the animation name with the .chroma extension
-    /// </summary>
-    /// <returns></returns>
-    string GetAnimationName()
-    {
-        if (!string.IsNullOrEmpty(AnimationName))
-        {
-            string animationName;
-            if (!AnimationName.EndsWith(".chroma"))
-            {
-                animationName = string.Format("{0}.chroma", AnimationName);
-            }
-            else
-            {
-                animationName = AnimationName;
-            }
-            return animationName;
-        }
-        else
-        {
-            return string.Empty;
-        }
-    }
-
     // Play the animation on enable
     void OnEnable()
     {
-        string animationName = GetAnimationName();
+        string animationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
         if (!string.IsNullOrEmpty(animationName))
         {
             UnityNativeChromaSDK.PlayAnimation(animationName);
@@ -48,7 +23,7 @@ public class UnityNativeChromaSDKPlayOnEnable : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        string animationName = GetAnimationName();
+        string animationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
         if (!string.IsNullOrEmpty(animationName))
         {
             UnityNativeChromaSDK.StopAnimation(animationName);
