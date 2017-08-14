@@ -80,49 +80,6 @@ class ChromaParticleWindow : EditorWindow
         return null;
     }
 
-    private void OnEnable()
-    {
-        Object obj = LoadPath(KEY_CAMERA, typeof(Camera));
-        if (obj &&
-            obj is Camera)
-        {
-            _mRenderCamera = (Camera)obj; 
-        }
-
-        obj = LoadPath(KEY_PARTICLE, typeof(ParticleSystem));
-        if (obj &&
-            obj is ParticleSystem)
-        {
-            _mParticleSystem = (ParticleSystem)obj;
-        }
-    }
-
-    void SavePath(Object obj, string key)
-    {
-        if (obj)
-        {
-            string path = AssetDatabase.GetAssetPath(obj);
-            if (!string.IsNullOrEmpty(path))
-            {
-                EditorPrefs.SetString(key, path);
-            }
-            else
-            {
-                EditorPrefs.SetString(key, obj.GetInstanceID().ToString());
-            }
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (!string.IsNullOrEmpty(_mAnimation))
-        {
-            EditorPrefs.SetString(KEY_ANIMATION, _mAnimation);
-        }
-        SavePath(_mRenderCamera, KEY_CAMERA);
-        SavePath(_mParticleSystem, KEY_PARTICLE);
-    }
-
     protected static void SetupBlankTexture()
     {
         if (null == _sTextureClear)
@@ -161,10 +118,9 @@ class ChromaParticleWindow : EditorWindow
         GUI.DrawTexture(rect, _mRenderTexture, ScaleMode.ScaleAndCrop, false);
     }
 
-    private void CaptureFrame()
+    private void CaptureFrame(int animationId)
     {
-        int animationId = GetAnimation();
-        if (animationId >= 0 && _mRenderTexture && _mRenderCamera)
+        if (_mRenderTexture && _mRenderCamera)
         {
             int[] colors = null;
             if (UnityNativeChromaSDK.GetDeviceType(animationId) == UnityNativeChromaSDK.DeviceType.DE_1D)
@@ -219,8 +175,9 @@ class ChromaParticleWindow : EditorWindow
                 {
                     for (int j = 0; j < maxColumn; ++j)
                     {
+                        int targetIndex = i * maxColumn + j;
                         Color color = pixels[index];
-                        colors[index] = UnityNativeChromaSDK.ToBGR(color);
+                        colors[targetIndex] = UnityNativeChromaSDK.ToBGR(color);
                         ++index;
                     }
                 }
@@ -234,6 +191,10 @@ class ChromaParticleWindow : EditorWindow
                 return;
             }
 
+            if (null == colors)
+            {
+                Debug.LogError("Colors are null!");
+            }
             int frameCount = UnityNativeChromaSDK.PluginGetFrameCount(animationId);
             if (frameCount == 1 && _mCaptureIndex == 0)
             {
@@ -243,18 +204,15 @@ class ChromaParticleWindow : EditorWindow
             {
                 UnityNativeChromaSDK.AddFrame(animationId, _mInterval, colors);
             }
+            PreviewLastFrame(animationId);
             ++_mCaptureIndex;
         }
     }
 
-    private void PreviewLastFrame()
+    private void PreviewLastFrame(int animationId)
     {
-        int animationId = GetAnimation();
-        if (animationId >= 0)
-        {
-            int frameCount = UnityNativeChromaSDK.PluginGetFrameCount(animationId);
-            UnityNativeChromaSDK.PluginPreviewFrame(animationId, frameCount - 1);
-        }
+        int frameCount = UnityNativeChromaSDK.PluginGetFrameCount(animationId);
+        UnityNativeChromaSDK.PluginPreviewFrame(animationId, frameCount - 1);
     }
 
     private void DeleteFrame()
@@ -316,17 +274,72 @@ class ChromaParticleWindow : EditorWindow
         return false;
     }
 
+    private void RestoreSelection()
+    {
+        // restore animation name
+        if (EditorPrefs.HasKey(KEY_ANIMATION))
+        {
+            _mAnimation = EditorPrefs.GetString(KEY_ANIMATION);
+        }
+
+        // restore camera name
+        if (!_mRenderCamera &&
+            EditorPrefs.HasKey(KEY_CAMERA))
+        {
+            GameObject go = GameObject.Find(EditorPrefs.GetString(KEY_CAMERA));
+            if (go)
+            {
+                _mRenderCamera = go.GetComponent<Camera>();
+            }
+        }
+
+        // restore particle system
+        if (!_mParticleSystem &&
+            EditorPrefs.HasKey(KEY_PARTICLE))
+        {
+            GameObject go = GameObject.Find(EditorPrefs.GetString(KEY_PARTICLE));
+            if (go)
+            {
+                _mParticleSystem = go.GetComponent<ParticleSystem>();
+            }
+        }
+    }
+    private void SaveSelection()
+    {
+        // save animation name
+        if (!string.IsNullOrEmpty(_mAnimation))
+        {
+            EditorPrefs.SetString(KEY_ANIMATION, _mAnimation);
+        }
+
+        // save render camera name
+        if (_mRenderCamera)
+        {
+            EditorPrefs.SetString(KEY_CAMERA, _mRenderCamera.gameObject.name);
+        }
+
+        // save particle system
+        if (_mParticleSystem)
+        {
+            EditorPrefs.SetString(KEY_PARTICLE, _mParticleSystem.gameObject.name);
+        }
+    }
+
     private void OnGUI()
     {
+        RestoreSelection();
+        SaveSelection();
+
+        int animationId = GetAnimation();
         UnityNativeChromaSDK.Init();
 
-        if (_mCapturing)
+        if (animationId >= 0 &&
+            _mCapturing)
         {
             if (_mTimerCapture < DateTime.Now)
             {
                 _mTimerCapture = DateTime.Now + TimeSpan.FromSeconds(_mInterval);
-                CaptureFrame();
-                PreviewLastFrame();
+                CaptureFrame(animationId);
             }
         }
 
@@ -352,8 +365,6 @@ class ChromaParticleWindow : EditorWindow
         }
 
         _mAnimation = EditorGUILayout.TextField("Animation Name:", _mAnimation);
-
-        int animationId = GetAnimation();
 
         _mRenderCamera = (Camera)EditorGUILayout.ObjectField("RenderCamera", _mRenderCamera, typeof(Camera), true);
 
@@ -445,8 +456,7 @@ class ChromaParticleWindow : EditorWindow
         GUI.enabled = null != _mRenderCamera && !string.IsNullOrEmpty(_mAnimation);
         if (GUILayout.Button("1 Frame"))
         {
-            CaptureFrame();
-            PreviewLastFrame();
+            CaptureFrame(animationId);
         }
         if (GUILayout.Button(_mCapturing ? "Stop" : "Start"))
         {

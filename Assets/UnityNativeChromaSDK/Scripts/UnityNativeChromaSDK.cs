@@ -203,16 +203,16 @@ namespace ChromaSDK
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        [DllImport(DLL_NAME)]
-        private static extern int PluginAddFrame(int animationId, float duration, IntPtr colors, int length);
+        [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int PluginAddFrame(int animationId, float duration, int[] colors, int length);
 
         /// <summary>
         /// Update a frame in a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        [DllImport(DLL_NAME)]
-        private static extern int PluginUpdateFrame(int animationId, int frameIndex, float duration, IntPtr colors, int length);
+        [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int PluginUpdateFrame(int animationId, int frameIndex, float duration, int[] colors, int length);
 
         /// <summary>
         /// Preview a frame in a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
@@ -535,11 +535,7 @@ namespace ChromaSDK
         /// <returns></returns>
         public static int AddFrame(int animationId, float duration, int[] colors)
         {
-            IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * colors.Length);
-            Marshal.Copy(colors, 0, p, colors.Length);
-            int result = PluginAddFrame(animationId, duration, p, colors.Length);
-            Marshal.FreeHGlobal(p);
-            return result;
+            return PluginAddFrame(animationId, duration, colors, colors.Length);
         }
 
         /// <summary>
@@ -552,11 +548,7 @@ namespace ChromaSDK
         /// <returns></returns>
         public static int UpdateFrame(int animationId, int frameIndex, float duration, int[] colors)
         {
-            IntPtr p = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(int)) * colors.Length);
-            Marshal.Copy(colors, 0, p, colors.Length);
-            int result = PluginUpdateFrame(animationId, frameIndex, duration, p, colors.Length);
-            Marshal.FreeHGlobal(p);
-            return result;
+            return PluginUpdateFrame(animationId, frameIndex, duration, colors, colors.Length);
         }
 
         #endregion
