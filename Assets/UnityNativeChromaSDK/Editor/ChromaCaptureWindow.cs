@@ -424,6 +424,7 @@ class ChromaCaptureWindow : EditorWindow
         if (GUILayout.Button("Reset"))
         {
             ResetAnimation();
+            SaveAnimation();
         }
         if (GUILayout.Button("Close"))
         {
@@ -450,6 +451,7 @@ class ChromaCaptureWindow : EditorWindow
         if (GUILayout.Button("1 Frame"))
         {
             CaptureFrame(animationId);
+            SaveAnimation();
         }
         if (GUILayout.Button(_mCapturing ? "Stop" : "Start"))
         {
