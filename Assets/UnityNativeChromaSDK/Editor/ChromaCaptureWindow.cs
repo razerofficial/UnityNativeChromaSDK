@@ -28,9 +28,19 @@ class ChromaCaptureWindow : EditorWindow
     private bool _mCapturing = false;
     private DateTime _mTimerCapture = DateTime.MinValue;
     private int _mCaptureIndex = 0;
-    private bool _mCompositeCapture = true;
 
     protected static Texture2D _sTextureClear = null;
+
+    enum Modes
+    {
+        Normal,
+        Composite,
+        Playback
+    }
+
+    private Modes _mMode = Modes.Normal;
+
+    private string _mLastPlaybackName = string.Empty;
 
     [MenuItem("Window/ChromaSDK/Open Capture Chroma Window")]
     private static void OpenPanel()
@@ -61,31 +71,6 @@ class ChromaCaptureWindow : EditorWindow
     int GetAnimation()
     {
         return GetAnimation(GetAnimationName());
-    }
-
-    Object LoadPath(string key, Type type)
-    {
-        if (EditorPrefs.HasKey(key))
-        {
-            string path = EditorPrefs.GetString(key);
-            if (!string.IsNullOrEmpty(path))
-            {
-                Object obj = AssetDatabase.LoadAssetAtPath(path, type);
-                if (null != obj)
-                {
-                    return obj;
-                }
-                else
-                {
-                    int id;
-                    if (int.TryParse(path, out id))
-                    {
-                        return EditorUtility.InstanceIDToObject(id);
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     protected static void SetupBlankTexture()
@@ -224,7 +209,7 @@ class ChromaCaptureWindow : EditorWindow
 
     private bool IsAnimationSelected()
     {
-        if (null != Selection.activeObject)
+        if (Selection.activeObject)
         {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (!string.IsNullOrEmpty(path))
@@ -298,7 +283,7 @@ class ChromaCaptureWindow : EditorWindow
 
     private void MakeAnimationReady()
     {
-        if (_mCompositeCapture)
+        if (_mMode == Modes.Composite)
         {
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
@@ -326,7 +311,7 @@ class ChromaCaptureWindow : EditorWindow
     {
         MakeAnimationReady();
 
-        if (_mCompositeCapture)
+        if (_mMode == Modes.Composite)
         {
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
@@ -352,7 +337,7 @@ class ChromaCaptureWindow : EditorWindow
     {
         MakeAnimationReady();
 
-        if (_mCompositeCapture)
+        if (_mMode == Modes.Composite)
         {
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
@@ -378,7 +363,7 @@ class ChromaCaptureWindow : EditorWindow
     {
         MakeAnimationReady();
 
-        if (_mCompositeCapture)
+        if (_mMode == Modes.Composite)
         {
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
@@ -408,7 +393,7 @@ class ChromaCaptureWindow : EditorWindow
     {
         MakeAnimationReady();
 
-        if (_mCompositeCapture)
+        if (_mMode == Modes.Composite)
         {
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
@@ -436,7 +421,7 @@ class ChromaCaptureWindow : EditorWindow
     {
         MakeAnimationReady();
 
-        if (_mCompositeCapture)
+        if (_mMode == Modes.Composite)
         {
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
@@ -454,7 +439,7 @@ class ChromaCaptureWindow : EditorWindow
     {
         MakeAnimationReady();
 
-        if (!_mCompositeCapture)
+        if (_mMode == Modes.Normal)
         {
             UnityNativeChromaSDK.EditAnimation(GetAnimationName());
         }
@@ -464,7 +449,7 @@ class ChromaCaptureWindow : EditorWindow
     {
         MakeAnimationReady();
 
-        if (_mCompositeCapture)
+        if (_mMode == Modes.Composite)
         {
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
@@ -504,7 +489,7 @@ class ChromaCaptureWindow : EditorWindow
             if (_mTimerCapture < DateTime.Now)
             {
                 _mTimerCapture = DateTime.Now + TimeSpan.FromSeconds(_mInterval);
-                if (_mCompositeCapture)
+                if (_mMode == Modes.Composite)
                 {
                     for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
                     {
@@ -544,180 +529,242 @@ class ChromaCaptureWindow : EditorWindow
             _mAnimation = string.Empty;
         }
 
-        _mAnimation = EditorGUILayout.TextField("Animation Name:", _mAnimation);
-
-        _mRenderCamera = (Camera)EditorGUILayout.ObjectField("RenderCamera", _mRenderCamera, typeof(Camera), true);
-
         GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        GUILayout.Label("Select:");
-        GUI.enabled = null != _mAnimation;
-        if (GUILayout.Button("Animation"))
+        GUILayout.Label("Mode:");
+        GUI.enabled = _mMode != Modes.Normal;
+        if (GUILayout.Button("Normal"))
         {
-            Selection.activeGameObject = null;
-            string path = string.Format("Assets/StreamingAssets/{0}", GetAnimationName());
-            if (File.Exists(path))
-            {
-                Selection.activeObject = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
-            }
-            else
-            {
-                Selection.activeObject = null;
-            }
+            _mMode = Modes.Normal;
         }
-        GUI.enabled = null != _mRenderCamera;
-        if (GUILayout.Button("Camera"))
+        GUI.enabled = _mMode != Modes.Composite;
+        if (GUILayout.Button("Composite"))
         {
-            Selection.activeObject = null;
-            Selection.activeGameObject = _mRenderCamera.gameObject;
+            _mMode = Modes.Composite;
         }
-        GUI.enabled = null != _mParticleSystem;
-        if (GUILayout.Button("ParticleSystem"))
+        GUI.enabled = _mMode != Modes.Playback;
+        if (GUILayout.Button("Playback"))
         {
-            Selection.activeGameObject = null;
-            Selection.activeObject = _mParticleSystem;
+            _mMode = Modes.Playback;
         }
         GUI.enabled = true;
         GUILayout.EndHorizontal();
 
-        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        GUILayout.Label("Camera:");
-        GUI.enabled = null != _mRenderCamera;
-        if (GUILayout.Button("Align With View"))
+        if (_mMode == Modes.Composite)
         {
-            Selection.activeGameObject = _mRenderCamera.gameObject;
-            EditorApplication.ExecuteMenuItem("GameObject/Align With View");
-            Selection.activeObject = activeObject;
-            Selection.activeGameObject = activeGameObject;
-        }
-        GUI.enabled = true;
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        GUILayout.Label("Animation:");
-        if (GUILayout.Button("Play"))
-        {
-            OnClickPlay();
-        }
-        if (GUILayout.Button("Stop"))
-        {
-            OnClickStop();
-        }
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        if (GUILayout.Button("Reset"))
-        {
-            OnClickReset();
-        }
-        if (GUILayout.Button("Close"))
-        {
-            OnClickClose();
-        }
-        if (GUILayout.Button("Edit"))
-        {
-            OnClickEdit();
-        }
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        float interval = EditorGUILayout.FloatField("Capture Interval", _mInterval);
-        if (interval >= 0.1f)
-        {
-            _mInterval = interval;
-        }
-        GUILayout.EndHorizontal();
-
-        for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
-        {
-            string animationName = GetCompositeName(device);
-            int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
             GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-            GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Make Composite GameObject"))
+            {
+                GameObject go = new GameObject("CompositeAnimation");
+                for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                {
+                    string animationName = GetCompositeName(device);
+                    go.AddComponent<UnityNativeChromaSDKPlayOnEnable>().AnimationName = animationName;
+                }
+            }
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
 
-        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        _mCompositeCapture = EditorGUILayout.Toggle("Composite Capture:", _mCompositeCapture);
-        if (GUILayout.Button("Create Composite GameObject"))
+        switch (_mMode)
         {
-            GameObject go = new GameObject("CompositeAnimation");
-            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
-            {
-                string animationName = GetCompositeName(device);
-                go.AddComponent<UnityNativeChromaSDKPlayOnEnable>().AnimationName = animationName;
-            }
-        }
-        GUILayout.EndHorizontal();
+            case Modes.Normal:
+            case Modes.Composite:
 
-        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        GUILayout.Label("Capture:");
-        GUI.enabled = null != _mRenderCamera && !string.IsNullOrEmpty(_mAnimation);
-        if (GUILayout.Button("1 Frame"))
-        {
-            OnClick1Frame();
-        }
-        if (GUILayout.Button(_mCapturing ? "Stop" : "Start"))
-        {
-            MakeAnimationReady();
 
-            _mCapturing = !_mCapturing;
-            if (_mCapturing)
-            {
-                OnClickReset();
-                _mCaptureIndex = 0;
-            }
-            else
-            {
-                OnClickSave();
-            }
-        }
-        GUI.enabled = true;
-        GUILayout.EndHorizontal();
+                _mAnimation = EditorGUILayout.TextField("Animation Name:", _mAnimation);
 
-        Rect rect = GUILayoutUtility.GetLastRect();
-        if (_mRenderCamera)
-        {
-            if (null == _mRenderTexture)
-            {
-                _mRenderTexture = new RenderTexture(RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE, 24, RenderTextureFormat.ARGB32);
-                _mRenderCamera.targetTexture = _mRenderTexture;
-            }
-            _mRenderCamera.Render();
-            rect.y += 30;
-            DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
-            /*
-            if (animationId >= 0)
-            {
-                rect.y += 300;
-                const int padding = 8;
-                if (UnityNativeChromaSDK.GetDeviceType(animationId) == UnityNativeChromaSDK.DeviceType.DE_1D)
+                _mRenderCamera = (Camera)EditorGUILayout.ObjectField("RenderCamera", _mRenderCamera, typeof(Camera), true);
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                GUILayout.Label("Select:");
+                GUI.enabled = null != _mAnimation;
+                if (GUILayout.Button("Animation"))
                 {
-                    UnityNativeChromaSDK.Device1D device = UnityNativeChromaSDK.GetDevice1D(animationId);
-                    int maxLeds = UnityNativeChromaSDK.GetMaxLeds(device);
-                    for (int k = 1; (k * maxLeds) < position.width && (rect.y + rect.height) <= position.height; k *= 2)
+                    Selection.activeGameObject = null;
+                    string path = string.Format("Assets/StreamingAssets/{0}", GetAnimationName());
+                    if (File.Exists(path))
                     {
-                        DisplayRenderTexture((int)rect.y, maxLeds * k, k);
-                        rect.y += k + padding;
+                        Selection.activeObject = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
+                    }
+                    else
+                    {
+                        Selection.activeObject = null;
                     }
                 }
-                else if (UnityNativeChromaSDK.GetDeviceType(animationId) == UnityNativeChromaSDK.DeviceType.DE_2D)
+                GUI.enabled = null != _mRenderCamera;
+                if (GUILayout.Button("Camera"))
                 {
-                    UnityNativeChromaSDK.Device2D device = UnityNativeChromaSDK.GetDevice2D(animationId);
-                    int maxRow = UnityNativeChromaSDK.GetMaxRow(device);
-                    int maxColumn = UnityNativeChromaSDK.GetMaxColumn(device);
-                    DisplayRenderTexture((int)rect.y, maxColumn, maxRow);
-                    for (int k = 1; (k * maxColumn) < position.width && (rect.y + rect.height) <= position.height; k *= 2)
+                    Selection.activeObject = null;
+                    Selection.activeGameObject = _mRenderCamera.gameObject;
+                }
+                GUI.enabled = null != _mParticleSystem;
+                if (GUILayout.Button("ParticleSystem"))
+                {
+                    Selection.activeGameObject = null;
+                    Selection.activeObject = _mParticleSystem;
+                }
+                GUI.enabled = true;
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                GUILayout.Label("Camera:");
+                GUI.enabled = null != _mRenderCamera;
+                if (GUILayout.Button("Align With View"))
+                {
+                    Selection.activeGameObject = _mRenderCamera.gameObject;
+                    EditorApplication.ExecuteMenuItem("GameObject/Align With View");
+                    Selection.activeObject = activeObject;
+                    Selection.activeGameObject = activeGameObject;
+                }
+                GUI.enabled = true;
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                GUILayout.Label("Animation:");
+                if (GUILayout.Button("Play"))
+                {
+                    OnClickPlay();
+                }
+                if (GUILayout.Button("Stop"))
+                {
+                    OnClickStop();
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                if (GUILayout.Button("Reset"))
+                {
+                    OnClickReset();
+                }
+                if (GUILayout.Button("Close"))
+                {
+                    OnClickClose();
+                }
+                if (GUILayout.Button("Edit"))
+                {
+                    OnClickEdit();
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                float interval = EditorGUILayout.FloatField("Capture Interval", _mInterval);
+                if (interval >= 0.1f)
+                {
+                    _mInterval = interval;
+                }
+                GUILayout.EndHorizontal();
+
+                for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                {
+                    string animationName = GetCompositeName(device);
+                    int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                    GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
+                    GUILayout.EndHorizontal();
+                }
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                GUILayout.Label("Capture:");
+                GUI.enabled = null != _mRenderCamera && !string.IsNullOrEmpty(_mAnimation);
+                if (GUILayout.Button("1 Frame"))
+                {
+                    OnClick1Frame();
+                }
+                if (GUILayout.Button(_mCapturing ? "Stop" : "Start"))
+                {
+                    MakeAnimationReady();
+
+                    _mCapturing = !_mCapturing;
+                    if (_mCapturing)
                     {
-                        DisplayRenderTexture((int)rect.y, maxColumn * k, maxRow * k);
-                        rect.y += maxRow * k + padding;
+                        OnClickReset();
+                        _mCaptureIndex = 0;
+                    }
+                    else
+                    {
+                        OnClickSave();
                     }
                 }
-            }
-            */
+                GUI.enabled = true;
+                GUILayout.EndHorizontal();
+
+                Rect rect = GUILayoutUtility.GetLastRect();
+                if (_mRenderCamera)
+                {
+                    if (null == _mRenderTexture)
+                    {
+                        _mRenderTexture = new RenderTexture(RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE, 24, RenderTextureFormat.ARGB32);
+                        _mRenderCamera.targetTexture = _mRenderTexture;
+                    }
+                    _mRenderCamera.Render();
+                    rect.y += 30;
+                    DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
+                    /*
+                    if (animationId >= 0)
+                    {
+                        rect.y += 300;
+                        const int padding = 8;
+                        if (UnityNativeChromaSDK.GetDeviceType(animationId) == UnityNativeChromaSDK.DeviceType.DE_1D)
+                        {
+                            UnityNativeChromaSDK.Device1D device = UnityNativeChromaSDK.GetDevice1D(animationId);
+                            int maxLeds = UnityNativeChromaSDK.GetMaxLeds(device);
+                            for (int k = 1; (k * maxLeds) < position.width && (rect.y + rect.height) <= position.height; k *= 2)
+                            {
+                                DisplayRenderTexture((int)rect.y, maxLeds * k, k);
+                                rect.y += k + padding;
+                            }
+                        }
+                        else if (UnityNativeChromaSDK.GetDeviceType(animationId) == UnityNativeChromaSDK.DeviceType.DE_2D)
+                        {
+                            UnityNativeChromaSDK.Device2D device = UnityNativeChromaSDK.GetDevice2D(animationId);
+                            int maxRow = UnityNativeChromaSDK.GetMaxRow(device);
+                            int maxColumn = UnityNativeChromaSDK.GetMaxColumn(device);
+                            DisplayRenderTexture((int)rect.y, maxColumn, maxRow);
+                            for (int k = 1; (k * maxColumn) < position.width && (rect.y + rect.height) <= position.height; k *= 2)
+                            {
+                                DisplayRenderTexture((int)rect.y, maxColumn * k, maxRow * k);
+                                rect.y += maxRow * k + padding;
+                            }
+                        }
+                    }
+                    */
+                }
+                break;
+
+            case Modes.Playback:
+                if (IsAnimationSelected())
+                {
+                    if (Selection.activeObject)
+                    {
+                        string animationName = GetAnimationName(Selection.activeObject.name);
+                        if (_mLastPlaybackName != animationName)
+                        {
+                            UnityNativeChromaSDK.StopAnimation(_mLastPlaybackName);
+                            _mLastPlaybackName = animationName;
+                            UnityNativeChromaSDK.PlayAnimation(animationName);
+                        }
+                        GUILayout.Label(Selection.activeObject.name);
+                        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                        if (GUILayout.Button("Play"))
+                        {
+                            UnityNativeChromaSDK.PlayAnimation(animationName);
+                        }
+                        if (GUILayout.Button("Stop"))
+                        {
+                            UnityNativeChromaSDK.StopAnimation(animationName);
+                        }
+                        if (GUILayout.Button("Reload"))
+                        {
+                            UnityNativeChromaSDK.CloseAnimation(animationName);
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                }
+                break;
         }
 
-        rect = new Rect(0, position.height - 40, 150, 40);
-        if (GUI.Button(rect, "Reinit"))
+        if (GUI.Button(new Rect(0, position.height - 40, 150, 40), "Reinit"))
         {
             UnityNativeChromaSDK.Uninit();
             UnityNativeChromaSDK.Init();
