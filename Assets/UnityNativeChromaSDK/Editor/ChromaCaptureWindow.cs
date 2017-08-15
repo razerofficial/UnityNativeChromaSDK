@@ -375,7 +375,15 @@ class ChromaCaptureWindow : EditorWindow
         if (GUILayout.Button("Animation"))
         {
             Selection.activeGameObject = null;
-            //Selection.activeObject = _mAnimation;
+            string path = string.Format("Assets/StreamingAssets/{0}", GetAnimationName());
+            if (File.Exists(path))
+            {
+                Selection.activeObject = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
+            }
+            else
+            {
+                Selection.activeObject = null;
+            }
         }
         GUI.enabled = null != _mRenderCamera;
         if (GUILayout.Button("Camera"))
