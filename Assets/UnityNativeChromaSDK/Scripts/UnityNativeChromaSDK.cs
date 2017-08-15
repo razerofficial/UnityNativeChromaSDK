@@ -232,6 +232,10 @@ namespace ChromaSDK
         [DllImport(DLL_NAME)]
         public static extern int PluginPreviewFrame(int animationId, int frameIndex);
 
+        /// Override duration for all frames for a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        [DllImport(DLL_NAME)]
+        public static extern int PluginOverrideFrameDuration(int animationId, float duration);
+
         #region Helpers (handle path conversions)
 
         /// <summary>

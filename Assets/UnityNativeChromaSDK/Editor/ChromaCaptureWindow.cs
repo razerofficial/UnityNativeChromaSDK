@@ -28,6 +28,7 @@ class ChromaCaptureWindow : EditorWindow
     private bool _mCapturing = false;
     private DateTime _mTimerCapture = DateTime.MinValue;
     private int _mCaptureIndex = 0;
+    private float _mOverrideTime = 0.1f;
 
     protected static Texture2D _sTextureClear = null;
 
@@ -490,6 +491,36 @@ class ChromaCaptureWindow : EditorWindow
         }
     }
 
+    private void OnClickSetOverrideTime()
+    {
+        MakeAnimationReady();
+
+        if (_mMode == Modes.Composite)
+        {
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                int animationId = GetAnimation(animationName);
+                if (animationId >= 0)
+                {
+                    UnityNativeChromaSDK.PluginOverrideFrameDuration(animationId, _mOverrideTime);
+                    string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                }
+            }
+        }
+        else
+        {
+            int animationId = GetAnimation();
+            if (animationId >= 0)
+            {
+                UnityNativeChromaSDK.PluginOverrideFrameDuration(animationId, _mOverrideTime);
+                string path = UnityNativeChromaSDK.GetStreamingPath(GetAnimationName());
+                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+            }
+        }
+    }
+
 
     private void OnGUI()
     {
@@ -763,6 +794,19 @@ class ChromaCaptureWindow : EditorWindow
                     }
                 }
                 GUI.enabled = true;
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                GUILayout.Label("Override Frame Time: (ALL FRAMES)");
+                _mOverrideTime = EditorGUILayout.FloatField(_mOverrideTime);
+                if (_mOverrideTime < 0.1f)
+                {
+                    _mOverrideTime = 0.1f;
+                }
+                if (GUILayout.Button("Set"))
+                {
+                    OnClickSetOverrideTime();
+                }
                 GUILayout.EndHorizontal();
 
                 Rect rect = GUILayoutUtility.GetLastRect();
