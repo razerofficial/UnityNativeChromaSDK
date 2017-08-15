@@ -13,12 +13,12 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
     readonly string[] _mAnimations =
     {
-        "RandomChromaLinkEffect.chroma",
-        "RandomHeadsetEffect.chroma",
-        "RandomKeyboardEffect.chroma",
-        "RandomKeypadEffect.chroma",
-        "RandomMouseEffect.chroma",
-        "RandomMousepadEffect.chroma",
+        "Random_ChromaLink.chroma",
+        "Random_Headset.chroma",
+        "Random_Keyboard.chroma",
+        "Random_Keypad.chroma",
+        "Random_Mouse.chroma",
+        "Random_Mousepad.chroma",
     };
     bool UseLogging()
     {

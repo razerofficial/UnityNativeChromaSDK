@@ -42,7 +42,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomMousepadEffect
+  AnimationName: Random_Mousepad.chroma
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -53,7 +53,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomMouseEffect
+  AnimationName: Random_Mouse.chroma
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -64,7 +64,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomKeypadEffect
+  AnimationName: Random_Keypad.chroma
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -75,7 +75,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomKeyboardEffect
+  AnimationName: Random_Keyboard.chroma
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -86,7 +86,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomHeadsetEffect
+  AnimationName: Random_Headset.chroma
 --- !u!114 &11400010
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomChromaLinkEffect
+  AnimationName: Random_ChromaLink.chroma
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
