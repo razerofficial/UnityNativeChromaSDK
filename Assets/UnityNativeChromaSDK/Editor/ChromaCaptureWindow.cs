@@ -655,13 +655,25 @@ class ChromaCaptureWindow : EditorWindow
                 }
                 GUILayout.EndHorizontal();
 
-                for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                if (_mMode == Modes.Normal)
                 {
-                    string animationName = GetCompositeName(device);
+                    string animationName = GetAnimationName();
                     int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
+                    UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationName);
                     GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                     GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
                     GUILayout.EndHorizontal();
+                }
+                if (_mMode == Modes.Composite)
+                {
+                    for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                    {
+                        string animationName = GetCompositeName(device);
+                        int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
+                        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                        GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
+                        GUILayout.EndHorizontal();
+                    }
                 }
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
@@ -700,35 +712,6 @@ class ChromaCaptureWindow : EditorWindow
                     _mRenderCamera.Render();
                     rect.y += 30;
                     DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
-                    /*
-                    if (animationId >= 0)
-                    {
-                        rect.y += 300;
-                        const int padding = 8;
-                        if (UnityNativeChromaSDK.GetDeviceType(animationId) == UnityNativeChromaSDK.DeviceType.DE_1D)
-                        {
-                            UnityNativeChromaSDK.Device1D device = UnityNativeChromaSDK.GetDevice1D(animationId);
-                            int maxLeds = UnityNativeChromaSDK.GetMaxLeds(device);
-                            for (int k = 1; (k * maxLeds) < position.width && (rect.y + rect.height) <= position.height; k *= 2)
-                            {
-                                DisplayRenderTexture((int)rect.y, maxLeds * k, k);
-                                rect.y += k + padding;
-                            }
-                        }
-                        else if (UnityNativeChromaSDK.GetDeviceType(animationId) == UnityNativeChromaSDK.DeviceType.DE_2D)
-                        {
-                            UnityNativeChromaSDK.Device2D device = UnityNativeChromaSDK.GetDevice2D(animationId);
-                            int maxRow = UnityNativeChromaSDK.GetMaxRow(device);
-                            int maxColumn = UnityNativeChromaSDK.GetMaxColumn(device);
-                            DisplayRenderTexture((int)rect.y, maxColumn, maxRow);
-                            for (int k = 1; (k * maxColumn) < position.width && (rect.y + rect.height) <= position.height; k *= 2)
-                            {
-                                DisplayRenderTexture((int)rect.y, maxColumn * k, maxRow * k);
-                                rect.y += maxRow * k + padding;
-                            }
-                        }
-                    }
-                    */
                 }
                 break;
 
@@ -744,7 +727,11 @@ class ChromaCaptureWindow : EditorWindow
                             _mLastPlaybackName = animationName;
                             UnityNativeChromaSDK.PlayAnimation(animationName);
                         }
-                        GUILayout.Label(Selection.activeObject.name);
+                        int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
+                        UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationName);
+                        GUILayout.Label(string.Format("Name: {0}", animationName));
+                        GUILayout.Label(string.Format("Device: {0}", device));
+                        GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
                         GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                         if (GUILayout.Button("Play"))
                         {
