@@ -647,24 +647,64 @@ class ChromaCaptureWindow : EditorWindow
                 }
                 GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                float interval = EditorGUILayout.FloatField("Capture Interval", _mInterval);
-                if (interval >= 0.1f)
-                {
-                    _mInterval = interval;
-                }
-                GUILayout.EndHorizontal();
-
                 if (_mMode == Modes.Normal)
                 {
                     string animationName = GetAnimationName();
                     int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
                     UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationName);
+                    GUILayout.Label(string.Format("Name: {0}", animationName));
+                    GUILayout.Label(string.Format("Device: {0}", device));
                     GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                    GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
+                    bool doSave = false;
+                    GUI.enabled = device != UnityNativeChromaSDK.Device.ChromaLink;
+                    if (GUILayout.Button("ChromaLink"))
+                    {
+                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.ChromaLink);
+                        doSave = true;
+                    }
+                    GUI.enabled = device != UnityNativeChromaSDK.Device.Headset;
+                    if (GUILayout.Button("Headset"))
+                    {
+                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Headset);
+                        doSave = true;
+                    }
+                    GUI.enabled = device != UnityNativeChromaSDK.Device.Keyboard;
+                    if (GUILayout.Button("Keyboard"))
+                    {
+                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Keyboard);
+                        doSave = true;
+                    }
                     GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                    GUI.enabled = device != UnityNativeChromaSDK.Device.Keypad;
+                    if (GUILayout.Button("Keypad"))
+                    {
+                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Keypad);
+                        doSave = true;
+                    }
+                    GUI.enabled = device != UnityNativeChromaSDK.Device.Mouse;
+                    if (GUILayout.Button("Mouse"))
+                    {
+                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Mouse);
+                        doSave = true;
+                    }
+                    GUI.enabled = device != UnityNativeChromaSDK.Device.Mousepad;
+                    if (GUILayout.Button("Mousepad"))
+                    {
+                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Mousepad);
+                        doSave = true;
+                    }
+                    GUILayout.EndHorizontal();
+                    GUI.enabled = true;
+                    if (doSave)
+                    {
+                        int animationId = GetAnimation();
+                        string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                        UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                    }
+                    GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
                 }
-                if (_mMode == Modes.Composite)
+                else if (_mMode == Modes.Composite)
                 {
                     for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
                     {
@@ -675,6 +715,14 @@ class ChromaCaptureWindow : EditorWindow
                         GUILayout.EndHorizontal();
                     }
                 }
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                float interval = EditorGUILayout.FloatField("Capture Interval", _mInterval);
+                if (interval >= 0.1f)
+                {
+                    _mInterval = interval;
+                }
+                GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                 GUILayout.Label("Capture:");

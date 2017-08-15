@@ -167,6 +167,16 @@ namespace ChromaSDK
         private static extern int PluginGetDevice(int animationId);
 
         /// <summary>
+        /// Set the device of a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        /// </summary>
+        /// <param name="animationId"></param>
+        /// <param name="deviceType"></param>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginSetDevice(int animationId, int deviceType, int device);
+
+        /// <summary>
         /// Get the frame count of a chroma animation, returns -1 if failed to get data, otherwise returns the number of frames
         /// </summary>
         /// <param name="path"></param>
@@ -517,6 +527,30 @@ namespace ChromaSDK
                     break;
             }
             return Device2D.Invalid;
+        }
+
+        public static int SetDevice(string animation, Device device)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                switch (device)
+                {
+                    case Device.ChromaLink:
+                        return PluginSetDevice(animationId, (int)DeviceType.DE_1D, (int)Device1D.ChromaLink);
+                    case Device.Headset:
+                        return PluginSetDevice(animationId, (int)DeviceType.DE_1D, (int)Device1D.Headset);
+                    case Device.Keyboard:
+                        return PluginSetDevice(animationId, (int)DeviceType.DE_2D, (int)Device2D.Keyboard);
+                    case Device.Keypad:
+                        return PluginSetDevice(animationId, (int)DeviceType.DE_2D, (int)Device2D.Keypad);
+                    case Device.Mouse:
+                        return PluginSetDevice(animationId, (int)DeviceType.DE_2D, (int)Device2D.Mouse);
+                    case Device.Mousepad:
+                        return PluginSetDevice(animationId, (int)DeviceType.DE_1D, (int)Device1D.Mousepad);
+                }
+            }
+            return animationId;
         }
 
         public static int GetFrameCount(string animation)
