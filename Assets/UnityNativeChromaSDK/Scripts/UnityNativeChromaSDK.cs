@@ -304,36 +304,40 @@ namespace ChromaSDK
 
         public enum DeviceType
         {
+            Invalid = -1,
             DE_1D = 0,
             DE_2D = 1,
-            Invalid = -1,
+            MAX = 2,
         }
 
         public enum Device
         {
-            ChromaLink,
-            Headset,
-            Keyboard,
-            Keypad,
-            Mouse,
-            Mousepad,
             Invalid = -1,
+            ChromaLink = 0,
+            Headset = 1,
+            Keyboard = 2,
+            Keypad = 3,
+            Mouse = 4,
+            Mousepad = 5,
+            MAX = 6,
         }
 
         public enum Device1D
         {
+            Invalid = -1,
             ChromaLink = 0,
             Headset = 1,
             Mousepad = 2,
-            Invalid = -1,
+            MAX = 3,
         }
 
         public enum Device2D
         {
+            Invalid = -1,
             Keyboard = 0,
             Keypad = 1,
             Mouse = 2,
-            Invalid = -1,
+            MAX = 3,
         }
 
         /// <summary>

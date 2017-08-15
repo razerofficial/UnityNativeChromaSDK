@@ -28,6 +28,7 @@ class ChromaCaptureWindow : EditorWindow
     private bool _mCapturing = false;
     private DateTime _mTimerCapture = DateTime.MinValue;
     private int _mCaptureIndex = 0;
+    private bool _mCompositeCapture = true;
 
     protected static Texture2D _sTextureClear = null;
 
@@ -41,18 +42,25 @@ class ChromaCaptureWindow : EditorWindow
         }
     }
 
+    string GetAnimationName(string animationName)
+    {
+        return UnityNativeChromaSDK.GetAnimationNameWithExtension(animationName);
+    }
     string GetAnimationName()
     {
-        return UnityNativeChromaSDK.GetAnimationNameWithExtension(_mAnimation);
+        return GetAnimationName(_mAnimation);
     }
-    int GetAnimation()
+    int GetAnimation(string animationName)
     {
-        string animationName = GetAnimationName();
         if (string.IsNullOrEmpty(animationName))
         {
             return -1;
         }
         return UnityNativeChromaSDK.GetAnimation(animationName);
+    }
+    int GetAnimation()
+    {
+        return GetAnimation(GetAnimationName());
     }
 
     Object LoadPath(string key, Type type)
@@ -205,7 +213,6 @@ class ChromaCaptureWindow : EditorWindow
                 UnityNativeChromaSDK.AddFrame(animationId, _mInterval, colors);
             }
             PreviewLastFrame(animationId);
-            ++_mCaptureIndex;
         }
     }
 
@@ -213,48 +220,6 @@ class ChromaCaptureWindow : EditorWindow
     {
         int frameCount = UnityNativeChromaSDK.PluginGetFrameCount(animationId);
         UnityNativeChromaSDK.PluginPreviewFrame(animationId, frameCount - 1);
-    }
-
-    private void DeleteFrame()
-    {
-        int animationId = GetAnimation();
-        if (animationId >= 0)
-        {
-            int frameCount = UnityNativeChromaSDK.PluginGetFrameCount(animationId);
-            if (frameCount > 1)
-            {
-                //UnityNativeChromaSDK.DeleteFirstFrame();
-            }            
-        }
-    }
-
-    private void ResetAnimation()
-    {
-        int animationId = GetAnimation();
-        if (animationId >= 0)
-        {
-            UnityNativeChromaSDK.PluginResetAnimation(animationId);
-        }
-    }
-
-    private void AutoOverrideTime()
-    {
-        int animationId = GetAnimation();
-        if (animationId >= 0)
-        {
-            //UnityNativeChromaSDK.PluginOverrideDurations(animationId, _mInterval);
-        }
-    }
-
-    private void SaveAnimation()
-    {
-        string animationName = GetAnimationName();
-        int animationId = GetAnimation();
-        if (animationId >= 0)
-        {
-            string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-            UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
-        }
     }
 
     private bool IsAnimationSelected()
@@ -326,16 +291,205 @@ class ChromaCaptureWindow : EditorWindow
         }
     }
 
-    private bool IsAnimationReady()
+    string GetCompositeName(UnityNativeChromaSDK.Device device)
     {
-        string path = UnityNativeChromaSDK.GetStreamingPath(GetAnimationName());
-        if (File.Exists(path))
+        return GetAnimationName(string.Format("{0}_{1}", _mAnimation, device));
+    }
+
+    private void MakeAnimationReady()
+    {
+        if (_mCompositeCapture)
         {
-            return true;
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                if (!File.Exists(path))
+                {
+                    UnityNativeChromaSDK.CreateAnimation(path, device);
+                    AssetDatabase.Refresh();
+                }
+            }
         }
-        UnityNativeChromaSDK.CreateAnimation(path, UnityNativeChromaSDK.Device.ChromaLink);
-        UnityNativeChromaSDK.EditAnimation(GetAnimationName());
-        return false;
+        else
+        {
+            string path = UnityNativeChromaSDK.GetStreamingPath(GetAnimationName());
+            if (!File.Exists(path))
+            {
+                UnityNativeChromaSDK.CreateAnimation(path, UnityNativeChromaSDK.Device.ChromaLink);
+                AssetDatabase.Refresh();
+            }
+        }
+    }
+
+    private void OnClickPlay()
+    {
+        MakeAnimationReady();
+
+        if (_mCompositeCapture)
+        {
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                int animationId = GetAnimation(animationName);
+                if (animationId >= 0)
+                {
+                    UnityNativeChromaSDK.PluginPlayAnimation(animationId);
+                }
+            }
+        }
+        else
+        {
+            int animationId = GetAnimation();
+            if (animationId >= 0)
+            {
+                UnityNativeChromaSDK.PluginPlayAnimation(animationId);
+            }
+        }
+    }
+
+    private void OnClickStop()
+    {
+        MakeAnimationReady();
+
+        if (_mCompositeCapture)
+        {
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                int animationId = GetAnimation(animationName);
+                if (animationId >= 0)
+                {
+                    UnityNativeChromaSDK.PluginStopAnimation(animationId);
+                }
+            }
+        }
+        else
+        {
+            int animationId = GetAnimation();
+            if (animationId >= 0)
+            {
+                UnityNativeChromaSDK.PluginStopAnimation(animationId);
+            }
+        }
+    }
+
+    private void OnClickReset()
+    {
+        MakeAnimationReady();
+
+        if (_mCompositeCapture)
+        {
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                int animationId = GetAnimation(animationName);
+                if (animationId >= 0)
+                {
+                    UnityNativeChromaSDK.PluginResetAnimation(animationId);
+                    string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                }
+            }
+        }
+        else
+        {
+            int animationId = GetAnimation();
+            if (animationId >= 0)
+            {
+                UnityNativeChromaSDK.PluginResetAnimation(animationId);
+                string path = UnityNativeChromaSDK.GetStreamingPath(GetAnimationName());
+                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+            }
+        }
+    }
+
+    private void OnClickSave()
+    {
+        MakeAnimationReady();
+
+        if (_mCompositeCapture)
+        {
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                int animationId = GetAnimation(animationName);
+                if (animationId >= 0)
+                {
+                    string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                }
+            }
+        }
+        else
+        {
+            int animationId = GetAnimation();
+            if (animationId >= 0)
+            {
+                string path = UnityNativeChromaSDK.GetStreamingPath(GetAnimationName());
+                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+            }
+        }
+    }
+
+    private void OnClickClose()
+    {
+        MakeAnimationReady();
+
+        if (_mCompositeCapture)
+        {
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                UnityNativeChromaSDK.CloseAnimation(animationName);
+            }
+        }
+        else
+        {
+            UnityNativeChromaSDK.CloseAnimation(GetAnimationName());
+        }
+    }
+
+    private void OnClickEdit()
+    {
+        MakeAnimationReady();
+
+        if (!_mCompositeCapture)
+        {
+            UnityNativeChromaSDK.EditAnimation(GetAnimationName());
+        }
+    }
+
+    private void OnClick1Frame()
+    {
+        MakeAnimationReady();
+
+        if (_mCompositeCapture)
+        {
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                int animationId = GetAnimation(animationName);
+                if (animationId >= 0)
+                {
+                    CaptureFrame(animationId);
+                    string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                    OnClickSave();
+                    ++_mCaptureIndex;
+                }
+            }
+        }
+        else
+        {
+            int animationId = GetAnimation();
+            if (animationId >= 0)
+            {
+                CaptureFrame(animationId);
+                OnClickSave();
+                ++_mCaptureIndex;
+            }
+        }
     }
 
     private void OnGUI()
@@ -343,16 +497,29 @@ class ChromaCaptureWindow : EditorWindow
         RestoreSelection();
         SaveSelection();
 
-        int animationId = GetAnimation();
         UnityNativeChromaSDK.Init();
 
-        if (animationId >= 0 &&
-            _mCapturing)
+        if (_mCapturing)
         {
             if (_mTimerCapture < DateTime.Now)
             {
                 _mTimerCapture = DateTime.Now + TimeSpan.FromSeconds(_mInterval);
-                CaptureFrame(animationId);
+                if (_mCompositeCapture)
+                {
+                    for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                    {
+                        string animationName = GetCompositeName(device);
+                        int animationId = GetAnimation(animationName);
+                        CaptureFrame(animationId);
+                    }
+                    ++_mCaptureIndex;
+                }
+                else
+                {
+                    int animationId = GetAnimation();
+                    CaptureFrame(animationId);
+                    ++_mCaptureIndex;
+                }
             }
         }
 
@@ -426,49 +593,29 @@ class ChromaCaptureWindow : EditorWindow
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        GUILayout.Label(string.Format("Animation: ID={0} ({1})", animationId, UnityNativeChromaSDK.GetDevice(animationId)));
-        int frameCount = UnityNativeChromaSDK.PluginGetFrameCount(animationId);
-        if (animationId >= 0)
+        GUILayout.Label("Animation:");
+        if (GUILayout.Button("Play"))
         {
-            if (GUILayout.Button("Play"))
-            {
-                if (IsAnimationReady())
-                {
-                    UnityNativeChromaSDK.PluginPlayAnimation(animationId);
-                }
-            }
-            if (GUILayout.Button("Stop"))
-            {
-                if (IsAnimationReady())
-                {
-                    UnityNativeChromaSDK.PluginStopAnimation(animationId);
-                }
-            }
+            OnClickPlay();
+        }
+        if (GUILayout.Button("Stop"))
+        {
+            OnClickStop();
         }
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal(GUILayout.Width(position.width));
         if (GUILayout.Button("Reset"))
         {
-            if (IsAnimationReady())
-            {
-                ResetAnimation();
-                SaveAnimation();
-            }
+            OnClickReset();
         }
         if (GUILayout.Button("Close"))
         {
-            if (IsAnimationReady())
-            {
-                UnityNativeChromaSDK.CloseAnimation(GetAnimationName());
-            }
+            OnClickClose();
         }
         if (GUILayout.Button("Edit"))
         {
-            if (IsAnimationReady())
-            {
-                UnityNativeChromaSDK.EditAnimation(GetAnimationName());
-            }
+            OnClickEdit();
         }
         GUILayout.EndHorizontal();
 
@@ -478,7 +625,28 @@ class ChromaCaptureWindow : EditorWindow
         {
             _mInterval = interval;
         }
-        GUILayout.Label(string.Format("{0} frames", frameCount));
+        GUILayout.EndHorizontal();
+
+        for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+        {
+            string animationName = GetCompositeName(device);
+            int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
+            GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+            GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
+            GUILayout.EndHorizontal();
+        }
+
+        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+        _mCompositeCapture = EditorGUILayout.Toggle("Composite Capture:", _mCompositeCapture);
+        if (GUILayout.Button("Create Composite GameObject"))
+        {
+            GameObject go = new GameObject("CompositeAnimation");
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                go.AddComponent<UnityNativeChromaSDKPlayOnEnable>().AnimationName = animationName;
+            }
+        }
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal(GUILayout.Width(position.width));
@@ -486,26 +654,21 @@ class ChromaCaptureWindow : EditorWindow
         GUI.enabled = null != _mRenderCamera && !string.IsNullOrEmpty(_mAnimation);
         if (GUILayout.Button("1 Frame"))
         {
-            if (IsAnimationReady())
-            {
-                CaptureFrame(animationId);
-                SaveAnimation();
-            }
+            OnClick1Frame();
         }
         if (GUILayout.Button(_mCapturing ? "Stop" : "Start"))
         {
-            if (IsAnimationReady())
+            MakeAnimationReady();
+
+            _mCapturing = !_mCapturing;
+            if (_mCapturing)
             {
-                _mCapturing = !_mCapturing;
-                if (_mCapturing)
-                {
-                    ResetAnimation();
-                    _mCaptureIndex = 0;
-                }
-                else
-                {
-                    SaveAnimation();
-                }
+                OnClickReset();
+                _mCaptureIndex = 0;
+            }
+            else
+            {
+                OnClickSave();
             }
         }
         GUI.enabled = true;
@@ -522,6 +685,7 @@ class ChromaCaptureWindow : EditorWindow
             _mRenderCamera.Render();
             rect.y += 30;
             DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
+            /*
             if (animationId >= 0)
             {
                 rect.y += 300;
@@ -549,6 +713,7 @@ class ChromaCaptureWindow : EditorWindow
                     }
                 }
             }
+            */
         }
 
         rect = new Rect(0, position.height - 40, 150, 40);
