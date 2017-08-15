@@ -187,7 +187,7 @@ class ChromaCaptureWindow : EditorWindow
             }
             else
             {
-                Debug.LogError("Unknown device type!");
+                Debug.LogError("Set the animation device type!");
                 return;
             }
 
@@ -277,7 +277,8 @@ class ChromaCaptureWindow : EditorWindow
     private void RestoreSelection()
     {
         // restore animation name
-        if (EditorPrefs.HasKey(KEY_ANIMATION))
+        if (string.IsNullOrEmpty(_mAnimation) &&
+            EditorPrefs.HasKey(KEY_ANIMATION))
         {
             _mAnimation = EditorPrefs.GetString(KEY_ANIMATION);
         }
@@ -405,7 +406,7 @@ class ChromaCaptureWindow : EditorWindow
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        GUILayout.Label(string.Format("Animation: {0}", animationId));
+        GUILayout.Label(string.Format("Animation: ID={0} ({1})", animationId, UnityNativeChromaSDK.GetDevice(animationId)));
         int frameCount = UnityNativeChromaSDK.PluginGetFrameCount(animationId);
         if (animationId >= 0)
         {
@@ -509,10 +510,7 @@ class ChromaCaptureWindow : EditorWindow
             }
         }
 
-        rect.y += 50;
-        rect.width = 200;
-        rect.height = 40;
-
+        rect = new Rect(0, position.height - 40, 150, 40);
         if (GUI.Button(rect, "Reinit"))
         {
             UnityNativeChromaSDK.Uninit();
