@@ -31,6 +31,8 @@ class ChromaCaptureWindow : EditorWindow
 
     protected static Texture2D _sTextureClear = null;
 
+    private bool _mAutoAlignWithView = false;
+
     enum Modes
     {
         Normal,
@@ -477,6 +479,18 @@ class ChromaCaptureWindow : EditorWindow
         }
     }
 
+    private void OnClickAlignWithView(GameObject activeGameObject, Object activeObject)
+    {
+        if (_mRenderCamera)
+        {
+            Selection.activeGameObject = _mRenderCamera.gameObject;
+            EditorApplication.ExecuteMenuItem("GameObject/Align With View");
+            Selection.activeObject = activeObject;
+            Selection.activeGameObject = activeGameObject;
+        }
+    }
+
+
     private void OnGUI()
     {
         RestoreSelection();
@@ -489,6 +503,10 @@ class ChromaCaptureWindow : EditorWindow
             if (_mTimerCapture < DateTime.Now)
             {
                 _mTimerCapture = DateTime.Now + TimeSpan.FromSeconds(_mInterval);
+                if (_mAutoAlignWithView)
+                {
+                    OnClickAlignWithView(Selection.activeGameObject, Selection.activeObject);
+                }
                 if (_mMode == Modes.Composite)
                 {
                     for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
@@ -571,7 +589,6 @@ class ChromaCaptureWindow : EditorWindow
             case Modes.Normal:
             case Modes.Composite:
 
-
                 _mAnimation = EditorGUILayout.TextField("Animation Name:", _mAnimation);
 
                 _mRenderCamera = (Camera)EditorGUILayout.ObjectField("RenderCamera", _mRenderCamera, typeof(Camera), true);
@@ -612,12 +629,11 @@ class ChromaCaptureWindow : EditorWindow
                 GUI.enabled = null != _mRenderCamera;
                 if (GUILayout.Button("Align With View"))
                 {
-                    Selection.activeGameObject = _mRenderCamera.gameObject;
-                    EditorApplication.ExecuteMenuItem("GameObject/Align With View");
-                    Selection.activeObject = activeObject;
-                    Selection.activeGameObject = activeGameObject;
+                    OnClickAlignWithView(activeGameObject, activeObject);
                 }
+                _mAutoAlignWithView = GUILayout.Toggle(_mAutoAlignWithView, "Auto");
                 GUI.enabled = true;
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
