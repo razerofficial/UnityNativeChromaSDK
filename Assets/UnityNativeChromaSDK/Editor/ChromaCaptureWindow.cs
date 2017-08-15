@@ -776,6 +776,10 @@ class ChromaCaptureWindow : EditorWindow
                 GUI.enabled = null != _mRenderCamera && !string.IsNullOrEmpty(_mAnimation);
                 if (GUILayout.Button("1 Frame"))
                 {
+                    if (_mAutoAlignWithView)
+                    {
+                        OnClickAlignWithView(activeGameObject, activeObject);
+                    }
                     OnClick1Frame();
                 }
                 if (GUILayout.Button(_mCapturing ? "Stop" : "Start"))
