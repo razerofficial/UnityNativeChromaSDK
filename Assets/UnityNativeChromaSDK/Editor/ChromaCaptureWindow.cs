@@ -30,9 +30,15 @@ class ChromaCaptureWindow : EditorWindow
     private int _mCaptureIndex = 0;
     private float _mOverrideTime = 0.1f;
 
-    protected static Texture2D _sTextureClear = null;
+    private static Texture2D _sTextureClear = null;
+
+    private static Texture2D _sKeyboardTexture = null;
 
     private bool _mAutoAlignWithView = false;
+    private DateTime _mTimerAlign = DateTime.MinValue;
+
+    private bool _mToggleSceneView = false;
+    private Color _mColorSceneView = Color.white;
 
     enum Modes
     {
@@ -521,6 +527,45 @@ class ChromaCaptureWindow : EditorWindow
         }
     }
 
+    private void OnEnable()
+    {
+        SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+
+        if (null == _sKeyboardTexture)
+        {
+            _sKeyboardTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/KeyboardLayout.png", typeof(Texture2D));
+        }
+    }
+
+    private void OnDisable()
+    {
+        SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+    }
+
+    private void OnSceneGUI(SceneView sceneView)
+    {
+        if (_mToggleSceneView)
+        {
+            // Do your drawing here using Handles.
+            Handles.BeginGUI();
+            // Do your drawing here using GUI.
+
+            if (_mRenderCamera)
+            {
+                DisplayRenderTexture(0, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE / 2);
+
+                if (_sKeyboardTexture)
+                {
+                    Color oldColor = GUI.color;
+                    GUI.color = _mColorSceneView;
+                    GUI.DrawTexture(new Rect(0, 0, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE / 2), _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                    GUI.color = oldColor;
+                }
+            }
+
+            Handles.EndGUI();
+        }
+    }
 
     private void OnGUI()
     {
@@ -529,15 +574,20 @@ class ChromaCaptureWindow : EditorWindow
 
         UnityNativeChromaSDK.Init();
 
+        if (_mAutoAlignWithView)
+        {
+            if (_mTimerAlign < DateTime.Now)
+            {
+                _mTimerAlign = DateTime.Now + TimeSpan.FromSeconds(_mInterval);
+                OnClickAlignWithView(Selection.activeGameObject, Selection.activeObject);
+            }
+        }
+
         if (_mCapturing)
         {
             if (_mTimerCapture < DateTime.Now)
             {
                 _mTimerCapture = DateTime.Now + TimeSpan.FromSeconds(_mInterval);
-                if (_mAutoAlignWithView)
-                {
-                    OnClickAlignWithView(Selection.activeGameObject, Selection.activeObject);
-                }
                 if (_mMode == Modes.Composite)
                 {
                     for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
@@ -811,6 +861,14 @@ class ChromaCaptureWindow : EditorWindow
                 {
                     OnClickSetOverrideTime();
                 }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                if (GUILayout.Button("Layout"))
+                {
+                    _mToggleSceneView = !_mToggleSceneView;
+                }
+                _mColorSceneView = EditorGUILayout.ColorField(_mColorSceneView);
                 GUILayout.EndHorizontal();
 
                 Rect rect = GUILayoutUtility.GetLastRect();
