@@ -529,41 +529,9 @@ class ChromaCaptureWindow : EditorWindow
 
     private void OnEnable()
     {
-        SceneView.onSceneGUIDelegate += this.OnSceneGUI;
-
         if (null == _sKeyboardTexture)
         {
             _sKeyboardTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/KeyboardLayout.png", typeof(Texture2D));
-        }
-    }
-
-    private void OnDisable()
-    {
-        SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
-    }
-
-    private void OnSceneGUI(SceneView sceneView)
-    {
-        if (_mToggleSceneView)
-        {
-            // Do your drawing here using Handles.
-            Handles.BeginGUI();
-            // Do your drawing here using GUI.
-
-            if (_mRenderCamera)
-            {
-                DisplayRenderTexture(0, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE / 2);
-
-                if (_sKeyboardTexture)
-                {
-                    Color oldColor = GUI.color;
-                    GUI.color = _mColorSceneView;
-                    GUI.DrawTexture(new Rect(0, 0, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE / 2), _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                    GUI.color = oldColor;
-                }
-            }
-
-            Handles.EndGUI();
         }
     }
 
@@ -882,6 +850,19 @@ class ChromaCaptureWindow : EditorWindow
                     _mRenderCamera.Render();
                     rect.y += 30;
                     DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
+
+                    if (_mToggleSceneView)
+                    {
+                        if (_sKeyboardTexture)
+                        {
+                            Color oldColor = GUI.color;
+                            GUI.color = _mColorSceneView;
+                            const int border = 2;
+                            rect = new Rect(rect.x + border, rect.y + border, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
+                            GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                            GUI.color = oldColor;
+                        }
+                    }
                 }
                 break;
 
