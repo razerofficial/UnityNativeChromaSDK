@@ -244,6 +244,18 @@ namespace ChromaSDK
         [DllImport(DLL_NAME)]
         public static extern int PluginOverrideFrameDuration(int animationId, float duration);
 
+        /// Reverse the frames for a chroma animation, returns -1 on failure, otherwise returns the animation id
+        [DllImport(DLL_NAME)]
+        public static extern int PluginReverse(int animationId);
+
+        /// Mirrors the frames horizontally for a chroma animation, returns -1 on failure, otherwise returns the animation id
+        [DllImport(DLL_NAME)]
+        public static extern int PluginMirrorHorizontally(int animationId);
+
+        /// Mirrors the frames vertically for a chroma animation, returns -1 on failure, otherwise returns the animation id
+        [DllImport(DLL_NAME)]
+        public static extern int PluginMirrorVertically(int animationId);
+
         #region Helpers (handle path conversions)
 
         /// <summary>
@@ -811,6 +823,42 @@ namespace ChromaSDK
             if (animationId >= 0)
             {
                 int result = PluginStopAnimation(animationId);
+                return result;
+            }
+            return animationId;
+        }
+
+        /// Reverse the frames for a chroma animation, returns -1 on failure, otherwise returns the animation id
+        public static int Reverse(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                int result = PluginReverse(animationId);
+                return result;
+            }
+            return animationId;
+        }
+
+        /// Mirrors the frames horizontally for a chroma animation, returns -1 on failure, otherwise returns the animation id
+        public static int MirrorHorizontally(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                int result = PluginMirrorHorizontally(animationId);
+                return result;
+            }
+            return animationId;
+        }
+
+        /// Mirrors the frames vertically for a chroma animation, returns -1 on failure, otherwise returns the animation id
+        public static int MirrorVertically(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                int result = PluginMirrorVertically(animationId);
                 return result;
             }
             return animationId;

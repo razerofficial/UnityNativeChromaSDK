@@ -1090,17 +1090,41 @@ class ChromaCaptureWindow : EditorWindow
                         GUILayout.Label("Edit:");
                         if (GUILayout.Button("Reverse Animation"))
                         {
-
+                            int animationId = GetAnimation(animationName);
+                            if (animationId >= 0)
+                            {
+                                UnityNativeChromaSDK.Reverse(animationName);
+                                string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                                UnityNativeChromaSDK.CloseAnimation(animationName);
+                                UnityNativeChromaSDK.PlayAnimation(animationName);
+                            }
                         }
 
                         if (GUILayout.Button("Mirror Animation Horizontally"))
                         {
-
+                            int animationId = GetAnimation(animationName);
+                            if (animationId >= 0)
+                            {
+                                UnityNativeChromaSDK.MirrorHorizontally(animationName);
+                                string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                                UnityNativeChromaSDK.CloseAnimation(animationName);
+                                UnityNativeChromaSDK.PlayAnimation(animationName);
+                            }
                         }
 
                         if (GUILayout.Button("Mirror Animation Vertically"))
                         {
-
+                            int animationId = GetAnimation(animationName);
+                            if (animationId >= 0)
+                            {
+                                UnityNativeChromaSDK.MirrorVertically(animationName);
+                                string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
+                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                                UnityNativeChromaSDK.CloseAnimation(animationName);
+                                UnityNativeChromaSDK.PlayAnimation(animationName);
+                            }
                         }
                     }
                 }
