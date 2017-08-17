@@ -37,8 +37,8 @@ class ChromaCaptureWindow : EditorWindow
     private bool _mAutoAlignWithView = false;
     private DateTime _mTimerAlign = DateTime.MinValue;
 
-    private bool _mToggleSceneView = false;
-    private Color _mColorSceneView = Color.white;
+    private bool _mToggleLayout = false;
+    private Color _mColorLayout = Color.white;
 
     enum Modes
     {
@@ -329,7 +329,8 @@ class ChromaCaptureWindow : EditorWindow
                         ++index;
                     }
                 }
-                if (device == UnityNativeChromaSDK.Device2D.Keyboard)
+                if (_mToggleLayout &&
+                    device == UnityNativeChromaSDK.Device2D.Keyboard)
                 {
                     foreach (KeyValuePair<int, Point> kvp in _mRenderMapping)
                     {
@@ -992,9 +993,9 @@ class ChromaCaptureWindow : EditorWindow
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                 if (GUILayout.Button("Layout"))
                 {
-                    _mToggleSceneView = !_mToggleSceneView;
+                    _mToggleLayout = !_mToggleLayout;
                 }
-                _mColorSceneView = EditorGUILayout.ColorField(_mColorSceneView);
+                _mColorLayout = EditorGUILayout.ColorField(_mColorLayout);
                 GUILayout.EndHorizontal();
 
                 Rect rect = GUILayoutUtility.GetLastRect();
@@ -1009,12 +1010,12 @@ class ChromaCaptureWindow : EditorWindow
                     rect.y += 30;
                     DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
 
-                    if (_mToggleSceneView)
+                    if (_mToggleLayout)
                     {
                         if (_sKeyboardTexture)
                         {
                             Color oldColor = GUI.color;
-                            GUI.color = _mColorSceneView;
+                            GUI.color = _mColorLayout;
                             const int border = 2;
                             rect = new Rect(rect.x + border, rect.y + border, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
                             GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
