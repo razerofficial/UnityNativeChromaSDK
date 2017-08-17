@@ -38,7 +38,7 @@ namespace ChromaSDK
         /// <returns></returns>
         public static string GetVersion()
         {
-            return "1.1";
+            return "1.2";
         }
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
@@ -95,6 +95,14 @@ namespace ChromaSDK
         /// <returns></returns>
         [DllImport(DLL_NAME)]
         public static extern int PluginPlayAnimation(int animationId);
+
+        /// <summary>
+        /// Is animation playing?
+        /// </summary>
+        /// <param name="animationId"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        public static extern bool PluginIsPlaying(int animationId);
 
         /// <summary>
         /// Stop animation
@@ -745,6 +753,24 @@ namespace ChromaSDK
                 return result;
             }
             return animationId;
+        }
+
+        /// <summary>
+        /// Check if the animation is playing,
+        /// returns true if playing
+        /// returns false if not playing
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public static bool IsPlaying(string animation)
+        {
+            int animationId = GetAnimation(animation);
+            if (animationId >= 0)
+            {
+                bool result = PluginIsPlaying(animationId);
+                return result;
+            }
+            return false;
         }
 
         /// <summary>

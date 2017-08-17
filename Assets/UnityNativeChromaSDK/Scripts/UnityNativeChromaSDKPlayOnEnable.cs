@@ -8,14 +8,21 @@ public class UnityNativeChromaSDKPlayOnEnable : MonoBehaviour
     /// </summary>
     public string AnimationName = string.Empty;
 
+    /// <summary>
+    /// Loop the animation
+    /// </summary>
+    public bool Loop = false;
+
+    /// <summary>
+    /// Cache the name with extension
+    /// </summary>
+    private string _mAnimationName = string.Empty;
+
     // Play the animation on enable
     void OnEnable()
     {
-        string animationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
-        if (!string.IsNullOrEmpty(animationName))
-        {
-            UnityNativeChromaSDK.PlayAnimation(animationName);
-        }
+        _mAnimationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
+        UnityNativeChromaSDK.PlayAnimation(_mAnimationName);
     }
 
     /// <summary>
@@ -23,10 +30,17 @@ public class UnityNativeChromaSDKPlayOnEnable : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        string animationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
-        if (!string.IsNullOrEmpty(animationName))
+        UnityNativeChromaSDK.StopAnimation(_mAnimationName);
+    }
+
+    private void FixedUpdate()
+    {
+        if (Loop)
         {
-            UnityNativeChromaSDK.StopAnimation(animationName);
+            if (!UnityNativeChromaSDK.IsPlaying(_mAnimationName))
+            {
+                UnityNativeChromaSDK.PlayAnimation(_mAnimationName);
+            }
         }
     }
 

@@ -1086,6 +1086,22 @@ class ChromaCaptureWindow : EditorWindow
                             UnityNativeChromaSDK.CloseAnimation(animationName);
                         }
                         GUILayout.EndHorizontal();
+
+                        GUILayout.Label("Edit:");
+                        if (GUILayout.Button("Reverse Animation"))
+                        {
+
+                        }
+
+                        if (GUILayout.Button("Mirror Animation Horizontally"))
+                        {
+
+                        }
+
+                        if (GUILayout.Button("Mirror Animation Vertically"))
+                        {
+
+                        }
                     }
                 }
                 break;
