@@ -962,12 +962,14 @@ namespace ChromaSDK
 
         public static void SetKeyboardColor(int[] colors, int key, Color color)
         {
-            int maxRow = GetMaxRow(Device2D.Keyboard);
             int maxColumn = GetMaxColumn(Device2D.Keyboard);
             int row = GetHighByte((int)key);
             int column = GetLowByte((int)key);
             int index = row * maxColumn + column;
-            colors[index] = ToBGR(color);
+            if (index < colors.Length)
+            {
+                colors[index] = ToBGR(color);
+            }
         }
     }
 #endif
