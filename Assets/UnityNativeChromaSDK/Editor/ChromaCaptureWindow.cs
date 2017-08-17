@@ -803,13 +803,23 @@ class ChromaCaptureWindow : EditorWindow
         {
             GUILayout.BeginHorizontal(GUILayout.Width(position.width));
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Make Composite GameObject"))
+            GUILayout.Label("Make Composite:");
+            if (GUILayout.Button("PlayOnEnable"))
             {
-                GameObject go = new GameObject("CompositeAnimation");
+                GameObject go = new GameObject("CompositePlayOnEnable");
                 for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
                 {
                     string animationName = GetCompositeName(device);
                     go.AddComponent<UnityNativeChromaSDKPlayOnEnable>().AnimationName = animationName;
+                }
+            }
+            if (GUILayout.Button("PlayAndDeactivate"))
+            {
+                GameObject go = new GameObject("CompositePlayAndDeactivate");
+                for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                {
+                    string animationName = GetCompositeName(device);
+                    go.AddComponent<UnityNativeChromaSDKPlayAndDeactivate>().AnimationName = animationName;
                 }
             }
             GUILayout.FlexibleSpace();
@@ -894,9 +904,12 @@ class ChromaCaptureWindow : EditorWindow
                 {
                     OnClickClose();
                 }
-                if (GUILayout.Button("Edit"))
+                if (_mMode == Modes.Normal)
                 {
-                    OnClickEdit();
+                    if (GUILayout.Button("Edit"))
+                    {
+                        OnClickEdit();
+                    }
                 }
                 GUILayout.EndHorizontal();
 
@@ -1088,6 +1101,10 @@ class ChromaCaptureWindow : EditorWindow
                         GUILayout.EndHorizontal();
 
                         GUILayout.Label("Edit:");
+                        if (GUILayout.Button("Edit"))
+                        {
+                            UnityNativeChromaSDK.EditAnimation(animationName);
+                        }
                         if (GUILayout.Button("Reverse Animation"))
                         {
                             int animationId = GetAnimation(animationName);
