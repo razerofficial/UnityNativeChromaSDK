@@ -1017,10 +1017,6 @@ class ChromaCaptureWindow : EditorWindow
                             rect = new Rect(rect.x + border, rect.y + border, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
                             GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
                             GUI.color = oldColor;
-
-                            Event evt = Event.current;
-                            rect.x += 300;
-                            GUI.Label(rect, string.Format("Mouse position: {0}, {1}", evt.mousePosition.x-border, evt.mousePosition.y - rect.y - border));
                         }
                     }
                 }
