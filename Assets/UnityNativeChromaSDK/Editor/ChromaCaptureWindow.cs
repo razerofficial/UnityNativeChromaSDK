@@ -660,7 +660,7 @@ class ChromaCaptureWindow : EditorWindow
                     {
                         _mRenderCamera.transform.position = sceneCamera.transform.position;
                         _mRenderCamera.transform.rotation = sceneCamera.transform.rotation;
-                        _mRenderCamera.isOrthoGraphic = sceneCamera.isOrthoGraphic;
+                        _mRenderCamera.orthographic = sceneCamera.orthographic;
                         _mRenderCamera.orthographicSize = sceneCamera.orthographicSize;
                     }
                 }
