@@ -640,14 +640,18 @@ class ChromaCaptureWindow : EditorWindow
         }
     }
 
-    private void OnClickAlignWithView(GameObject activeGameObject, Object activeObject)
+    private void OnClickAlignWithView()
     {
         if (_mRenderCamera)
         {
-            Selection.activeGameObject = _mRenderCamera.gameObject;
-            EditorApplication.ExecuteMenuItem("GameObject/Align With View");
-            Selection.activeObject = activeObject;
-            Selection.activeGameObject = activeGameObject;
+            if (SceneView.currentDrawingSceneView &&
+                SceneView.currentDrawingSceneView.camera)
+            {
+                _mRenderCamera.transform.position = SceneView.currentDrawingSceneView.camera.transform.position;
+                _mRenderCamera.transform.rotation = SceneView.currentDrawingSceneView.camera.transform.rotation;
+                _mRenderCamera.isOrthoGraphic = SceneView.currentDrawingSceneView.camera.isOrthoGraphic;
+                _mRenderCamera.orthographicSize = SceneView.currentDrawingSceneView.camera.orthographicSize;
+            }
         }
     }
 
@@ -703,7 +707,7 @@ class ChromaCaptureWindow : EditorWindow
             if (_mTimerAlign < DateTime.Now)
             {
                 _mTimerAlign = DateTime.Now + TimeSpan.FromSeconds(_mInterval);
-                OnClickAlignWithView(Selection.activeGameObject, Selection.activeObject);
+                OnClickAlignWithView();
             }
         }
 
@@ -732,8 +736,6 @@ class ChromaCaptureWindow : EditorWindow
         }
 
         GameObject activeGameObject = Selection.activeGameObject;
-        Object activeObject = Selection.activeObject;
-
         if (activeGameObject)
         {
             ParticleSystem particleSystem = activeGameObject.GetComponent<ParticleSystem>();
@@ -834,7 +836,7 @@ class ChromaCaptureWindow : EditorWindow
                 GUI.enabled = null != _mRenderCamera;
                 if (GUILayout.Button("Align With View"))
                 {
-                    OnClickAlignWithView(activeGameObject, activeObject);
+                    OnClickAlignWithView();
                 }
                 _mAutoAlignWithView = GUILayout.Toggle(_mAutoAlignWithView, "Auto");
                 GUI.enabled = true;
@@ -952,7 +954,7 @@ class ChromaCaptureWindow : EditorWindow
                 {
                     if (_mAutoAlignWithView)
                     {
-                        OnClickAlignWithView(activeGameObject, activeObject);
+                        OnClickAlignWithView();
                     }
                     OnClick1Frame();
                 }
