@@ -17,6 +17,8 @@ class ChromaCaptureWindow : EditorWindow
     private const string KEY_CAMERA = "ChromaSDKCameraPath";
     private const string KEY_PARTICLE = "ChromaSDKParticleSystemPath";
 
+    private readonly string _mVersionString = string.Format("{0}", UnityNativeChromaSDK.GetVersion());
+
     private const int RENDER_TEXTURE_SIZE = 256;
 
     private string _mAnimation = null;
@@ -698,6 +700,8 @@ class ChromaCaptureWindow : EditorWindow
 
     private void OnGUI()
     {
+        Rect rect;
+
         RestoreSelection();
         SaveSelection();
 
@@ -998,7 +1002,7 @@ class ChromaCaptureWindow : EditorWindow
                 _mColorLayout = EditorGUILayout.ColorField(_mColorLayout);
                 GUILayout.EndHorizontal();
 
-                Rect rect = GUILayoutUtility.GetLastRect();
+                rect = GUILayoutUtility.GetLastRect();
                 if (_mRenderCamera)
                 {
                     if (null == _mRenderTexture)
@@ -1061,11 +1065,15 @@ class ChromaCaptureWindow : EditorWindow
                 break;
         }
 
-        if (GUI.Button(new Rect(0, position.height - 40, 150, 40), "Reinit"))
+        rect = new Rect(0, position.height - 40, 75, 40);
+        if (GUI.Button(rect, "Reinit"))
         {
             UnityNativeChromaSDK.Uninit();
             UnityNativeChromaSDK.Init();
         }
+
+        rect = new Rect(position.width - 40, position.height - 20, 100, 40);
+        GUI.Label(rect, _mVersionString);
 
         Repaint();
     }
