@@ -999,13 +999,13 @@ class ChromaCaptureWindow : EditorWindow
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                GUILayout.Label("Override Frame Time: (ALL FRAMES)");
+                GUILayout.Label("Override Time (ALL FRAMES):");
                 _mOverrideTime = EditorGUILayout.FloatField(_mOverrideTime);
                 if (_mOverrideTime < 0.1f)
                 {
                     _mOverrideTime = 0.1f;
                 }
-                if (GUILayout.Button("Set"))
+                if (GUILayout.Button("Set", GUILayout.Width(50)))
                 {
                     OnClickSetOverrideTime();
                 }
