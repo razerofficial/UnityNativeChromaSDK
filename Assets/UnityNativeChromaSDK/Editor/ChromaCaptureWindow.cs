@@ -649,13 +649,21 @@ class ChromaCaptureWindow : EditorWindow
     {
         if (_mRenderCamera)
         {
-            if (SceneView.currentDrawingSceneView &&
-                SceneView.currentDrawingSceneView.camera)
+            if (SceneView.sceneViews.Count > 0 &&
+                null != SceneView.sceneViews[0])
             {
-                _mRenderCamera.transform.position = SceneView.currentDrawingSceneView.camera.transform.position;
-                _mRenderCamera.transform.rotation = SceneView.currentDrawingSceneView.camera.transform.rotation;
-                _mRenderCamera.isOrthoGraphic = SceneView.currentDrawingSceneView.camera.isOrthoGraphic;
-                _mRenderCamera.orthographicSize = SceneView.currentDrawingSceneView.camera.orthographicSize;
+                SceneView sceneView = (SceneView)SceneView.sceneViews[0];
+                if (sceneView)
+                {
+                    Camera sceneCamera = sceneView.camera;
+                    if (sceneCamera)
+                    {
+                        _mRenderCamera.transform.position = sceneCamera.transform.position;
+                        _mRenderCamera.transform.rotation = sceneCamera.transform.rotation;
+                        _mRenderCamera.isOrthoGraphic = sceneCamera.isOrthoGraphic;
+                        _mRenderCamera.orthographicSize = sceneCamera.orthographicSize;
+                    }
+                }
             }
         }
     }
