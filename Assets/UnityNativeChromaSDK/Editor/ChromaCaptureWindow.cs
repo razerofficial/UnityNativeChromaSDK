@@ -289,7 +289,7 @@ class ChromaCaptureWindow : EditorWindow
                 _mTempTexture.Apply();
                 RenderTexture.active = null;
                 Color[] pixels = _mTempTexture.GetPixels();
-                colors = new int[maxLeds];
+                colors = UnityNativeChromaSDK.CreateColors1D(device);
                 int index = 0;
                 if (colors.Length > 0)
                 {
@@ -321,7 +321,7 @@ class ChromaCaptureWindow : EditorWindow
                 _mTempTexture.Apply();
                 RenderTexture.active = null;
                 Color[] pixels = _mTempTexture.GetPixels();
-                colors = new int[maxRow * maxColumn];
+                colors = UnityNativeChromaSDK.CreateColors2D(device);
                 int index = 0;
                 for (int i = maxRow-1; i >= 0; --i)
                 {

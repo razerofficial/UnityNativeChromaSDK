@@ -960,6 +960,93 @@ namespace ChromaSDK
             return (int)(((mask & 0xFF00) >> 8) & 0xFF);
         }
 
+        /// <summary>
+        /// Create an array of colors for the device
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public static int[] CreateColors1D(Device1D device)
+        {
+            switch (device)
+            {
+                case Device1D.ChromaLink:
+                case Device1D.Headset:
+                case Device1D.Mousepad:
+                    break;
+                default:
+                    Debug.LogError("CreateColors1D: Invalid device!");
+                    return null;
+            }
+            int maxLeds = GetMaxLeds(device);
+            int[] colors = new int[maxLeds];
+            for (int index = 0; index < colors.Length; ++index)
+            {
+                colors[0] = 0;
+            }
+            return colors;
+        }
+
+        /// <summary>
+        /// Create an array of colors for the device
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public static int[] CreateColors2D(Device2D device)
+        {
+            switch (device)
+            {
+                case Device2D.Keyboard:
+                case Device2D.Keypad:
+                case Device2D.Mouse:
+                    break;
+                default:
+                    Debug.LogError("CreateColors2D: Invalid device!");
+                    return null;
+            }
+            int maxRow = GetMaxRow(device);
+            int maxColumn = GetMaxColumn(device);
+            int[] colors = new int[maxRow * maxColumn];
+            for (int index = 0; index < colors.Length; ++index)
+            {
+                colors[0] = 0;
+            }
+            return colors;
+        }
+
+        /// <summary>
+        /// Create an array of colors for the device
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public static int[] CreateColors(Device device)
+        {
+            switch (device)
+            {
+                case Device.ChromaLink:
+                    return CreateColors1D(Device1D.ChromaLink);
+                case Device.Headset:
+                    return CreateColors1D(Device1D.Headset);
+                case Device.Keyboard:
+                    return CreateColors2D(Device2D.Keyboard);
+                case Device.Keypad:
+                    return CreateColors2D(Device2D.Keypad);
+                case Device.Mouse:
+                    return CreateColors2D(Device2D.Mouse);
+                case Device.Mousepad:
+                    return CreateColors1D(Device1D.Mousepad);
+                default:
+                    Debug.LogError("CreateColors: Invalid device!");
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Set the keyboard color given the key
+        /// The key should be (int)Keyboard.RZKEY or (int)Keyboard.RZLED
+        /// </summary>
+        /// <param name="colors"></param>
+        /// <param name="key"></param>
+        /// <param name="color"></param>
         public static void SetKeyboardColor(int[] colors, int key, Color color)
         {
             int maxColumn = GetMaxColumn(Device2D.Keyboard);
