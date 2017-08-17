@@ -16,6 +16,8 @@ class ChromaCaptureWindow : EditorWindow
     private const string KEY_ANIMATION = "ChromaSDKAnimationPath";
     private const string KEY_CAMERA = "ChromaSDKCameraPath";
     private const string KEY_PARTICLE = "ChromaSDKParticleSystemPath";
+    private const string KEY_AUTO_ALIGN = "ChromaSDKAutoAlign";
+    private const string KEY_LAYOUT = "ChromaSDKLayout";
 
     private readonly string _mVersionString = string.Format("{0}", UnityNativeChromaSDK.GetVersion());
 
@@ -696,6 +698,16 @@ class ChromaCaptureWindow : EditorWindow
         {
             _sKeyboardTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/KeyboardLayout.png", typeof(Texture2D));
         }
+
+        if (EditorPrefs.HasKey(KEY_AUTO_ALIGN))
+        {
+            _mAutoAlignWithView = EditorPrefs.GetBool(KEY_AUTO_ALIGN);
+        }
+
+        if (EditorPrefs.HasKey(KEY_LAYOUT))
+        {
+            _mToggleLayout = EditorPrefs.GetBool(KEY_LAYOUT);
+        }
     }
 
     private void OnGUI()
@@ -843,7 +855,12 @@ class ChromaCaptureWindow : EditorWindow
                 {
                     OnClickAlignWithView();
                 }
-                _mAutoAlignWithView = GUILayout.Toggle(_mAutoAlignWithView, "Auto");
+                bool autoAlignWithView = GUILayout.Toggle(_mAutoAlignWithView, "Auto");
+                if (_mAutoAlignWithView != autoAlignWithView)
+                {
+                    _mAutoAlignWithView = autoAlignWithView;
+                    EditorPrefs.SetBool(KEY_AUTO_ALIGN, _mAutoAlignWithView);
+                }
                 GUI.enabled = true;
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
@@ -998,6 +1015,7 @@ class ChromaCaptureWindow : EditorWindow
                 if (GUILayout.Button("Layout"))
                 {
                     _mToggleLayout = !_mToggleLayout;
+                    EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
                 }
                 _mColorLayout = EditorGUILayout.ColorField(_mColorLayout);
                 GUILayout.EndHorizontal();
