@@ -38,7 +38,7 @@ namespace ChromaSDK
         /// <returns></returns>
         public static string GetVersion()
         {
-            return "1.3";
+            return "1.4";
         }
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN

@@ -1,4 +1,5 @@
-﻿//#define SHOW_TEMP_TEXTURE
+﻿#define SHOW_LAYOUT_IN_SCENE_VIEW
+//#define SHOW_TEMP_TEXTURE
 
 using ChromaSDK;
 using Eric5h5;
@@ -18,6 +19,7 @@ class ChromaCaptureWindow : EditorWindow
     private const string KEY_PARTICLE = "ChromaSDKParticleSystemPath";
     private const string KEY_AUTO_ALIGN = "ChromaSDKAutoAlign";
     private const string KEY_LAYOUT = "ChromaSDKLayout";
+    private const string KEY_MASK = "ChromaSDKMask";
 
     private readonly string _mVersionString = string.Format("{0}", UnityNativeChromaSDK.GetVersion());
 
@@ -27,6 +29,7 @@ class ChromaCaptureWindow : EditorWindow
     private Camera _mRenderCamera = null;
     private RenderTexture _mRenderTexture = null;
     private Texture2D _mTempTexture = null;
+    private Object _mMask = null;
     private float _mInterval = 0.1f;
     private ParticleSystem _mParticleSystem = null;
     private bool _mCapturing = false;
@@ -700,6 +703,9 @@ class ChromaCaptureWindow : EditorWindow
 
     private void OnEnable()
     {
+#if SHOW_LAYOUT_IN_SCENE_VIEW
+        SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+#endif
         SetupRenderMapping();
 
         if (null == _sKeyboardTexture)
@@ -716,7 +722,54 @@ class ChromaCaptureWindow : EditorWindow
         {
             _mToggleLayout = EditorPrefs.GetBool(KEY_LAYOUT);
         }
+
+        if (EditorPrefs.HasKey(KEY_MASK))
+        {
+            string mask = EditorPrefs.GetString(KEY_MASK);
+            string animationName = GetAnimationName(mask);
+            int animationId = GetAnimation(animationName);
+            if (animationId >= 0)
+            {
+                string path = string.Format("Assets/StreamingAssets/{0}", animationName);
+                _mMask = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
+            }
+        }
     }
+
+#if SHOW_LAYOUT_IN_SCENE_VIEW
+    private void OnDisable()
+    {
+        SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+    }
+#endif
+
+#if SHOW_LAYOUT_IN_SCENE_VIEW
+    private void OnSceneGUI(SceneView sceneView)
+    {
+        if (_mToggleLayout)
+        {
+            // Do your drawing here using Handles.
+            Handles.BeginGUI();
+            // Do your drawing here using GUI.
+
+            if (_mRenderCamera)
+            {
+                if (_sKeyboardTexture)
+                {
+                    Color oldColor = GUI.color;
+                    GUI.color = _mColorLayout;
+                    int size = Mathf.Min(Screen.width, Screen.height);
+                    int center = Screen.width / 2;
+                    Rect rect = new Rect(center-size/2, 0, size, size);
+                    GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                    GUI.color = oldColor;
+                }
+            }
+
+            Handles.EndGUI();
+        }
+    }
+#endif
 
     private void OnGUI()
     {
@@ -833,7 +886,22 @@ class ChromaCaptureWindow : EditorWindow
 
                 _mAnimation = EditorGUILayout.TextField("Animation Name:", _mAnimation);
 
-                _mRenderCamera = (Camera)EditorGUILayout.ObjectField("RenderCamera", _mRenderCamera, typeof(Camera), true);
+                _mRenderCamera = (Camera)EditorGUILayout.ObjectField("RenderCamera:", _mRenderCamera, typeof(Camera), true);
+
+                Object mask = (Object)EditorGUILayout.ObjectField("Mask", _mMask, typeof(Object), true);
+                if (mask != _mMask)
+                {
+                    if (mask)
+                    {
+                        _mMask = mask;
+                        string animationName = GetAnimationName(mask.name);
+                        int animationId = GetAnimation(animationName);
+                        if (animationId >= 0)
+                        {
+                            EditorPrefs.SetString(KEY_MASK, animationName);
+                        }
+                    }
+                }
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                 GUILayout.Label("Select:");
