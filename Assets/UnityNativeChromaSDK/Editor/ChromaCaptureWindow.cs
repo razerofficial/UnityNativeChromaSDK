@@ -272,6 +272,28 @@ class ChromaCaptureWindow : EditorWindow
         return Color.black;
     }
 
+    /// <summary>
+    /// Get mask colors
+    /// </summary>
+    /// <returns></returns>
+    int[] GetMaskColors()
+    {
+        if (_mMask)
+        {
+            string animationName = GetAnimationName(_mMask.name);
+            int animationId = GetAnimation(animationName);
+            if (animationId >= 0)
+            {
+                UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationId);
+                int[] colors = UnityNativeChromaSDK.CreateColors(device);
+                float duration;
+                UnityNativeChromaSDK.GetFrame(animationId, 0, out duration, colors);
+                return colors;
+            }
+        }
+        return null;
+    }
+
     private void CaptureFrame(int animationId)
     {
         if (_mRenderTexture && _mRenderCamera)
@@ -325,6 +347,7 @@ class ChromaCaptureWindow : EditorWindow
                 RenderTexture.active = null;
                 Color[] pixels = _mTempTexture.GetPixels();
                 colors = UnityNativeChromaSDK.CreateColors2D(device);
+                int[] maskColors = GetMaskColors();
                 int index = 0;
                 for (int i = maxRow-1; i >= 0; --i)
                 {
@@ -332,6 +355,16 @@ class ChromaCaptureWindow : EditorWindow
                     {
                         int targetIndex = i * maxColumn + j;
                         Color color = pixels[index];
+                        // use mask to see if key should be skipped
+                        if (device == UnityNativeChromaSDK.Device2D.Keyboard &&
+                            null != maskColors &&
+                            targetIndex < maskColors.Length)
+                        {
+                            if (maskColors[targetIndex] == 0)
+                            {
+                                color = Color.black;
+                            }
+                        }
                         colors[targetIndex] = UnityNativeChromaSDK.ToBGR(color);
                         ++index;
                     }
@@ -342,6 +375,19 @@ class ChromaCaptureWindow : EditorWindow
                     foreach (KeyValuePair<int, Point> kvp in _mRenderMapping)
                     {
                         Color color = GetKeyboardColor(renderPixels, kvp.Key);
+
+                        // use mask to see if key should be skipped
+                        int targetIndex = UnityNativeChromaSDK.GetKeyboardIndex(kvp.Key);
+                        if (device == UnityNativeChromaSDK.Device2D.Keyboard &&
+                            null != maskColors &&
+                            targetIndex < maskColors.Length)
+                        {
+                            if (maskColors[targetIndex] == 0)
+                            {
+                                color = Color.black;
+                            }
+                        }
+
                         UnityNativeChromaSDK.SetKeyboardColor(colors, kvp.Key, color);
                     }
                 }
@@ -891,9 +937,9 @@ class ChromaCaptureWindow : EditorWindow
                 Object mask = (Object)EditorGUILayout.ObjectField("Mask", _mMask, typeof(Object), true);
                 if (mask != _mMask)
                 {
+                    _mMask = mask;
                     if (mask)
                     {
-                        _mMask = mask;
                         string animationName = GetAnimationName(mask.name);
                         int animationId = GetAnimation(animationName);
                         if (animationId >= 0)

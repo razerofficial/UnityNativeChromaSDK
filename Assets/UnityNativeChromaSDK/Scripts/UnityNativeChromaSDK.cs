@@ -233,6 +233,14 @@ namespace ChromaSDK
         private static extern int PluginUpdateFrame(int animationId, int frameIndex, float duration, int[] colors, int length);
 
         /// <summary>
+        /// Get a frame in a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int PluginGetFrame(int animationId, int frameIndex, out float duration, int[] colors, int length);
+
+        /// <summary>
         /// Preview a frame in a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
         /// </summary>
         /// <param name="path"></param>
@@ -611,6 +619,19 @@ namespace ChromaSDK
         public static int UpdateFrame(int animationId, int frameIndex, float duration, int[] colors)
         {
             return PluginUpdateFrame(animationId, frameIndex, duration, colors, colors.Length);
+        }
+
+        /// <summary>
+        /// Update a frame in a chroma animation, returns -1 if failed to get data, otherwise returns the animation id
+        /// </summary>
+        /// <param name="animationId"></param>
+        /// <param name="frameIndex"></param>
+        /// <param name="duration"></param>
+        /// <param name="colors"></param>
+        /// <returns></returns>
+        public static int GetFrame(int animationId, int frameIndex, out float duration, int[] colors)
+        {
+            return PluginGetFrame(animationId, frameIndex, out duration, colors, colors.Length);
         }
 
         #endregion
@@ -1115,6 +1136,21 @@ namespace ChromaSDK
         }
 
         /// <summary>
+        /// Get the index of the keyboard key
+        /// The key should be (int)Keyboard.RZKEY or (int)Keyboard.RZLED
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static int GetKeyboardIndex(int key)
+        {
+            int maxColumn = GetMaxColumn(Device2D.Keyboard);
+            int row = GetHighByte((int)key);
+            int column = GetLowByte((int)key);
+            int index = row * maxColumn + column;
+            return index;
+        }
+
+        /// <summary>
         /// Set the keyboard color given the key
         /// The key should be (int)Keyboard.RZKEY or (int)Keyboard.RZLED
         /// </summary>
@@ -1123,10 +1159,7 @@ namespace ChromaSDK
         /// <param name="color"></param>
         public static void SetKeyboardColor(int[] colors, int key, Color color)
         {
-            int maxColumn = GetMaxColumn(Device2D.Keyboard);
-            int row = GetHighByte((int)key);
-            int column = GetLowByte((int)key);
-            int index = row * maxColumn + column;
+            int index = GetKeyboardIndex(key);
             if (index < colors.Length)
             {
                 colors[index] = ToBGR(color);
