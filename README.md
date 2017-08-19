@@ -41,15 +41,23 @@ Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/Unit
 <a name="getting-started"></a>
 ## Getting Started
 
-1 Install [Unity3d](https://unity3d.com/)
+1 Install [Synapse](http://developer.razerzone.com/works-with-chroma/download/)
 
-2 Open Unity and start with an existing project or open a new project
+2 (Optional) Install the [Emulator](http://developer.razerzone.com/works-with-chroma/download/)
 
-3 Create `Chroma` animations from the `Assets/ChromaSDK/Create Chroma Animation` menu item. This will open a file save dialog and create a chroma animation file when saved.
+3 Connect [Razer Chroma hardware](http://developer.razerzone.com/works-with-chroma/compatible-devices/)
 
-4 Edit `Chroma` animations by selecting a `Chroma` animation in the `Object Hierarchy` and select the `Assets/ChromaSDK/Edit Chroma Animation` menu item.
+4 Install [Unity3d](https://unity3d.com/)
 
-5 You can also associate the `Chroma` editor application with the `.chroma` extension and double-click `.chroma` assets in the `Object Hierarchy`.
+5 Open Unity and start with an existing project or open a new project
+
+6 Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/UnityNativeChromaSDK/releases/tag/1.0) into your project.
+
+7 Create `Chroma` animations from the `Assets/ChromaSDK/Create Chroma Animation` menu item. This will open a file save dialog and create a chroma animation file when saved.
+
+8 Edit `Chroma` animations by selecting a `Chroma` animation in the `Object Hierarchy` and select the `Assets/ChromaSDK/Edit Chroma Animation` menu item.
+
+9 You can also associate the `Chroma` editor application with the `.chroma` extension and double-click `.chroma` assets in the `Object Hierarchy`.
 
 <a name="assets"></a>
 ## Assets
