@@ -182,3 +182,19 @@ The `UnityNativeChromaSDKPlayOnEnable.cs` script will play the animation when th
 The `UnityNativeChromaSDKPlayOnEnable.cs` script will stop the animation when the `OnDisable` event fires.
 
 ![image_5](images/image_5.png)
+
+**Example03**
+
+Particle capture example
+
+**Example04**
+
+Show `PlayOnEnable` script
+
+**Example05**
+
+Image plane capture example
+
+**Example06**
+
+Show `PlayAndDeactivate` script
