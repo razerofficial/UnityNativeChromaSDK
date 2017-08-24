@@ -1045,6 +1045,36 @@ namespace ChromaSDK
             };
         }
 
+        public class Mouse
+        {
+            //! Mouse LED Id defintion for the virtual grid.
+            public enum RZLED2
+            {
+                RZLED2_SCROLLWHEEL = 0x0203,  //!< Scroll Wheel LED.
+                RZLED2_LOGO = 0x0703,  //!< Logo LED.
+                RZLED2_BACKLIGHT = 0x0403,  //!< Backlight LED.
+                RZLED2_LEFT_SIDE1 = 0x0100,  //!< Left LED 1.
+                RZLED2_LEFT_SIDE2 = 0x0200,  //!< Left LED 2.
+                RZLED2_LEFT_SIDE3 = 0x0300,  //!< Left LED 3.
+                RZLED2_LEFT_SIDE4 = 0x0400,  //!< Left LED 4.
+                RZLED2_LEFT_SIDE5 = 0x0500,  //!< Left LED 5.
+                RZLED2_LEFT_SIDE6 = 0x0600,  //!< Left LED 6.
+                RZLED2_LEFT_SIDE7 = 0x0700,  //!< Left LED 7.
+                RZLED2_BOTTOM1 = 0x0801,  //!< Bottom LED 1.
+                RZLED2_BOTTOM2 = 0x0802,  //!< Bottom LED 2.
+                RZLED2_BOTTOM3 = 0x0803,  //!< Bottom LED 3.
+                RZLED2_BOTTOM4 = 0x0804,  //!< Bottom LED 4.
+                RZLED2_BOTTOM5 = 0x0805,  //!< Bottom LED 5.
+                RZLED2_RIGHT_SIDE1 = 0x0106,  //!< Right LED 1.
+                RZLED2_RIGHT_SIDE2 = 0x0206,  //!< Right LED 2.
+                RZLED2_RIGHT_SIDE3 = 0x0306,  //!< Right LED 3.
+                RZLED2_RIGHT_SIDE4 = 0x0406,  //!< Right LED 4.
+                RZLED2_RIGHT_SIDE5 = 0x0506,  //!< Right LED 5.
+                RZLED2_RIGHT_SIDE6 = 0x0606,  //!< Right LED 6.
+                RZLED2_RIGHT_SIDE7 = 0x0706   //!< Right LED 7.
+            }
+        }
+
         public static int GetLowByte(int mask)
         {
             return (int)(mask & 0xFF);
@@ -1164,6 +1194,21 @@ namespace ChromaSDK
             {
                 colors[index] = ToBGR(color);
             }
+        }
+
+        /// <summary>
+        /// Get the index of the mouse led
+        /// The key should be (int)Mouse.RZLED2
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static int GetMouseIndex(int led)
+        {
+            int maxColumn = GetMaxColumn(Device2D.Mouse);
+            int row = GetHighByte((int)led);
+            int column = GetLowByte((int)led);
+            int index = row * maxColumn + column;
+            return index;
         }
     }
 #endif

@@ -40,6 +40,7 @@ class ChromaCaptureWindow : EditorWindow
     private static Texture2D _sTextureClear = null;
 
     private static Texture2D _sKeyboardTexture = null;
+    private static Texture2D _sMouseTexture = null;
     private static Texture2D _sMousepadTexture = null;
 
     private bool _mAutoAlignWithView = false;
@@ -72,6 +73,7 @@ class ChromaCaptureWindow : EditorWindow
 
     }
     private Dictionary<int, Point> _mKeyboardTextureMapping = new Dictionary<int, Point>();
+    private Dictionary<int, Point> _mMouseTextureMapping = new Dictionary<int, Point>();
     private Dictionary<int, Point> _mMousepadTextureMapping = new Dictionary<int, Point>();
 
     [MenuItem("Window/ChromaSDK/Open Capture Chroma Window")]
@@ -257,7 +259,25 @@ class ChromaCaptureWindow : EditorWindow
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_DECIMAL] = new Point(228, 66);
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZLED.RZLED_LOGO] = new Point(124, 84);
 
-        _mMousepadTextureMapping.Clear();
+        _mMouseTextureMapping.Clear();
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_SCROLLWHEEL] = new Point(63, 47);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE1] = new Point(10, 60);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE2] = new Point(11, 86);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE3] = new Point(13, 107);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE4] = new Point(12, 132);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE5] = new Point(15, 158);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE6] = new Point(13, 179);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE7] = new Point(16, 203);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE1] = new Point(117, 60);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE2] = new Point(114, 86);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE3] = new Point(113, 107);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE4] = new Point(115, 132);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE5] = new Point(116, 158);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE6] = new Point(118, 179);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE7] = new Point(111, 203);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LOGO] = new Point(60, 185);
+
+        _mMousepadTextureMapping.Clear(); 
         _mMousepadTextureMapping[0] = new Point(231, 20);
         _mMousepadTextureMapping[1] = new Point(246, 61);
         _mMousepadTextureMapping[2] = new Point(246, 96);
@@ -283,6 +303,23 @@ class ChromaCaptureWindow : EditorWindow
         }
 
         Point point = _mKeyboardTextureMapping[key];
+
+        int index = (RENDER_TEXTURE_SIZE - 1 - point._mY) * RENDER_TEXTURE_SIZE + point._mX;
+        if (index < colors.Length)
+        {
+            return colors[index];
+        }
+        return Color.black;
+    }
+
+    private Color GetMouseColor(Color[] colors, int led)
+    {
+        if (!_mMouseTextureMapping.ContainsKey(led))
+        {
+            return Color.black;
+        }
+
+        Point point = _mMouseTextureMapping[led];
 
         int index = (RENDER_TEXTURE_SIZE - 1 - point._mY) * RENDER_TEXTURE_SIZE + point._mX;
         if (index < colors.Length)
@@ -438,6 +475,15 @@ class ChromaCaptureWindow : EditorWindow
                             }
 
                             UnityNativeChromaSDK.SetKeyboardColor(colors, kvp.Key, color);
+                        }
+                    }
+                    else if (device == UnityNativeChromaSDK.Device2D.Mouse)
+                    {
+                        foreach (KeyValuePair<int, Point> kvp in _mMouseTextureMapping)
+                        {
+                            Color color = GetMouseColor(renderPixels, kvp.Key);
+                            int targetIndex = UnityNativeChromaSDK.GetMouseIndex(kvp.Key);
+                            colors[targetIndex] = UnityNativeChromaSDK.ToBGR(color);
                         }
                     }
                 }
@@ -809,6 +855,11 @@ class ChromaCaptureWindow : EditorWindow
             _sKeyboardTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/KeyboardLayout.png", typeof(Texture2D));
         }
 
+        if (null == _sMouseTexture)
+        {
+            _sMouseTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/MouseLayout.png", typeof(Texture2D));
+        }
+
         if (null == _sMousepadTexture)
         {
             _sMousepadTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/MousepadLayout.png", typeof(Texture2D));
@@ -863,6 +914,10 @@ class ChromaCaptureWindow : EditorWindow
                 if (_sKeyboardTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
                 {
                     GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                }
+                if (_sMouseTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mouse)
+                {
+                    GUI.DrawTexture(rect, _sMouseTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
                 }
                 if (_sMousepadTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
                 {
@@ -1216,6 +1271,15 @@ class ChromaCaptureWindow : EditorWindow
                     }
                     _mDeviceLayout = UnityNativeChromaSDK.Device.Keyboard;
                 }
+                if (GUILayout.Button("M"))
+                {
+                    if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Mouse)
+                    {
+                        _mToggleLayout = !_mToggleLayout;
+                        EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                    }
+                    _mDeviceLayout = UnityNativeChromaSDK.Device.Mouse;
+                }
                 if (GUILayout.Button("MP"))
                 {
                     if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
@@ -1252,6 +1316,11 @@ class ChromaCaptureWindow : EditorWindow
                             if (_sKeyboardTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
                             {
                                 GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                            }
+
+                            if (_sMouseTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mouse)
+                            {
+                                GUI.DrawTexture(rect, _sMouseTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
                             }
 
                             if (_sMousepadTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
