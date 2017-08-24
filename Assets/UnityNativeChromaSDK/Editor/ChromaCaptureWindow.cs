@@ -40,11 +40,13 @@ class ChromaCaptureWindow : EditorWindow
     private static Texture2D _sTextureClear = null;
 
     private static Texture2D _sKeyboardTexture = null;
+    private static Texture2D _sMousepadTexture = null;
 
     private bool _mAutoAlignWithView = false;
     private DateTime _mTimerAlign = DateTime.MinValue;
 
     private bool _mToggleLayout = false;
+    private UnityNativeChromaSDK.Device _mDeviceLayout = UnityNativeChromaSDK.Device.Keyboard;
     private Color _mColorLayout = Color.white;
 
     enum Modes
@@ -69,7 +71,8 @@ class ChromaCaptureWindow : EditorWindow
         public int _mY;
 
     }
-    private Dictionary<int, Point> _mRenderMapping = new Dictionary<int, Point>();
+    private Dictionary<int, Point> _mKeyboardTextureMapping = new Dictionary<int, Point>();
+    private Dictionary<int, Point> _mMousepadTextureMapping = new Dictionary<int, Point>();
 
     [MenuItem("Window/ChromaSDK/Open Capture Chroma Window")]
     private static void OpenPanel()
@@ -140,129 +143,163 @@ class ChromaCaptureWindow : EditorWindow
         GUI.DrawTexture(rect, _mRenderTexture, ScaleMode.ScaleAndCrop, false);
     }
 
-    void SetupRenderMapping()
+    void SetupTextureMapping()
     {
-        _mRenderMapping.Clear();
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO1] = new Point(12, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO2] = new Point(12, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO3] = new Point(12, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO4] = new Point(12, 56);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO5] = new Point(12, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_ESC] = new Point(24, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F1] = new Point(49, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F2] = new Point(59, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F3] = new Point(70, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F4] = new Point(79, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F5] = new Point(91, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F6] = new Point(102, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F7] = new Point(113, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F8] = new Point(122, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F9] = new Point(134, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F10] = new Point(144, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F11] = new Point(154, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F12] = new Point(164, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_PRINTSCREEN] = new Point(176, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_SCROLL] = new Point(185, 14);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_PAUSE] = new Point(195, 14); //pause break
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_1] = new Point(23, 26); //~
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_1] = new Point(34, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_2] = new Point(44, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_3] = new Point(54, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_4] = new Point(64, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_5] = new Point(74, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_6] = new Point(84, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_7] = new Point(94, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_8] = new Point(104, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_9] = new Point(114, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_0] = new Point(124, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_2] = new Point(134, 26); //-
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_3] = new Point(143, 26); //=
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_BACKSPACE] = new Point(158, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_INSERT] = new Point(175, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_HOME] = new Point(186, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_PAGEUP] = new Point(196, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMLOCK] = new Point(208, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_DIVIDE] = new Point(218, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_MULTIPLY] = new Point(228, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_SUBTRACT] = new Point(238, 26);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_TAB] = new Point(26, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_Q] = new Point(39, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_W] = new Point(49, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_E] = new Point(59, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_R] = new Point(69, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_T] = new Point(79, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_Y] = new Point(89, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_U] = new Point(99, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_I] = new Point(109, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_O] = new Point(119, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_P] = new Point(129, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_4] = new Point(139, 36); //[
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_5] = new Point(148, 36); //]
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_6] = new Point(161, 36); //backslash
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_DELETE] = new Point(175, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_END] = new Point(186, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_PAGEDOWN] = new Point(195, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD7] = new Point(208, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD8] = new Point(218, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD9] = new Point(228, 36);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_ADD] = new Point(238, 42);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_CAPSLOCK] = new Point(27, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_A] = new Point(41, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_S] = new Point(51, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_D] = new Point(61, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F] = new Point(71, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_G] = new Point(81, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_H] = new Point(91, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_J] = new Point(101, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_K] = new Point(111, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_L] = new Point(121, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_7] = new Point(131, 46); //;
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_8] = new Point(141, 46); //'
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_ENTER] = new Point(157, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD4] = new Point(208, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD5] = new Point(218, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD6] = new Point(228, 0);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LSHIFT] = new Point(29, 56);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_Z] = new Point(46, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_X] = new Point(56, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_C] = new Point(66, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_V] = new Point(76, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_B] = new Point(86, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_N] = new Point(96, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_M] = new Point(106, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_9] = new Point(116, 46); //,
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_10] = new Point(126, 46); //.
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_11] = new Point(136, 46); // /
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RSHIFT] = new Point(154, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_UP] = new Point(186, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD1] = new Point(208, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD2] = new Point(218, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD3] = new Point(228, 46);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_ENTER] = new Point(238, 60);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LCTRL] = new Point(11, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LWIN] = new Point(27, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LALT] = new Point(39, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_SPACE] = new Point(88, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RALT] = new Point(126, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_FN] = new Point(139, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RMENU] = new Point(149, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RCTRL] = new Point(161, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LEFT] = new Point(176, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_DOWN] = new Point(186, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RIGHT] = new Point(196, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD0] = new Point(213, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_DECIMAL] = new Point(228, 66);
-        _mRenderMapping[(int)UnityNativeChromaSDK.Keyboard.RZLED.RZLED_LOGO] = new Point(124, 84);
+        _mKeyboardTextureMapping.Clear();
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO1] = new Point(12, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO2] = new Point(12, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO3] = new Point(12, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO4] = new Point(12, 56);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO5] = new Point(12, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_ESC] = new Point(24, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F1] = new Point(49, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F2] = new Point(59, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F3] = new Point(70, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F4] = new Point(79, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F5] = new Point(91, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F6] = new Point(102, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F7] = new Point(113, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F8] = new Point(122, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F9] = new Point(134, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F10] = new Point(144, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F11] = new Point(154, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F12] = new Point(164, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_PRINTSCREEN] = new Point(176, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_SCROLL] = new Point(185, 14);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_PAUSE] = new Point(195, 14); //pause break
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_1] = new Point(23, 26); //~
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_1] = new Point(34, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_2] = new Point(44, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_3] = new Point(54, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_4] = new Point(64, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_5] = new Point(74, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_6] = new Point(84, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_7] = new Point(94, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_8] = new Point(104, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_9] = new Point(114, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_0] = new Point(124, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_2] = new Point(134, 26); //-
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_3] = new Point(143, 26); //=
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_BACKSPACE] = new Point(158, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_INSERT] = new Point(175, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_HOME] = new Point(186, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_PAGEUP] = new Point(196, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMLOCK] = new Point(208, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_DIVIDE] = new Point(218, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_MULTIPLY] = new Point(228, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_SUBTRACT] = new Point(238, 26);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_TAB] = new Point(26, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_Q] = new Point(39, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_W] = new Point(49, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_E] = new Point(59, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_R] = new Point(69, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_T] = new Point(79, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_Y] = new Point(89, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_U] = new Point(99, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_I] = new Point(109, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_O] = new Point(119, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_P] = new Point(129, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_4] = new Point(139, 36); //[
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_5] = new Point(148, 36); //]
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_6] = new Point(161, 36); //backslash
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_DELETE] = new Point(175, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_END] = new Point(186, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_PAGEDOWN] = new Point(195, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD7] = new Point(208, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD8] = new Point(218, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD9] = new Point(228, 36);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_ADD] = new Point(238, 42);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_CAPSLOCK] = new Point(27, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_A] = new Point(41, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_S] = new Point(51, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_D] = new Point(61, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_F] = new Point(71, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_G] = new Point(81, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_H] = new Point(91, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_J] = new Point(101, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_K] = new Point(111, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_L] = new Point(121, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_7] = new Point(131, 46); //;
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_8] = new Point(141, 46); //'
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_ENTER] = new Point(157, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD4] = new Point(208, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD5] = new Point(218, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD6] = new Point(228, 0);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LSHIFT] = new Point(29, 56);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_Z] = new Point(46, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_X] = new Point(56, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_C] = new Point(66, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_V] = new Point(76, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_B] = new Point(86, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_N] = new Point(96, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_M] = new Point(106, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_9] = new Point(116, 46); //,
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_10] = new Point(126, 46); //.
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_OEM_11] = new Point(136, 46); // /
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RSHIFT] = new Point(154, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_UP] = new Point(186, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD1] = new Point(208, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD2] = new Point(218, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD3] = new Point(228, 46);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_ENTER] = new Point(238, 60);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LCTRL] = new Point(11, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LWIN] = new Point(27, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LALT] = new Point(39, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_SPACE] = new Point(88, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RALT] = new Point(126, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_FN] = new Point(139, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RMENU] = new Point(149, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RCTRL] = new Point(161, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LEFT] = new Point(176, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_DOWN] = new Point(186, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_RIGHT] = new Point(196, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD0] = new Point(213, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_DECIMAL] = new Point(228, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZLED.RZLED_LOGO] = new Point(124, 84);
+
+        _mMousepadTextureMapping.Clear();
+        _mMousepadTextureMapping[0] = new Point(231, 20);
+        _mMousepadTextureMapping[1] = new Point(246, 61);
+        _mMousepadTextureMapping[2] = new Point(246, 96);
+        _mMousepadTextureMapping[3] = new Point(246, 130);
+        _mMousepadTextureMapping[4] = new Point(238, 165);
+        _mMousepadTextureMapping[5] = new Point(206, 179);
+        _mMousepadTextureMapping[6] = new Point(164, 179);
+        _mMousepadTextureMapping[7] = new Point(124, 179);
+        _mMousepadTextureMapping[8] = new Point(86, 179);
+        _mMousepadTextureMapping[9] = new Point(44, 179);
+        _mMousepadTextureMapping[10] = new Point(11, 165);
+        _mMousepadTextureMapping[11] = new Point(3, 129);
+        _mMousepadTextureMapping[12] = new Point(3, 98);
+        _mMousepadTextureMapping[13] = new Point(3, 61);
+        _mMousepadTextureMapping[14] = new Point(6, 21);
     }
 
     private Color GetKeyboardColor(Color[] colors, int key)
     {
-        if (!_mRenderMapping.ContainsKey(key))
+        if (!_mKeyboardTextureMapping.ContainsKey(key))
         {
             return Color.black;
         }
 
-        Point point = _mRenderMapping[key];
+        Point point = _mKeyboardTextureMapping[key];
+
+        int index = (RENDER_TEXTURE_SIZE - 1 - point._mY) * RENDER_TEXTURE_SIZE + point._mX;
+        if (index < colors.Length)
+        {
+            return colors[index];
+        }
+        return Color.black;
+    }
+
+    private Color GetMousepadColor(Color[] colors, int led)
+    {
+        if (!_mMousepadTextureMapping.ContainsKey(led))
+        {
+            return Color.black;
+        }
+
+        Point point = _mMousepadTextureMapping[led];
 
         int index = (RENDER_TEXTURE_SIZE - 1 - point._mY) * RENDER_TEXTURE_SIZE + point._mX;
         if (index < colors.Length)
@@ -310,6 +347,7 @@ class ChromaCaptureWindow : EditorWindow
                 DisplayRenderTexture(0, maxLeds, 1);
                 _mTempTexture.ReadPixels(new Rect(0, 0, _mTempTexture.width, _mTempTexture.height), 0, 0, false);
                 _mTempTexture.Apply();
+                Color[] renderPixels = _mTempTexture.GetPixels();
                 TextureScale.Bilinear(_mTempTexture, maxLeds, 1);
                 _mTempTexture.Apply();
                 RenderTexture.active = null;
@@ -323,6 +361,17 @@ class ChromaCaptureWindow : EditorWindow
                         Color color = pixels[index];
                         colors[i] = UnityNativeChromaSDK.ToBGR(color);
                         ++index;
+                    }
+                }
+                if (_mToggleLayout)
+                {
+                    if (device == UnityNativeChromaSDK.Device1D.Mousepad)
+                    {
+                        foreach (KeyValuePair<int, Point> kvp in _mMousepadTextureMapping)
+                        {
+                            Color color = GetMousepadColor(renderPixels, kvp.Key);
+                            colors[kvp.Key] = UnityNativeChromaSDK.ToBGR(color);
+                        }
                     }
                 }
 #if !SHOW_TEMP_TEXTURE
@@ -369,26 +418,27 @@ class ChromaCaptureWindow : EditorWindow
                         ++index;
                     }
                 }
-                if (_mToggleLayout &&
-                    device == UnityNativeChromaSDK.Device2D.Keyboard)
+                if (_mToggleLayout)
                 {
-                    foreach (KeyValuePair<int, Point> kvp in _mRenderMapping)
+                    if (device == UnityNativeChromaSDK.Device2D.Keyboard)
                     {
-                        Color color = GetKeyboardColor(renderPixels, kvp.Key);
-
-                        // use mask to see if key should be skipped
-                        int targetIndex = UnityNativeChromaSDK.GetKeyboardIndex(kvp.Key);
-                        if (device == UnityNativeChromaSDK.Device2D.Keyboard &&
-                            null != maskColors &&
-                            targetIndex < maskColors.Length)
+                        foreach (KeyValuePair<int, Point> kvp in _mKeyboardTextureMapping)
                         {
-                            if (maskColors[targetIndex] == 0)
-                            {
-                                color = Color.black;
-                            }
-                        }
+                            Color color = GetKeyboardColor(renderPixels, kvp.Key);
 
-                        UnityNativeChromaSDK.SetKeyboardColor(colors, kvp.Key, color);
+                            // use mask to see if key should be skipped
+                            int targetIndex = UnityNativeChromaSDK.GetKeyboardIndex(kvp.Key);
+                            if (null != maskColors &&
+                                targetIndex < maskColors.Length)
+                            {
+                                if (maskColors[targetIndex] == 0)
+                                {
+                                    color = Color.black;
+                                }
+                            }
+
+                            UnityNativeChromaSDK.SetKeyboardColor(colors, kvp.Key, color);
+                        }
                     }
                 }
 #if !SHOW_TEMP_TEXTURE
@@ -752,11 +802,16 @@ class ChromaCaptureWindow : EditorWindow
 #if SHOW_LAYOUT_IN_SCENE_VIEW
         SceneView.onSceneGUIDelegate += this.OnSceneGUI;
 #endif
-        SetupRenderMapping();
+        SetupTextureMapping();
 
         if (null == _sKeyboardTexture)
         {
             _sKeyboardTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/KeyboardLayout.png", typeof(Texture2D));
+        }
+
+        if (null == _sMousepadTexture)
+        {
+            _sMousepadTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/MousepadLayout.png", typeof(Texture2D));
         }
 
         if (EditorPrefs.HasKey(KEY_AUTO_ALIGN))
@@ -800,16 +855,20 @@ class ChromaCaptureWindow : EditorWindow
 
             if (_mRenderCamera)
             {
-                if (_sKeyboardTexture)
+                Color oldColor = GUI.color;
+                GUI.color = _mColorLayout;
+                int size = Mathf.Min(Screen.width, Screen.height);
+                int center = Screen.width / 2;
+                Rect rect = new Rect(center - size / 2, 0, size, size);
+                if (_sKeyboardTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
                 {
-                    Color oldColor = GUI.color;
-                    GUI.color = _mColorLayout;
-                    int size = Mathf.Min(Screen.width, Screen.height);
-                    int center = Screen.width / 2;
-                    Rect rect = new Rect(center-size/2, 0, size, size);
                     GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                    GUI.color = oldColor;
                 }
+                if (_sMousepadTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
+                {
+                    GUI.DrawTexture(rect, _sMousepadTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                }
+                GUI.color = oldColor;
             }
 
             Handles.EndGUI();
@@ -1147,10 +1206,24 @@ class ChromaCaptureWindow : EditorWindow
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                if (GUILayout.Button("Layout"))
+                GUILayout.Label("Layout");
+                if (GUILayout.Button("K"))
                 {
-                    _mToggleLayout = !_mToggleLayout;
-                    EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                    if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
+                    {
+                        _mToggleLayout = !_mToggleLayout;
+                        EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                    }
+                    _mDeviceLayout = UnityNativeChromaSDK.Device.Keyboard;
+                }
+                if (GUILayout.Button("MP"))
+                {
+                    if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
+                    {
+                        _mToggleLayout = !_mToggleLayout;
+                        EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                    }
+                    _mDeviceLayout = UnityNativeChromaSDK.Device.Mousepad;
                 }
                 _mColorLayout = EditorGUILayout.ColorField(_mColorLayout);
                 GUILayout.EndHorizontal();
@@ -1175,7 +1248,17 @@ class ChromaCaptureWindow : EditorWindow
                             GUI.color = _mColorLayout;
                             const int border = 2;
                             rect = new Rect(rect.x + border, rect.y + border, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
-                            GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                            
+                            if (_sKeyboardTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
+                            {
+                                GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                            }
+
+                            if (_sMousepadTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
+                            {
+                                GUI.DrawTexture(rect, _sMousepadTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                            }
+
                             GUI.color = oldColor;
                         }
                     }
