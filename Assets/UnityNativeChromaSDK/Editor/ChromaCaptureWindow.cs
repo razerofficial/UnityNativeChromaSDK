@@ -284,21 +284,21 @@ class ChromaCaptureWindow : EditorWindow
 
 
         _mMousepadTextureMapping.Clear(); 
-        _mMousepadTextureMapping[0] = new Point(231, 20);
-        _mMousepadTextureMapping[1] = new Point(246, 61);
-        _mMousepadTextureMapping[2] = new Point(246, 96);
-        _mMousepadTextureMapping[3] = new Point(246, 130);
-        _mMousepadTextureMapping[4] = new Point(238, 165);
-        _mMousepadTextureMapping[5] = new Point(206, 179);
-        _mMousepadTextureMapping[6] = new Point(164, 179);
-        _mMousepadTextureMapping[7] = new Point(124, 179);
-        _mMousepadTextureMapping[8] = new Point(86, 179);
-        _mMousepadTextureMapping[9] = new Point(44, 179);
-        _mMousepadTextureMapping[10] = new Point(11, 165);
-        _mMousepadTextureMapping[11] = new Point(3, 129);
-        _mMousepadTextureMapping[12] = new Point(3, 98);
-        _mMousepadTextureMapping[13] = new Point(3, 61);
-        _mMousepadTextureMapping[14] = new Point(6, 21);
+        _mMousepadTextureMapping[0] = new Point(235, 28);
+        _mMousepadTextureMapping[1] = new Point(252, 84);
+        _mMousepadTextureMapping[2] = new Point(252, 131);
+        _mMousepadTextureMapping[3] = new Point(252, 182);
+        _mMousepadTextureMapping[4] = new Point(244, 231);
+        _mMousepadTextureMapping[5] = new Point(211, 251);
+        _mMousepadTextureMapping[6] = new Point(168, 251);
+        _mMousepadTextureMapping[7] = new Point(127, 251);
+        _mMousepadTextureMapping[8] = new Point(88, 251);
+        _mMousepadTextureMapping[9] = new Point(46, 251);
+        _mMousepadTextureMapping[10] = new Point(13, 231);
+        _mMousepadTextureMapping[11] = new Point(4, 182);
+        _mMousepadTextureMapping[12] = new Point(4, 131);
+        _mMousepadTextureMapping[13] = new Point(4, 84);
+        _mMousepadTextureMapping[14] = new Point(8, 28);
     }
 
     private Color GetKeyboardColor(Color[] colors, int key)
