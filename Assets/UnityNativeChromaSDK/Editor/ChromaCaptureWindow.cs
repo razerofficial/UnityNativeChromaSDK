@@ -260,22 +260,28 @@ class ChromaCaptureWindow : EditorWindow
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZLED.RZLED_LOGO] = new Point(124, 84);
 
         _mMouseTextureMapping.Clear();
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_SCROLLWHEEL] = new Point(63, 47);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE1] = new Point(10, 60);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE2] = new Point(11, 86);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE3] = new Point(13, 107);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE4] = new Point(12, 132);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE5] = new Point(15, 158);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE6] = new Point(13, 179);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE7] = new Point(16, 203);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE1] = new Point(117, 60);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE2] = new Point(114, 86);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE3] = new Point(113, 107);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE4] = new Point(115, 132);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE5] = new Point(116, 158);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE6] = new Point(118, 179);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE7] = new Point(111, 203);
-        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LOGO] = new Point(60, 185);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LOGO] = new Point(127, 167);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_BOTTOM1] = new Point(43, 237);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_BOTTOM2] = new Point(85, 237);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_BOTTOM3] = new Point(127, 237);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_BOTTOM4] = new Point(170, 237);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_BOTTOM5] = new Point(212, 237);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE1] = new Point(21, 41);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE2] = new Point(21, 70);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE3] = new Point(21, 96);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE4] = new Point(21, 123);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE5] = new Point(21, 149);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE6] = new Point(21, 178);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_LEFT_SIDE7] = new Point(21, 205);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE1] = new Point(236, 41);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE2] = new Point(236, 70);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE3] = new Point(236, 96);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE4] = new Point(236, 123);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE5] = new Point(236, 149);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE6] = new Point(236, 178);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_RIGHT_SIDE7] = new Point(236, 205);
+        _mMouseTextureMapping[(int)UnityNativeChromaSDK.Mouse.RZLED2.RZLED2_SCROLLWHEEL] = new Point(127, 53);
+
 
         _mMousepadTextureMapping.Clear(); 
         _mMousepadTextureMapping[0] = new Point(231, 20);
