@@ -37,6 +37,13 @@ public class UnityNativeChromaSDKPlayAndDeactivate: MonoBehaviour
     // Play the animation on enable
     void OnEnable()
     {
+		// Turn off script if platform is not supported
+		if (!UnityNativeChromaSDK.IsPlatformSupported())
+		{
+			enabled = false;
+			return;
+		}
+		
         // play the animation in the on enable event
         _mAnimationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
         UnityNativeChromaSDK.PlayAnimation(_mAnimationName);

@@ -18,6 +18,15 @@ namespace ChromaSDK
         const string DLL_NAME = "UnityNativeChromaSDK";
 #endif
 
+		/// <summary>
+		/// Get the plugin version
+		/// </summary>
+		/// <returns></returns>
+		public static string GetVersion()
+		{
+			return "1.5";
+		}
+
         /// <summary>
         /// Returns true if the platform is supported
         /// false if not supported
@@ -32,14 +41,164 @@ namespace ChromaSDK
 #endif
         }
 
-        /// <summary>
-        /// Get the plugin version
-        /// </summary>
-        /// <returns></returns>
-        public static string GetVersion()
-        {
-            return "1.5";
-        }
+		/// <summary>
+		/// Initialize and clear the loaded animations dictionary
+		/// </summary>
+		public static int Init()
+		{
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+			bool isInitialized = PluginIsInitialized();
+			if (!isInitialized)
+			{
+				int result = PluginInit();
+				_sLoadedAnimations.Clear();
+				return result;
+			}
+			//ignore: already initialized
+			return 0;
+#else
+			return -1;
+#endif
+		}
+
+		/// <summary>
+		/// Uninitialize and clear the loaded animations dictionary
+		/// </summary>
+		/// <returns></returns>
+		public static int Uninit()
+		{
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+			_sLoadedAnimations.Clear();
+			bool isInitialized = PluginIsInitialized();
+			if (isInitialized)
+			{
+				int result = PluginUninit();
+				return result;
+			}
+			//ignore: already uninitialized
+			return 0;
+#else
+			return -1;
+#endif
+		}
+
+		/// <summary>
+		/// Get the animation name with the .chroma extension
+		/// </summary>
+		/// <returns></returns>
+		public static string GetAnimationNameWithExtension(string animation)
+		{
+			if (string.IsNullOrEmpty(animation))
+			{
+				return string.Empty;
+			}
+			if (animation.EndsWith(".chroma"))
+			{
+				return animation;
+			}
+			return string.Format("{0}.chroma", animation);
+		}
+
+		/// <summary>
+		/// Get the animation id given an animation name,
+		/// Store the opened animation and reference by animation name
+		/// Returns -1 if failure occurred
+		/// else returns the animation id
+		/// </summary>
+		/// <param name="animation"></param>
+		/// <returns></returns>
+		public static int GetAnimation(string animation)
+		{
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+			if (string.IsNullOrEmpty(animation))
+			{
+				return -1;
+			}
+			string path = GetStreamingPath(animation);
+			int animationid;
+			if (!_sLoadedAnimations.ContainsKey(animation))
+			{
+				animationid = OpenAnimation(path);
+				if (animationid >= 0)
+				{
+					_sLoadedAnimations[animation] = animationid;
+				}
+			}
+			else
+			{
+				animationid = _sLoadedAnimations[animation];
+			}
+			return animationid;
+#else
+			return -1;
+#endif
+		}
+
+		/// <summary>
+		/// Play the animation,
+		/// returns animation id upon success
+		/// returns -1 on failure
+		/// </summary>
+		/// <param name="animation"></param>
+		/// <returns></returns>
+		public static int PlayAnimation(string animation)
+		{
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+			int animationId = GetAnimation(animation);
+			if (animationId >= 0)
+			{
+				int result = PluginPlayAnimation(animationId);
+				return result;
+			}
+			return animationId;
+#else
+			return -1;
+#endif
+		}
+
+		/// <summary>
+		/// Check if the animation is playing,
+		/// returns true if playing
+		/// returns false if not playing
+		/// </summary>
+		/// <param name="animation"></param>
+		/// <returns></returns>
+		public static bool IsPlaying(string animation)
+		{
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+			int animationId = GetAnimation(animation);
+			if (animationId >= 0)
+			{
+				bool result = PluginIsPlaying(animationId);
+				return result;
+			}
+			return false;
+#else
+			return false;
+#endif
+		}
+
+		/// <summary>
+		/// Stop the animation,
+		/// returns animation id upon success
+		/// returns -1 on failure
+		/// </summary>
+		/// <param name="animation"></param>
+		/// <returns></returns>
+		public static int StopAnimation(string animation)
+		{
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+			int animationId = GetAnimation(animation);
+			if (animationId >= 0)
+			{
+				int result = PluginStopAnimation(animationId);
+				return result;
+			}
+			return animationId;
+#else
+			return -1;
+#endif
+		}
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 
@@ -690,123 +849,6 @@ namespace ChromaSDK
         private static Dictionary<string, int> _sLoadedAnimations = new Dictionary<string, int>();
 
         /// <summary>
-        /// Initialize and clear the loaded animations dictionary
-        /// </summary>
-        public static int Init()
-        {
-            bool isInitialized = PluginIsInitialized();
-            if (!isInitialized)
-            {
-                int result = PluginInit();
-                _sLoadedAnimations.Clear();
-                return result;
-            }
-            //ignore: already initialized
-            return 0;
-        }
-
-        /// <summary>
-        /// Uninitialize and clear the loaded animations dictionary
-        /// </summary>
-        /// <returns></returns>
-        public static int Uninit()
-        {
-            _sLoadedAnimations.Clear();
-            bool isInitialized = PluginIsInitialized();
-            if (isInitialized)
-            {
-                int result = PluginUninit();
-                return result;
-            }
-            //ignore: already uninitialized
-            return 0;
-        }
-
-        /// <summary>
-        /// Get the animation name with the .chroma extension
-        /// </summary>
-        /// <returns></returns>
-        public static string GetAnimationNameWithExtension(string animation)
-        {
-            if (string.IsNullOrEmpty(animation))
-            {
-                return string.Empty;
-            }
-            if (animation.EndsWith(".chroma"))
-            {
-                return animation;
-            }
-            return string.Format("{0}.chroma", animation);
-        }
-
-        /// <summary>
-        /// Get the animation id given an animation name,
-        /// Store the opened animation and reference by animation name
-        /// Returns -1 if failure occurred
-        /// else returns the animation id
-        /// </summary>
-        /// <param name="animation"></param>
-        /// <returns></returns>
-        public static int GetAnimation(string animation)
-        {
-            if (string.IsNullOrEmpty(animation))
-            {
-                return -1;
-            }
-            string path = GetStreamingPath(animation);
-            int animationid;
-            if (!_sLoadedAnimations.ContainsKey(animation))
-            {
-                animationid = OpenAnimation(path);
-                if (animationid >= 0)
-                {
-                    _sLoadedAnimations[animation] = animationid;
-                }
-            }
-            else
-            {
-                animationid = _sLoadedAnimations[animation];
-            }
-            return animationid;
-        }
-
-        /// <summary>
-        /// Play the animation,
-        /// returns animation id upon success
-        /// returns -1 on failure
-        /// </summary>
-        /// <param name="animation"></param>
-        /// <returns></returns>
-        public static int PlayAnimation(string animation)
-        {
-            int animationId = GetAnimation(animation);
-            if (animationId >= 0)
-            {
-                int result = PluginPlayAnimation(animationId);
-                return result;
-            }
-            return animationId;
-        }
-
-        /// <summary>
-        /// Check if the animation is playing,
-        /// returns true if playing
-        /// returns false if not playing
-        /// </summary>
-        /// <param name="animation"></param>
-        /// <returns></returns>
-        public static bool IsPlaying(string animation)
-        {
-            int animationId = GetAnimation(animation);
-            if (animationId >= 0)
-            {
-                bool result = PluginIsPlaying(animationId);
-                return result;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Close the animation,
         /// returns animation id upon success
         /// returns -1 on failure
@@ -826,24 +868,6 @@ namespace ChromaSDK
                         _sLoadedAnimations.Remove(animation);
                     }
                 }
-                return result;
-            }
-            return animationId;
-        }
-
-        /// <summary>
-        /// Stop the animation,
-        /// returns animation id upon success
-        /// returns -1 on failure
-        /// </summary>
-        /// <param name="animation"></param>
-        /// <returns></returns>
-        public static int StopAnimation(string animation)
-        {
-            int animationId = GetAnimation(animation);
-            if (animationId >= 0)
-            {
-                int result = PluginStopAnimation(animationId);
                 return result;
             }
             return animationId;
@@ -1210,6 +1234,7 @@ namespace ChromaSDK
             int index = row * maxColumn + column;
             return index;
         }
-    }
+
 #endif
+    }
 }

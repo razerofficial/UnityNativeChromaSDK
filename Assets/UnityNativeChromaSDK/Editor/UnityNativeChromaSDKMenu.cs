@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class UnityNativeChromaSDKMenu : MonoBehaviour
 {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
     private const int VERSION = 1;
 
     [MenuItem("Assets/ChromaSDK/Open Docs")]
@@ -45,4 +46,5 @@ public class UnityNativeChromaSDKMenu : MonoBehaviour
         }
 
     }
+#endif
 }
