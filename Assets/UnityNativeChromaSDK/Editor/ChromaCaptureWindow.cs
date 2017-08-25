@@ -915,8 +915,9 @@ class ChromaCaptureWindow : EditorWindow
                 Color oldColor = GUI.color;
                 GUI.color = _mColorLayout;
                 int size = Mathf.Min(Screen.width, Screen.height);
-                int center = Screen.width / 2;
-                Rect rect = new Rect(center - size / 2, 0, size, size);
+                int centerWidth = Screen.width / 2;
+                int centerHeight = Screen.height / 2;
+                Rect rect = new Rect(centerWidth - size / 2, centerHeight - size / 2, size, size);
                 if (_sKeyboardTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
                 {
                     GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
