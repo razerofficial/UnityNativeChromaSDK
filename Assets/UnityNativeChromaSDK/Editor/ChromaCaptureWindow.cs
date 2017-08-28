@@ -1042,6 +1042,15 @@ class ChromaCaptureWindow : EditorWindow
                     go.AddComponent<UnityNativeChromaSDKPlayAndDeactivate>().AnimationName = animationName;
                 }
             }
+            if (GUILayout.Button("PlayOnDestroy"))
+            {
+                GameObject go = new GameObject("CompositePlayOnDestroy");
+                for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                {
+                    string animationName = GetCompositeName(device);
+                    go.AddComponent<UnityNativeChromaSDKPlayOnDestroy>().AnimationName = animationName;
+                }
+            }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
