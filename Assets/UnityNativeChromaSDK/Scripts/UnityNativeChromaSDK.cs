@@ -58,10 +58,24 @@ namespace ChromaSDK
             {
                 return -1;
             }
-            bool isInitialized = PluginIsInitialized();
+            bool isInitialized = false;
+            try
+            {
+                isInitialized = PluginIsInitialized();
+            }
+            catch (Exception)
+            {
+            }
 			if (!isInitialized)
 			{
-				int result = PluginInit();
+                int result = -1;
+                try
+                {
+                    result = PluginInit();
+                }
+                catch (Exception)
+                {
+                }
 				_sLoadedAnimations.Clear();
 				return result;
 			}
@@ -84,10 +98,24 @@ namespace ChromaSDK
                 return -1;
             }
             _sLoadedAnimations.Clear();
-			bool isInitialized = PluginIsInitialized();
+            bool isInitialized = false;
+            try
+            {
+                isInitialized = PluginIsInitialized();
+            }
+            catch (Exception)
+            {
+            }
 			if (isInitialized)
 			{
-				int result = PluginUninit();
+                int result = -1;
+                try
+                {
+                    result = PluginUninit();
+                }
+                catch (Exception)
+                {
+                }
 				return result;
 			}
 			//ignore: already uninitialized
@@ -468,7 +496,14 @@ namespace ChromaSDK
                 byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName+"\0");
                 IntPtr lpData = Marshal.AllocHGlobal(array.Length);
                 Marshal.Copy(array, 0, lpData, array.Length);
-                int animationId = PluginOpenAnimation(lpData);
+                int animationId = 1;
+                try
+                {
+                    animationId = PluginOpenAnimation(lpData);
+                }
+                catch (Exception)
+                {
+                }
                 Marshal.FreeHGlobal(lpData);
                 return animationId;
             }
@@ -495,7 +530,14 @@ namespace ChromaSDK
                 byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName+"\0");
                 IntPtr lpData = Marshal.AllocHGlobal(array.Length);
                 Marshal.Copy(array, 0, lpData, array.Length);
-                int animationId = PluginOpenEditorDialog(lpData);
+                int animationId = 1;
+                try
+                {
+                    animationId = PluginOpenEditorDialog(lpData);
+                }
+                catch (Exception)
+                {
+                }
                 Marshal.FreeHGlobal(lpData);
                 return animationId;
             }
@@ -516,7 +558,14 @@ namespace ChromaSDK
                 byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName + "\0");
                 IntPtr lpData = Marshal.AllocHGlobal(array.Length);
                 Marshal.Copy(array, 0, lpData, array.Length);
-                int result = PluginSaveAnimation(animationId, lpData);
+                int result = -1;
+                try
+                {
+                    result = PluginSaveAnimation(animationId, lpData);
+                }
+                catch (Exception)
+                {
+                }
                 Marshal.FreeHGlobal(lpData);
                 return result;
             }
