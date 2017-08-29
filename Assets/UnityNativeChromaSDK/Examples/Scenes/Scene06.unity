@@ -99,7 +99,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 574504689}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -.707106829, y: -0, z: 0, w: -.707106829}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -112,8 +112,8 @@ Camera:
   m_GameObject: {fileID: 574504689}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -123,14 +123,14 @@ Camera:
   near clip plane: .300000012
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 100
+  orthographic: 1
+  orthographic size: 285.164307
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 1821261886}
   m_HDR: 0
 --- !u!81 &574504692
 AudioListener:
@@ -251,3 +251,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25e2a619375e33a4fa1ff81567c97c46, type: 1}
   m_Name: 
   AnimationName: Random_ChromaLink.chroma
+--- !u!84 &1821261886
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_Width: 256
+  m_Height: 256
+  m_DepthFormat: 2
+  m_ColorFormat: 0
+  m_IsCubemap: 0
+  m_MipMap: 0
+  m_SRGB: 0
+  m_TextureSettings:
+    m_FilterMode: 1
+    m_Aniso: 0
+    m_MipBias: 0
+    m_WrapMode: 1

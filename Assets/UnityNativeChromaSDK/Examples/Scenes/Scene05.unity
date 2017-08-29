@@ -74,7 +74,7 @@ NavMeshSettings:
     widthInaccuracy: 16.666666
     heightInaccuracy: 10
   m_NavMesh: {fileID: 0}
---- !u!84 &564502903
+--- !u!84 &58831578
 RenderTexture:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -170,7 +170,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1456005978}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -.707106829, y: -0, z: 0, w: -.707106829}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -183,8 +183,8 @@ Camera:
   m_GameObject: {fileID: 1456005978}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -194,14 +194,14 @@ Camera:
   near clip plane: .300000012
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 100
+  orthographic: 1
+  orthographic size: 285.164307
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 58831578}
   m_HDR: 0
 --- !u!81 &1456005981
 AudioListener:
@@ -224,6 +224,24 @@ Behaviour:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1456005978}
   m_Enabled: 1
+--- !u!84 &1636554297
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_Width: 256
+  m_Height: 256
+  m_DepthFormat: 2
+  m_ColorFormat: 0
+  m_IsCubemap: 0
+  m_MipMap: 0
+  m_SRGB: 0
+  m_TextureSettings:
+    m_FilterMode: 1
+    m_Aniso: 0
+    m_MipBias: 0
+    m_WrapMode: 1
 --- !u!1 &1730195910
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,8 +266,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1730195910}
-  m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106829}
-  m_LocalPosition: {x: -81.8652573, y: 1265.39001, z: -36.0413475}
+  m_LocalRotation: {x: -.707106829, y: -0, z: 0, w: -.707106829}
+  m_LocalPosition: {x: -223.71199, y: 832.164673, z: 8.4550581}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -261,8 +279,8 @@ Camera:
   m_GameObject: {fileID: 1730195910}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -273,13 +291,13 @@ Camera:
   far clip plane: 9999
   field of view: 60
   orthographic: 1
-  orthographic size: 431.820007
+  orthographic size: 285.164307
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 564502903}
+  m_TargetTexture: {fileID: 1636554297}
   m_HDR: 0
 --- !u!92 &1730195914
 Behaviour:

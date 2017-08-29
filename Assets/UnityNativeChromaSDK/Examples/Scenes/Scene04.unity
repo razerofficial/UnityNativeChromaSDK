@@ -99,7 +99,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1030733724}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -.707106829, y: -0, z: 0, w: -.707106829}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -112,8 +112,8 @@ Camera:
   m_GameObject: {fileID: 1030733724}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -123,14 +123,14 @@ Camera:
   near clip plane: .300000012
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 100
+  orthographic: 1
+  orthographic size: 285.164307
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 1142746863}
   m_HDR: 0
 --- !u!81 &1030733727
 AudioListener:
@@ -153,6 +153,24 @@ Behaviour:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1030733724}
   m_Enabled: 1
+--- !u!84 &1142746863
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_Width: 256
+  m_Height: 256
+  m_DepthFormat: 2
+  m_ColorFormat: 0
+  m_IsCubemap: 0
+  m_MipMap: 0
+  m_SRGB: 0
+  m_TextureSettings:
+    m_FilterMode: 1
+    m_Aniso: 0
+    m_MipBias: 0
+    m_WrapMode: 1
 --- !u!1001 &1372784399
 Prefab:
   m_ObjectHideFlags: 0
@@ -236,7 +254,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomChromaLinkEffect
+  AnimationName: Random_ChromaLink.chroma
+  Loop: 0
 --- !u!114 &2071709150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,7 +267,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomHeadsetEffect
+  AnimationName: Random_Headset.chroma
+  Loop: 0
 --- !u!114 &2071709151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,7 +280,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomKeyboardEffect
+  AnimationName: Random_Keyboard.chroma
+  Loop: 0
 --- !u!114 &2071709152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,7 +293,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomKeypadEffect
+  AnimationName: Random_Keypad.chroma
+  Loop: 0
 --- !u!114 &2071709153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -284,7 +306,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomMouseEffect
+  AnimationName: Random_Mouse.chroma
+  Loop: 0
 --- !u!114 &2071709154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,4 +319,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8656669802b72a84983a62be53618b9c, type: 1}
   m_Name: 
-  AnimationName: RandomMousepadEffect
+  AnimationName: Random_Mousepad.chroma
+  Loop: 0
