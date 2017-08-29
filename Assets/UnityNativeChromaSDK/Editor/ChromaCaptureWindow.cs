@@ -39,6 +39,7 @@ class ChromaCaptureWindow : EditorWindow
 
     private static Texture2D _sTextureClear = null;
 
+    private static Texture2D _sChromaLinkTexture = null;
     private static Texture2D _sKeyboardTexture = null;
     private static Texture2D _sMouseTexture = null;
     private static Texture2D _sMousepadTexture = null;
@@ -72,6 +73,7 @@ class ChromaCaptureWindow : EditorWindow
         public int _mY;
 
     }
+    private Dictionary<int, Point> _mChromaLinkTextureMapping = new Dictionary<int, Point>();
     private Dictionary<int, Point> _mKeyboardTextureMapping = new Dictionary<int, Point>();
     private Dictionary<int, Point> _mMouseTextureMapping = new Dictionary<int, Point>();
     private Dictionary<int, Point> _mMousepadTextureMapping = new Dictionary<int, Point>();
@@ -147,6 +149,14 @@ class ChromaCaptureWindow : EditorWindow
 
     void SetupTextureMapping()
     {
+        _mChromaLinkTextureMapping.Clear();
+        _mChromaLinkTextureMapping[0] = new Point(19, 127);
+        _mChromaLinkTextureMapping[1] = new Point(73, 127);
+        _mChromaLinkTextureMapping[2] = new Point(127, 127);
+        _mChromaLinkTextureMapping[3] = new Point(181, 127);
+        _mChromaLinkTextureMapping[4] = new Point(235, 127);
+
+
         _mKeyboardTextureMapping.Clear();
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO1] = new Point(12, 26);
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_MACRO2] = new Point(12, 36);
@@ -301,6 +311,23 @@ class ChromaCaptureWindow : EditorWindow
         _mMousepadTextureMapping[14] = new Point(8, 28);
     }
 
+    private Color GetChromaLinkColor(Color[] colors, int led)
+    {
+        if (!_mChromaLinkTextureMapping.ContainsKey(led))
+        {
+            return Color.black;
+        }
+
+        Point point = _mChromaLinkTextureMapping[led];
+
+        int index = (RENDER_TEXTURE_SIZE - 1 - point._mY) * RENDER_TEXTURE_SIZE + point._mX;
+        if (index < colors.Length)
+        {
+            return colors[index];
+        }
+        return Color.black;
+    }
+
     private Color GetKeyboardColor(Color[] colors, int key)
     {
         if (!_mKeyboardTextureMapping.ContainsKey(key))
@@ -408,13 +435,23 @@ class ChromaCaptureWindow : EditorWindow
                 }
                 if (_mToggleLayout)
                 {
-                    if (device == UnityNativeChromaSDK.Device1D.Mousepad)
+                    switch (device)
                     {
-                        foreach (KeyValuePair<int, Point> kvp in _mMousepadTextureMapping)
-                        {
-                            Color color = GetMousepadColor(renderPixels, kvp.Key);
-                            colors[kvp.Key] = UnityNativeChromaSDK.ToBGR(color);
-                        }
+                        case UnityNativeChromaSDK.Device1D.ChromaLink:
+                        case UnityNativeChromaSDK.Device1D.Headset:
+                            foreach (KeyValuePair<int, Point> kvp in _mChromaLinkTextureMapping)
+                            {
+                                Color color = GetChromaLinkColor(renderPixels, kvp.Key);
+                                colors[kvp.Key] = UnityNativeChromaSDK.ToBGR(color);
+                            }
+                            break;
+                        case UnityNativeChromaSDK.Device1D.Mousepad:
+                            foreach (KeyValuePair<int, Point> kvp in _mMousepadTextureMapping)
+                            {
+                                Color color = GetMousepadColor(renderPixels, kvp.Key);
+                                colors[kvp.Key] = UnityNativeChromaSDK.ToBGR(color);
+                            }
+                            break;
                     }
                 }
 #if !SHOW_TEMP_TEXTURE
@@ -856,6 +893,11 @@ class ChromaCaptureWindow : EditorWindow
 #endif
         SetupTextureMapping();
 
+        if (null == _sChromaLinkTexture)
+        {
+            _sChromaLinkTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/ChromaLinkLayout.png", typeof(Texture2D));
+        }
+
         if (null == _sKeyboardTexture)
         {
             _sKeyboardTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/UnityNativeChromaSDK/Textures/KeyboardLayout.png", typeof(Texture2D));
@@ -918,17 +960,33 @@ class ChromaCaptureWindow : EditorWindow
                 int centerWidth = Screen.width / 2;
                 int centerHeight = Screen.height / 2;
                 Rect rect = new Rect(centerWidth - size / 2, centerHeight - size / 2, size, size);
-                if (_sKeyboardTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
+                switch (_mDeviceLayout)
                 {
-                    GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                }
-                if (_sMouseTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mouse)
-                {
-                    GUI.DrawTexture(rect, _sMouseTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                }
-                if (_sMousepadTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
-                {
-                    GUI.DrawTexture(rect, _sMousepadTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                    case UnityNativeChromaSDK.Device.ChromaLink:
+                    case UnityNativeChromaSDK.Device.Headset:
+                        if (_sChromaLinkTexture)
+                        {
+                            GUI.DrawTexture(rect, _sChromaLinkTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                        }
+                        break;
+                    case UnityNativeChromaSDK.Device.Keyboard:
+                        if (_sKeyboardTexture)
+                        {
+                            GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                        }
+                        break;
+                    case UnityNativeChromaSDK.Device.Mouse:
+                        if (_sMouseTexture)
+                        {
+                            GUI.DrawTexture(rect, _sMouseTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                        }
+                        break;
+                    case UnityNativeChromaSDK.Device.Mousepad:
+                        if (_sMousepadTexture)
+                        {
+                            GUI.DrawTexture(rect, _sMousepadTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                        }
+                        break;
                 }
                 GUI.color = oldColor;
             }
@@ -1278,6 +1336,15 @@ class ChromaCaptureWindow : EditorWindow
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                 GUILayout.Label("Layout");
+                if (GUILayout.Button("C"))
+                {
+                    if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.ChromaLink)
+                    {
+                        _mToggleLayout = !_mToggleLayout;
+                        EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                    }
+                    _mDeviceLayout = UnityNativeChromaSDK.Device.ChromaLink;
+                }
                 if (GUILayout.Button("K"))
                 {
                     if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
@@ -1329,19 +1396,33 @@ class ChromaCaptureWindow : EditorWindow
                             const int border = 2;
                             rect = new Rect(rect.x + border, rect.y + border, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
                             
-                            if (_sKeyboardTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
+                            switch (_mDeviceLayout)
                             {
-                                GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                            }
-
-                            if (_sMouseTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mouse)
-                            {
-                                GUI.DrawTexture(rect, _sMouseTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                            }
-
-                            if (_sMousepadTexture && _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
-                            {
-                                GUI.DrawTexture(rect, _sMousepadTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                case UnityNativeChromaSDK.Device.ChromaLink:
+                                case UnityNativeChromaSDK.Device.Headset:
+                                    if (_sChromaLinkTexture)
+                                    {
+                                        GUI.DrawTexture(rect, _sChromaLinkTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                    }
+                                    break;
+                                case UnityNativeChromaSDK.Device.Keyboard:
+                                    if (_sKeyboardTexture)
+                                    {
+                                        GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                    }
+                                    break;
+                                case UnityNativeChromaSDK.Device.Mouse:
+                                    if (_sMouseTexture)
+                                    {
+                                        GUI.DrawTexture(rect, _sMouseTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                    }
+                                    break;
+                                case UnityNativeChromaSDK.Device.Mousepad:
+                                    if (_sMousepadTexture)
+                                    {
+                                        GUI.DrawTexture(rect, _sMousepadTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                    }
+                                    break;
                             }
 
                             GUI.color = oldColor;
