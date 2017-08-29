@@ -20,6 +20,7 @@ class ChromaCaptureWindow : EditorWindow
     private const string KEY_AUTO_ALIGN = "ChromaSDKAutoAlign";
     private const string KEY_LAYOUT = "ChromaSDKLayout";
     private const string KEY_MASK = "ChromaSDKMask";
+    private const string KEY_LOOP = "ChromaSDKLoop";
 
     private readonly string _mVersionString = string.Format("{0}", UnityNativeChromaSDK.GetVersion());
 
@@ -50,6 +51,8 @@ class ChromaCaptureWindow : EditorWindow
     private bool _mToggleLayout = false;
     private UnityNativeChromaSDK.Device _mDeviceLayout = UnityNativeChromaSDK.Device.Keyboard;
     private Color _mColorLayout = Color.white;
+
+    private bool _mToggleLoop = false;
 
     enum Modes
     {
@@ -934,6 +937,11 @@ class ChromaCaptureWindow : EditorWindow
                 _mMask = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
             }
         }
+
+        if (EditorPrefs.HasKey(KEY_LOOP))
+        {
+            _mToggleLoop = EditorPrefs.GetBool(KEY_LOOP);
+        }
     }
 
 #if SHOW_LAYOUT_IN_SCENE_VIEW
@@ -1448,6 +1456,22 @@ class ChromaCaptureWindow : EditorWindow
                         GUILayout.Label(string.Format("Name: {0}", animationName));
                         GUILayout.Label(string.Format("Device: {0}", device));
                         GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
+                        bool isPlaying = UnityNativeChromaSDK.IsPlaying(animationName);
+                        GUILayout.Label(string.Format("Is Playing: {0}", isPlaying));
+                        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                        GUILayout.Label("Loop:");
+                        bool loop = GUILayout.Toggle(_mToggleLoop, "");
+                        if (loop != _mToggleLoop)
+                        {
+                            _mToggleLoop = loop;
+                            EditorPrefs.SetBool(KEY_LOOP, _mToggleLoop);
+                        }
+                        GUILayout.FlexibleSpace();
+                        if (_mToggleLoop && !isPlaying)
+                        {
+                            UnityNativeChromaSDK.PlayAnimation(animationName);
+                        }
+                        GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                         if (GUILayout.Button("Play"))
                         {
