@@ -49,6 +49,20 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
     }  
     private void OnGUI()
     {
+        if (!UnityNativeChromaSDK.IsPlatformSupported())
+        {
+            GUILayout.BeginVertical(GUILayout.Height(Screen.height));
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("The ChromaSDK is not supported on this platform!");
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
+            return;
+        }
+
         bool isInitialized = UnityNativeChromaSDK.PluginIsInitialized();
         GUILayout.BeginVertical(GUILayout.Height(Screen.height));
         GUILayout.FlexibleSpace();

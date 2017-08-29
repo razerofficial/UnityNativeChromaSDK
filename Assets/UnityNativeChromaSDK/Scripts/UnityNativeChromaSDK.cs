@@ -35,7 +35,14 @@ namespace ChromaSDK
         public static bool IsPlatformSupported()
         {
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            return true;
+            try
+            {
+                return PluginIsPlatformSupported();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 #else
             return false;
 #endif
@@ -47,7 +54,11 @@ namespace ChromaSDK
 		public static int Init()
 		{
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-			bool isInitialized = PluginIsInitialized();
+            if (!UnityNativeChromaSDK.IsPlatformSupported())
+            {
+                return -1;
+            }
+            bool isInitialized = PluginIsInitialized();
 			if (!isInitialized)
 			{
 				int result = PluginInit();
@@ -68,7 +79,11 @@ namespace ChromaSDK
 		public static int Uninit()
 		{
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-			_sLoadedAnimations.Clear();
+            if (!UnityNativeChromaSDK.IsPlatformSupported())
+            {
+                return -1;
+            }
+            _sLoadedAnimations.Clear();
 			bool isInitialized = PluginIsInitialized();
 			if (isInitialized)
 			{
@@ -201,6 +216,12 @@ namespace ChromaSDK
 		}
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+
+        /// <summary>
+        /// Is the platform supported?
+        /// </summary>
+        [DllImport(DLL_NAME)]
+        public static extern bool PluginIsPlatformSupported();
 
         /// <summary>
         /// Is the plugin initialized
