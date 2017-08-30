@@ -4,6 +4,7 @@
 
 * [Related](#related)
 * [Frameworks supported](#frameworks-supported)
+* [Prerequisites](#prerequisites)
 * [Dependencies](#dependencies)
 * [Packaging](#packaging)
 * [Getting Started](#getting-started)
@@ -24,10 +25,19 @@
 
 - [UnityChromaSDK](https://github.com/RazerOfficial/UnityChromaSDK) - Unity C# library for the Chroma Rest API
 
+
 <a name="frameworks-supported"></a>
 ## Frameworks supported
 - Unity 3.5.7 or later
 - Windows Editor / Windows Standalone
+
+
+<a name="prerequisites"></a>
+## Prerequisites
+- Install [Synapse](http://developer.razerzone.com/works-with-chroma/download/)
+- Install [Chroma SDK 2.5.3](http://developer.razerzone.com/works-with-chroma/download/)
+- Install [Microsoft Visual C++ Redistributable for Visual Studio 2017](https://www.visualstudio.com/downloads/)
+
 
 <a name="dependencies"></a>
 ## Dependencies
