@@ -70,7 +70,11 @@ Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/Unit
 
 9 Edit `Chroma` animations by selecting a `Chroma` animation in the `Object Hierarchy` and select the `Assets/ChromaSDK/Edit Chroma Animation` menu item.
 
-10 You can also associate the `Chroma` editor application with the `.chroma` extension and double-click `.chroma` assets in the `Object Hierarchy`.
+![image_1](images/image_1.png)
+
+10 Also edit `Chroma` animations by selecting a `.chroma` file in the `Object Hierarchy`, right-click, and select the `ChromaSDK/Edit Chroma Animation` context item.
+
+![image_6](images/image_6.png)
 
 
 <a name="tutorials"></a>
