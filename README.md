@@ -79,42 +79,42 @@ Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/Unit
 
 **Capture Window**
 
-<a target="_blank" href="https://www.youtube.com/watch?v=dUo0wYkh6oM">![Video](https://img.youtube.com/vi/dUo0wYkh6oM/0.jpg)</a>
+<a target="_blank" href="https://www.youtube.com/watch?v=dUo0wYkh6oM"><img src="https://img.youtube.com/vi/dUo0wYkh6oM/0.jpg"/></a>
 
 
 **Composite Capture**
 
-<a target="_blank" href="https://www.youtube.com/watch?v=1m9Qzo6dEyE">![Video](https://img.youtube.com/vi/1m9Qzo6dEyE/0.jpg)</a>
+<a target="_blank" href="https://www.youtube.com/watch?v=1m9Qzo6dEyE"><img src="https://img.youtube.com/vi/1m9Qzo6dEyE/0.jpg"/></a>
 
 
 **Composite Playback**
 
-<a target="_blank" href="https://www.youtube.com/watch?v=PeQfVA6E_2M">![Video](https://img.youtube.com/vi/PeQfVA6E_2M/0.jpg)</a>
+<a target="_blank" href="https://www.youtube.com/watch?v=PeQfVA6E_2M"><img src="https://img.youtube.com/vi/PeQfVA6E_2M/0.jpg"/></a>
 
 
 **Capture With Images**
 
-<a target="_blank" href="https://www.youtube.com/watch?v=6XKO6u7nWGk">![Video](https://img.youtube.com/vi/6XKO6u7nWGk/0.jpg)</a>
+<a target="_blank" href="https://www.youtube.com/watch?v=6XKO6u7nWGk"><img src="https://img.youtube.com/vi/6XKO6u7nWGk/0.jpg"/></a>
 
 
 **Keyboard Layout Toggle**
 
-<a target="_blank" href="https://www.youtube.com/watch?v=48l0cO3mITk">![Video](https://img.youtube.com/vi/48l0cO3mITk/0.jpg)</a>
+<a target="_blank" href="https://www.youtube.com/watch?v=48l0cO3mITk"><img src="https://img.youtube.com/vi/48l0cO3mITk/0.jpg"/></a>
 
 
 **Loop and Reverse**
 
-<a target="_blank" href="https://www.youtube.com/watch?v=jkcdqcBsGi0">![Video](https://img.youtube.com/vi/jkcdqcBsGi0/0.jpg)</a>
+<a target="_blank" href="https://www.youtube.com/watch?v=jkcdqcBsGi0"><img src="https://img.youtube.com/vi/jkcdqcBsGi0/0.jpg"/></a>
 
 
 **Keyboard Masks**
 
-<a target="_blank" href="https://www.youtube.com/watch?v=gOegDh8tLUo">![Video](https://img.youtube.com/vi/gOegDh8tLUo/0.jpg)</a>
+<a target="_blank" href="https://www.youtube.com/watch?v=gOegDh8tLUo"><img src="https://img.youtube.com/vi/gOegDh8tLUo/0.jpg"/></a>
 
 
 **Layouts and Playback Looping**
 
-<a target="_blank" href="https://www.youtube.com/watch?v=J6BWRsBHzWo">![Video](https://img.youtube.com/vi/J6BWRsBHzWo/0.jpg)</a>
+<a target="_blank" href="https://www.youtube.com/watch?v=J6BWRsBHzWo"><img src="https://img.youtube.com/vi/J6BWRsBHzWo/0.jpg"/></a>
 
 
 <a name="assets"></a>
