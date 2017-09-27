@@ -776,6 +776,32 @@ class ChromaCaptureWindow : EditorWindow
         }
     }
 
+    private void OnClickUnload()
+    {
+        MakeAnimationReady();
+
+        if (_mMode == Modes.Composite)
+        {
+            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+            {
+                string animationName = GetCompositeName(device);
+                int animationId = GetAnimation(animationName);
+                if (animationId >= 0)
+                {
+                    UnityNativeChromaSDK.PluginUnloadAnimation(animationId);
+                }
+            }
+        }
+        else
+        {
+            int animationId = GetAnimation();
+            if (animationId >= 0)
+            {
+                UnityNativeChromaSDK.PluginUnloadAnimation(animationId);
+            }
+        }
+    }
+
     private void OnClickClose()
     {
         MakeAnimationReady();
@@ -1346,6 +1372,7 @@ class ChromaCaptureWindow : EditorWindow
                         OnClickAlignWithView();
                     }
                     OnClick1Frame();
+                    OnClickUnload();
                 }
                 if (GUILayout.Button(_mCapturing ? "Stop" : "Start"))
                 {
@@ -1360,6 +1387,7 @@ class ChromaCaptureWindow : EditorWindow
                     else
                     {
                         OnClickSave();
+                        OnClickUnload();
                     }
                 }
                 GUI.enabled = true;
