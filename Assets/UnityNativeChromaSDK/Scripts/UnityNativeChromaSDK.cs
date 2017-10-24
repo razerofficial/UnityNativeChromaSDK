@@ -755,7 +755,8 @@ namespace ChromaSDK
         private static extern int PluginSetDevice(int animationId, int deviceType, int device);
 
         /// <summary>
-        /// Get the frame count of a chroma animation, returns -1 if failed to get data, otherwise returns the number of frames
+        /// Get the frame count of a chroma animation,
+        /// returns -1 if failed to get data, otherwise returns the number of frames
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -769,6 +770,23 @@ namespace ChromaSDK
         /// <returns></returns>
         [DllImport(DLL_NAME)]
         private static extern int PluginGetFrameCountName(IntPtr path);
+
+        /// <summary>
+        /// Get the current frame of a chroma animation,
+        /// returns -1 if failed to get data, otherwise returns the current frame
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        public static extern int PluginGetCurrentFrame(int animationId);
+
+        /// <summary>
+        /// Get the current frame
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginGetCurrentFrameName(IntPtr path);
 
         /// <summary>
         /// Set key color for a frame
@@ -1330,6 +1348,26 @@ namespace ChromaSDK
             catch (Exception ex)
             {
                 Debug.LogError(string.Format("Failed to get frame count: {0} exception={1}", path, ex));
+            }
+            FreeIntPtr(lpData);
+            return result;
+        }
+
+        public static int GetCurrentFrameName(string animation)
+        {
+            int result = -1;
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    result = PluginGetCurrentFrameName(lpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to get current frame: {0} exception={1}", path, ex));
             }
             FreeIntPtr(lpData);
             return result;

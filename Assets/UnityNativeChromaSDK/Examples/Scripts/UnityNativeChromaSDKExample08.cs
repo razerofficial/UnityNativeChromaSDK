@@ -26,6 +26,15 @@ public class UnityNativeChromaSDKExample08 : MonoBehaviour
 
         GUILayout.BeginVertical(GUILayout.Height(Screen.height));
         GUILayout.FlexibleSpace();
+
+        GUILayout.Label(string.Format("Frame Count: {0}",
+            UnityNativeChromaSDK.GetFrameCountName(TARGET_ANIMATION)));
+
+        GUILayout.Label(string.Format("Current Frame: {0}",
+            UnityNativeChromaSDK.GetCurrentFrameName(TARGET_ANIMATION)));
+
+        GUILayout.FlexibleSpace();
+
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
         GUILayout.FlexibleSpace();
 
