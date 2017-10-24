@@ -46,7 +46,7 @@ public class UnityNativeChromaSDKPlayAndDeactivate: MonoBehaviour
 		
         // play the animation in the on enable event
         _mAnimationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
-        UnityNativeChromaSDK.PlayAnimation(_mAnimationName);
+        UnityNativeChromaSDK.PlayAnimationName(_mAnimationName);
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class UnityNativeChromaSDKPlayAndDeactivate: MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        UnityNativeChromaSDK.StopAnimation(_mAnimationName);
+        UnityNativeChromaSDK.StopAnimationName(_mAnimationName);
     }
 
     private void FixedUpdate()

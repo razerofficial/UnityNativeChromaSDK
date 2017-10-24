@@ -650,7 +650,7 @@ class ChromaCaptureWindow : EditorWindow
                 string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
                 if (!File.Exists(path))
                 {
-                    UnityNativeChromaSDK.CreateAnimation(path, device);
+                    UnityNativeChromaSDK.CreateAnimation(animationName, device);
                     AssetDatabase.Refresh();
                 }
             }
@@ -660,13 +660,13 @@ class ChromaCaptureWindow : EditorWindow
             string path = UnityNativeChromaSDK.GetStreamingPath(GetAnimationName());
             if (!File.Exists(path))
             {
-                UnityNativeChromaSDK.CreateAnimation(path, UnityNativeChromaSDK.Device.ChromaLink);
+                UnityNativeChromaSDK.CreateAnimation(GetAnimationName(), UnityNativeChromaSDK.Device.ChromaLink);
                 AssetDatabase.Refresh();
             }
         }
     }
 
-    private void OnClickPlay()
+    private void OnClickPlay(bool loop)
     {
         MakeAnimationReady();
 
@@ -675,20 +675,13 @@ class ChromaCaptureWindow : EditorWindow
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
                 string animationName = GetCompositeName(device);
-                int animationId = GetAnimation(animationName);
-                if (animationId >= 0)
-                {
-                    UnityNativeChromaSDK.PluginPlayAnimation(animationId);
-                }
+                UnityNativeChromaSDK.PlayAnimationName(animationName, loop);
             }
         }
         else
         {
-            int animationId = GetAnimation();
-            if (animationId >= 0)
-            {
-                UnityNativeChromaSDK.PluginPlayAnimation(animationId);
-            }
+            string animationName = GetAnimationName();
+            UnityNativeChromaSDK.PlayAnimationName(animationName, loop);
         }
     }
 
@@ -701,20 +694,13 @@ class ChromaCaptureWindow : EditorWindow
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
                 string animationName = GetCompositeName(device);
-                int animationId = GetAnimation(animationName);
-                if (animationId >= 0)
-                {
-                    UnityNativeChromaSDK.PluginStopAnimation(animationId);
-                }
+                UnityNativeChromaSDK.StopAnimationName(animationName);
             }
         }
         else
         {
-            int animationId = GetAnimation();
-            if (animationId >= 0)
-            {
-                UnityNativeChromaSDK.PluginStopAnimation(animationId);
-            }
+            string animationName = GetAnimationName();
+            UnityNativeChromaSDK.StopAnimationName(animationName);
         }
     }
 
@@ -811,12 +797,12 @@ class ChromaCaptureWindow : EditorWindow
             for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
             {
                 string animationName = GetCompositeName(device);
-                UnityNativeChromaSDK.CloseAnimation(animationName);
+                UnityNativeChromaSDK.CloseAnimationName(animationName);
             }
         }
         else
         {
-            UnityNativeChromaSDK.CloseAnimation(GetAnimationName());
+            UnityNativeChromaSDK.CloseAnimationName(GetAnimationName());
         }
     }
 
@@ -1243,7 +1229,11 @@ class ChromaCaptureWindow : EditorWindow
                     GUILayout.Label("Animation:");
                     if (GUILayout.Button("Play"))
                     {
-                        OnClickPlay();
+                        OnClickPlay(false);
+                    }
+                    if (GUILayout.Button("Loop"))
+                    {
+                        OnClickPlay(true);
                     }
                     if (GUILayout.Button("Stop"))
                     {
@@ -1334,7 +1324,7 @@ class ChromaCaptureWindow : EditorWindow
                                 string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
                                 UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
                             }
-                            int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
+                            int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
                             GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
                         }
                     }
@@ -1346,7 +1336,7 @@ class ChromaCaptureWindow : EditorWindow
                         for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
                         {
                             animationName = GetCompositeName(device);
-                            int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
+                            int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
                             GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                             GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
                             GUILayout.EndHorizontal();
@@ -1515,11 +1505,11 @@ class ChromaCaptureWindow : EditorWindow
                         animationName = GetAnimationName(Selection.activeObject.name);
                         if (_mLastPlaybackName != animationName)
                         {
-                            UnityNativeChromaSDK.StopAnimation(_mLastPlaybackName);
+                            UnityNativeChromaSDK.StopAnimationName(_mLastPlaybackName);
                             _mLastPlaybackName = animationName;
-                            UnityNativeChromaSDK.PlayAnimation(animationName);
+                            UnityNativeChromaSDK.PlayAnimationName(animationName);
                         }
-                        int frameCount = UnityNativeChromaSDK.GetFrameCount(animationName);
+                        int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
                         UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationName);
                         GUILayout.Label(string.Format("Name: {0}", animationName));
                         GUILayout.Label(string.Format("Device: {0}", device));
@@ -1537,21 +1527,25 @@ class ChromaCaptureWindow : EditorWindow
                         GUILayout.FlexibleSpace();
                         if (_mToggleLoop && !isPlaying)
                         {
-                            UnityNativeChromaSDK.PlayAnimation(animationName);
+                            UnityNativeChromaSDK.PlayAnimationName(animationName);
                         }
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                         if (GUILayout.Button("Play"))
                         {
-                            UnityNativeChromaSDK.PlayAnimation(animationName);
+                            UnityNativeChromaSDK.PlayAnimationName(animationName);
+                        }
+                        if (GUILayout.Button("loop"))
+                        {
+                            UnityNativeChromaSDK.PlayAnimationName(animationName, true);
                         }
                         if (GUILayout.Button("Stop"))
                         {
-                            UnityNativeChromaSDK.StopAnimation(animationName);
+                            UnityNativeChromaSDK.StopAnimationName(animationName);
                         }
                         if (GUILayout.Button("Reload"))
                         {
-                            UnityNativeChromaSDK.CloseAnimation(animationName);
+                            UnityNativeChromaSDK.CloseAnimationName(animationName);
                         }
                         GUILayout.EndHorizontal();
 
@@ -1568,8 +1562,8 @@ class ChromaCaptureWindow : EditorWindow
                                 UnityNativeChromaSDK.Reverse(animationName);
                                 string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
                                 UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
-                                UnityNativeChromaSDK.CloseAnimation(animationName);
-                                UnityNativeChromaSDK.PlayAnimation(animationName);
+                                UnityNativeChromaSDK.CloseAnimationName(animationName);
+                                UnityNativeChromaSDK.PlayAnimationName(animationName);
                             }
                         }
 
@@ -1581,8 +1575,8 @@ class ChromaCaptureWindow : EditorWindow
                                 UnityNativeChromaSDK.MirrorHorizontally(animationName);
                                 string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
                                 UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
-                                UnityNativeChromaSDK.CloseAnimation(animationName);
-                                UnityNativeChromaSDK.PlayAnimation(animationName);
+                                UnityNativeChromaSDK.CloseAnimationName(animationName);
+                                UnityNativeChromaSDK.PlayAnimationName(animationName);
                             }
                         }
 
@@ -1594,8 +1588,8 @@ class ChromaCaptureWindow : EditorWindow
                                 UnityNativeChromaSDK.MirrorVertically(animationName);
                                 string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
                                 UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
-                                UnityNativeChromaSDK.CloseAnimation(animationName);
-                                UnityNativeChromaSDK.PlayAnimation(animationName);
+                                UnityNativeChromaSDK.CloseAnimationName(animationName);
+                                UnityNativeChromaSDK.PlayAnimationName(animationName);
                             }
                         }
                     }

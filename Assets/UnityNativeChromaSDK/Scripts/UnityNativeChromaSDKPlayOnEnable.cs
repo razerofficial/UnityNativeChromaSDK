@@ -29,7 +29,7 @@ public class UnityNativeChromaSDKPlayOnEnable : MonoBehaviour
 		}
 
         _mAnimationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
-        UnityNativeChromaSDK.PlayAnimation(_mAnimationName);
+        UnityNativeChromaSDK.PlayAnimationName(_mAnimationName, Loop);
     }
 
     /// <summary>
@@ -37,23 +37,7 @@ public class UnityNativeChromaSDKPlayOnEnable : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        UnityNativeChromaSDK.StopAnimation(_mAnimationName);
-    }
-
-    private void FixedUpdate()
-    {
-        if (Loop)
-        {
-            if (!UnityNativeChromaSDK.IsPlaying(_mAnimationName))
-            {
-                UnityNativeChromaSDK.PlayAnimation(_mAnimationName);
-            }
-        }
-    }
-
-    private void Awake()
-    {
-        UnityNativeChromaSDK.Init();
+        UnityNativeChromaSDK.StopAnimationName(_mAnimationName);
     }
 
     private void OnApplicationQuit()

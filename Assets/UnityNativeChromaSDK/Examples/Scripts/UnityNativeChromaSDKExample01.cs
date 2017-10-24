@@ -1,5 +1,3 @@
-//#define VERBOSE_LOGGING
-
 using ChromaSDK;
 using System.Collections.Generic;
 using System.Text;
@@ -20,33 +18,6 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         "Random_Mouse.chroma",
         "Random_Mousepad.chroma",
     };
-    bool UseLogging()
-    {
-#if VERBOSE_LOGGING
-        return true;
-#else
-        return false;
-#endif
-    }
-    private StringBuilder _mStatus = new StringBuilder();
-    void ClearStatus()
-    {
-        if (UseLogging())
-        {
-            if (_mStatus.Length > 0)
-            {
-                _mStatus.Remove(0, _mStatus.Length);
-            }
-        }
-    }
-    void AppendStatus(string format, params object[] args)
-    {
-        if (UseLogging())
-        {
-            _mStatus.AppendFormat(format, args);
-            _mStatus.AppendLine();
-        }
-    }  
     private void OnGUI()
     {
         if (!UnityNativeChromaSDK.IsPlatformSupported())
@@ -80,44 +51,36 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
         GUILayout.FlexibleSpace();
-        if (UseLogging())
-        {
-            GUILayout.Label(_mStatus.ToString());
-        }
-        GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
         GUILayout.FlexibleSpace();
-        GUI.enabled = !isInitialized;
         GUI.enabled = isInitialized;
         if (GUILayout.Button("PLAY", GUILayout.Height(30)))
         {
-            ClearStatus();
             foreach (string animation in _mAnimations)
             {
-                int animationId = UnityNativeChromaSDK.GetAnimation(animation);
-                int result = UnityNativeChromaSDK.PlayAnimation(animation);
-                AppendStatus("PlayAnimation name={0} id={1} result={2}", animation, animationId, result);
+                UnityNativeChromaSDK.PlayAnimationName(animation);
             }
         }
-        GUI.enabled = isInitialized;
+        if (GUILayout.Button("LOOP", GUILayout.Height(30)))
+        {
+            foreach (string animation in _mAnimations)
+            {
+                UnityNativeChromaSDK.PlayAnimationName(animation, true);
+            }
+        }
         if (GUILayout.Button("STOP", GUILayout.Height(30)))
         {
-            ClearStatus();
             foreach (string animation in _mAnimations)
             {
-                int animationId = UnityNativeChromaSDK.GetAnimation(animation);
-                int result = UnityNativeChromaSDK.StopAnimation(animation);
-                AppendStatus("StopAnimation name={0} id={1} result={2}", animation, animationId, result);
+                UnityNativeChromaSDK.StopAnimationName(animation);
             }
         }
-#if VERBOSE_LOGGING
-        if (GUILayout.Button("CLOSE", GUILayout.Height(30)))
+        if (GUILayout.Button("RELOAD", GUILayout.Height(30)))
         {
-            ClearStatus();
             foreach (string animation in _mAnimations)
             {
-                CloseAnimation(animation);
+                UnityNativeChromaSDK.CloseAnimationName(animation);
             }
         }
 #endif
@@ -126,35 +89,33 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.EndHorizontal();
         foreach (string animation in _mAnimations)
         {
-            int animationId = UnityNativeChromaSDK.GetAnimation(animation);
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
             GUILayout.FlexibleSpace();
+            GUILayout.Label(string.Format("{0}:", UnityNativeChromaSDK.GetDevice(animation)));
             GUILayout.Label(animation);
             GUI.enabled = isInitialized;
             if (GUILayout.Button("Play", GUILayout.Height(30)))
             {
-                int result = UnityNativeChromaSDK.PlayAnimation(animation);
-                AppendStatus("PlayAnimation name={0} id={1} result={2}", animation, animationId, result);
+                UnityNativeChromaSDK.PlayAnimationName(animation);
+            }
+            if (GUILayout.Button("Loop", GUILayout.Height(30)))
+            {
+                UnityNativeChromaSDK.PlayAnimationName(animation, true);
             }
             if (GUILayout.Button("Stop", GUILayout.Height(30)))
             {
-                int result = UnityNativeChromaSDK.StopAnimation(animation);
-                AppendStatus("StopAnimation name={0} id={1} result={2}", animation, animationId, result);
+                UnityNativeChromaSDK.StopAnimationName(animation);
             }
-#if VERBOSE_LOGGING
-            if (GUILayout.Button("Close", GUILayout.Height(30)))
+            if (GUILayout.Button("Reload", GUILayout.Height(30)))
             {
-                int result = UnityNativeChromaSDK.CloseAnimation(animation);
-                AppendStatus("CloseAnimation name={0} id={1} result={2}", animation, animationId, result);
+                UnityNativeChromaSDK.CloseAnimationName(animation);
             }
-#endif
             if (GUILayout.Button("Edit", GUILayout.Height(30)))
             {
-                int result = UnityNativeChromaSDK.EditAnimation(animation);
-                AppendStatus("EditAnimation name={0} result={1}", animation, result);
+                UnityNativeChromaSDK.EditAnimation(animation);
             }
             GUI.enabled = true;
-            GUILayout.Label(string.Format("({0}) {1}", UnityNativeChromaSDK.GetFrameCount(animation), UnityNativeChromaSDK.GetDevice(animation)));
+            GUILayout.Label(string.Format("({0} frames)", UnityNativeChromaSDK.GetFrameCountName(animation)));
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
@@ -172,14 +133,11 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
 
     private void Awake()
     {
-        int result = UnityNativeChromaSDK.Init();
-        AppendStatus("Status: Init result={0}", result);
+        UnityNativeChromaSDK.Init();
     }
 
     private void OnApplicationQuit()
     {
-        int result = UnityNativeChromaSDK.Uninit();
-        AppendStatus("Status: Uninit result={0}", result);
+        UnityNativeChromaSDK.Uninit();
     }
-#endif
 }

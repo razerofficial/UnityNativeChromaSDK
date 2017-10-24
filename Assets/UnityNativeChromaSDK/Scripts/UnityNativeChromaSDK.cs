@@ -24,7 +24,7 @@ namespace ChromaSDK
 		/// <returns></returns>
 		public static string GetVersion()
 		{
-			return "1.7";
+			return "1.8";
 		}
 
         /// <summary>
@@ -76,7 +76,6 @@ namespace ChromaSDK
                 catch (Exception)
                 {
                 }
-				_sLoadedAnimations.Clear();
 				return result;
 			}
 			//ignore: already initialized
@@ -97,7 +96,6 @@ namespace ChromaSDK
             {
                 return -1;
             }
-            _sLoadedAnimations.Clear();
             bool isInitialized = false;
             try
             {
@@ -158,55 +156,94 @@ namespace ChromaSDK
 				return -1;
 			}
 			string path = GetStreamingPath(animation);
-			int animationid;
-			if (!_sLoadedAnimations.ContainsKey(animation))
-			{
-				animationid = OpenAnimation(path);
-				if (animationid >= 0)
-				{
-					_sLoadedAnimations[animation] = animationid;
-				}
-			}
-			else
-			{
-				animationid = _sLoadedAnimations[animation];
-			}
-			return animationid;
-#else
-			return -1;
-#endif
-		}
-
-		/// <summary>
-		/// Play the animation,
-		/// returns animation id upon success
-		/// returns -1 on failure
-		/// </summary>
-		/// <param name="animation"></param>
-		/// <returns></returns>
-		public static int PlayAnimation(string animation)
-		{
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-			int animationId = GetAnimation(animation);
-			if (animationId >= 0)
-			{
-				int result = PluginPlayAnimation(animationId);
-				return result;
-			}
+            IntPtr lpData = GetIntPtr(path);
+            int animationId = -1;
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    animationId = PluginGetAnimation(lpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to get animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+            /*
+            if (animationId == -1)
+            {
+                Debug.LogError(string.Format("Failed to load animation: {0}", path));
+            }
+            else
+            {
+                Debug.Log(string.Format("Loaded animation: {0} {1}", animationId, path));
+            }
+            */
 			return animationId;
 #else
 			return -1;
 #endif
 		}
 
-		/// <summary>
-		/// Check if the animation is playing,
-		/// returns true if playing
-		/// returns false if not playing
+        /// <summary>
+        /// Play the animation
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static void PlayAnimationName(string animation)
+		{
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginPlayAnimationName(lpData, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to play animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+		}
+
+        /// <summary>
+		/// Play the animation with loop on or off
 		/// </summary>
-		/// <param name="animation"></param>
+		/// <param name="path"></param>
 		/// <returns></returns>
-		public static bool IsPlaying(string animation)
+		public static void PlayAnimationName(string animation, bool loop)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginPlayAnimationName(lpData, loop);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to play animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+        }
+
+        /// <summary>
+        /// Check if the animation is playing,
+        /// returns true if playing
+        /// returns false if not playing
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public static bool IsPlaying(string animation)
 		{
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 			int animationId = GetAnimation(animation);
@@ -221,27 +258,351 @@ namespace ChromaSDK
 #endif
 		}
 
-		/// <summary>
-		/// Stop the animation,
-		/// returns animation id upon success
-		/// returns -1 on failure
-		/// </summary>
-		/// <param name="animation"></param>
-		/// <returns></returns>
-		public static int StopAnimation(string animation)
+        /// <summary>
+        /// Check if device is playing animation
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public static bool IsPlayingType(Device device)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            bool result = false;
+            switch (device)
+            {
+                case Device.ChromaLink:
+                    result = PluginIsPlayingType((int)DeviceType.DE_1D, (int)Device1D.ChromaLink);
+                    break;
+                case Device.Headset:
+                    result = PluginIsPlayingType((int)DeviceType.DE_1D, (int)Device1D.Headset);
+                    break;
+                case Device.Keyboard:
+                    result = PluginIsPlayingType((int)DeviceType.DE_2D, (int)Device2D.Keyboard);
+                    break;
+                case Device.Keypad:
+                    result = PluginIsPlayingType((int)DeviceType.DE_2D, (int)Device2D.Keypad);
+                    break;
+                case Device.Mouse:
+                    result = PluginIsPlayingType((int)DeviceType.DE_2D, (int)Device2D.Mouse);
+                    break;
+                case Device.Mousepad:
+                    result = PluginIsPlayingType((int)DeviceType.DE_1D, (int)Device1D.Mousepad);
+                    break;
+
+            }
+            return result;
+#else
+			return false;
+#endif
+        }
+
+        /// <summary>
+        /// Stop the animation
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public static void StopAnimationName(string animation)
 		{
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-			int animationId = GetAnimation(animation);
-			if (animationId >= 0)
-			{
-				int result = PluginStopAnimation(animationId);
-				return result;
-			}
-			return animationId;
-#else
-			return -1;
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginStopAnimationName(lpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to stop animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
 #endif
 		}
+
+        public static void StopAnimationType(Device device)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            switch (device)
+            {
+                case Device.ChromaLink:
+                    PluginStopAnimationType((int)DeviceType.DE_1D, (int)Device1D.ChromaLink);
+                    break;
+                case Device.Headset:
+                    PluginStopAnimationType((int)DeviceType.DE_1D, (int)Device1D.Headset);
+                    break;
+                case Device.Keyboard:
+                    PluginStopAnimationType((int)DeviceType.DE_2D, (int)Device2D.Keyboard);
+                    break;
+                case Device.Keypad:
+                    PluginStopAnimationType((int)DeviceType.DE_2D, (int)Device2D.Keypad);
+                    break;
+                case Device.Mouse:
+                    PluginStopAnimationType((int)DeviceType.DE_2D, (int)Device2D.Mouse);
+                    break;
+                case Device.Mousepad:
+                    PluginStopAnimationType((int)DeviceType.DE_1D, (int)Device1D.Mousepad);
+                    break;
+
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Set the animation frame's key to the supplied color
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="rzkey"></param>
+        /// <param name="color"></param>
+        public static void SetKeyColorName(string animation, int frameId, int rzkey, Color color)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginSetKeyColorName(lpData, frameId, rzkey, ToBGR(color));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to set key color: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+        }
+
+        /// <summary>
+        /// Set the key to the supplied color for all animation frames
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="rzkey"></param>
+        /// <param name="color"></param>
+        public static void SetKeyColorAllFramesName(string animation, int rzkey, Color color)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    int frameCount = GetFrameCountName(animation);
+                    for (int frameId = 0; frameId < frameCount; ++frameId)
+                    {
+                        PluginSetKeyColorName(lpData, frameId, rzkey, ToBGR(color));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to set key color: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+        }
+
+        /// <summary>
+        /// Set the animation frame to the supplied color for a set of keys
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="keys"></param>
+        /// <param name="color"></param>
+        public static void SetKeysColorName(string animation, int frameId, int[] keys, Color color)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    foreach (int rzkey in keys)
+                    {
+                        PluginSetKeyColorName(lpData, frameId, rzkey, ToBGR(color));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to set keys color: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+        }
+
+        /// <summary>
+        /// Set the keys to the supplied color for all animation frames
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="keys"></param>
+        /// <param name="color"></param>
+        public static void SetKeysColorAllFramesName(string animation, int[] keys, Color color)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    int frameCount = GetFrameCountName(animation);
+                    foreach (int rzkey in keys)
+                    {
+                        for (int frameId = 0; frameId < frameCount; ++frameId)
+                        {
+                            PluginSetKeyColorName(lpData, frameId, rzkey, ToBGR(color));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to set keys color: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+        }
+
+        /// <summary>
+        /// Copy color from a source animation to a target animation for a key
+        /// </summary>
+        /// <param name="sourceAnimation"></param>
+        /// <param name="targetAnimation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="rzkey"></param>
+        public static void CopyKeyColorName(string sourceAnimation, string targetAnimation, int frameId, int rzkey)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string sourcePath = GetStreamingPath(sourceAnimation);
+            string targetPath = GetStreamingPath(targetAnimation);
+            IntPtr sourceLpData = GetIntPtr(sourcePath);
+            IntPtr targetLpData = GetIntPtr(targetPath);
+            try
+            {
+                if (sourceLpData != IntPtr.Zero)
+                {
+                    PluginCopyKeyColorName(sourceLpData, targetLpData, frameId, rzkey);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to copy key color: source={0} target={1} exception={2}", sourceAnimation, targetAnimation, ex));
+            }
+            FreeIntPtr(sourceLpData);
+            FreeIntPtr(targetLpData);
+#endif
+        }
+
+        /// <summary>
+        /// Copy color from a source animation to a target animation for a key for all frames
+        /// </summary>
+        /// <param name="sourceAnimation"></param>
+        /// <param name="targetAnimation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="rzkey"></param>
+        public static void CopyKeyColorAllFramesName(string sourceAnimation, string targetAnimation, int rzkey)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string sourcePath = GetStreamingPath(sourceAnimation);
+            string targetPath = GetStreamingPath(targetAnimation);
+            IntPtr sourceLpData = GetIntPtr(sourcePath);
+            IntPtr targetLpData = GetIntPtr(targetPath);
+            try
+            {
+                if (sourceLpData != IntPtr.Zero)
+                {
+                    int frameCount = GetFrameCountName(targetAnimation);
+                    for (int frameId = 0; frameId < frameCount; ++frameId)
+                    {
+                        PluginCopyKeyColorName(sourceLpData, targetLpData, frameId, rzkey);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to copy key color: source={0} target={1} exception={2}", sourceAnimation, targetAnimation, ex));
+            }
+            FreeIntPtr(sourceLpData);
+            FreeIntPtr(targetLpData);
+#endif
+        }
+
+        /// <summary>
+        /// Copy color from a source animation to a target animation for a set of keys
+        /// </summary>
+        /// <param name="sourceAnimation"></param>
+        /// <param name="targetAnimation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="keys"></param>
+        public static void CopyKeysColorName(string sourceAnimation, string targetAnimation, int frameId, int[] keys)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string sourcePath = GetStreamingPath(sourceAnimation);
+            string targetPath = GetStreamingPath(targetAnimation);
+            IntPtr sourceLpData = GetIntPtr(sourcePath);
+            IntPtr targetLpData = GetIntPtr(targetPath);
+            try
+            {
+                if (sourceLpData != IntPtr.Zero)
+                {
+                    foreach (int rzkey in keys)
+                    {
+                        PluginCopyKeyColorName(sourceLpData, targetLpData, frameId, rzkey);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to copy keys color: source={0} target={1} exception={2}", sourceAnimation, targetAnimation, ex));
+            }
+            FreeIntPtr(sourceLpData);
+            FreeIntPtr(targetLpData);
+#endif
+        }
+
+        /// <summary>
+        /// Copy color from a source animation to a target animation for a set of keys for all frames
+        /// </summary>
+        /// <param name="sourceAnimation"></param>
+        /// <param name="targetAnimation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="keys"></param>
+        public static void CopyKeysColorAllFramesName(string sourceAnimation, string targetAnimation, int[] keys)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string sourcePath = GetStreamingPath(sourceAnimation);
+            string targetPath = GetStreamingPath(targetAnimation);
+            IntPtr sourceLpData = GetIntPtr(sourcePath);
+            IntPtr targetLpData = GetIntPtr(targetPath);
+            try
+            {
+                if (sourceLpData != IntPtr.Zero)
+                {
+                    int frameCount = GetFrameCountName(targetAnimation);
+                    foreach (int rzkey in keys)
+                    {
+                        for (int frameId = 0; frameId < frameCount; ++frameId)
+                        {
+                            PluginCopyKeyColorName(sourceLpData, targetLpData, frameId, rzkey);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to copy keys color: source={0} target={1} exception={2}", sourceAnimation, targetAnimation, ex));
+            }
+            FreeIntPtr(sourceLpData);
+            FreeIntPtr(targetLpData);
+#endif
+        }
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 
@@ -273,7 +634,8 @@ namespace ChromaSDK
         private static extern int PluginOpenEditorDialog(IntPtr path);
 
         /// <summary>
-        /// Open a chroma animation, returns -1 if failed to open, otherwise returns the id of the animation
+        /// Open a chroma animation, returns -1 if failed to open,
+        /// otherwise returns the id of the animation
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -401,6 +763,34 @@ namespace ChromaSDK
         public static extern int PluginGetFrameCount(int animationId);
 
         /// <summary>
+        /// Get the frame count
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginGetFrameCountName(IntPtr path);
+
+        /// <summary>
+        /// Set key color for a frame
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="frameId"></param>
+        /// <param name="rzkey"></param>
+        /// <param name="color"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginSetKeyColorName(IntPtr path, int frameId, int rzkey, int color);
+
+        /// <summary>
+        /// Copy from a source animation to set a target key color for a frame
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="targetPath"></param>
+        /// <param name="frameId"></param>
+        /// <param name="rzkey"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginCopyKeyColorName(IntPtr sourcePath, IntPtr targetPath, int frameId, int rzkey);
+
+        /// <summary>
         /// Get the Max Leds for 1D Devices
         /// </summary>
         /// <param name="device"></param>
@@ -472,7 +862,117 @@ namespace ChromaSDK
         [DllImport(DLL_NAME)]
         public static extern int PluginMirrorVertically(int animationId);
 
+        /// <summary>
+        /// Open a chroma animation, returns -1 if failed to open,
+        /// otherwise returns the id of the animation
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginGetAnimation(IntPtr path);
+
+        /// <summary>
+        /// Close the animation
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern int PluginCloseAnimationName(IntPtr path);
+
+        /// <summary>
+        /// Play animation with looping on or off
+        /// </summary>
+        /// <param name="animationId"></param>
+        /// <param name="loop"></param>
+        [DllImport(DLL_NAME)]
+        public static extern void PluginPlayAnimationLoop(int animationId, bool loop);
+
+        /// <summary>
+        /// Play animation with looping on or off by path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="loop"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginPlayAnimationName(IntPtr path, bool loop);
+
+        /// <summary>
+        /// Stop animation by path
+        /// </summary>
+        /// <param name="path"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginStopAnimationName(IntPtr path);
+
+        /// <summary>
+        /// Stop animation by type
+        /// </summary>
+        /// <param name="deviceType"></param>
+        /// <param name="device"></param>
+        [DllImport(DLL_NAME)]
+        public static extern void PluginStopAnimationType(int deviceType, int device);
+
+        /// <summary>
+        /// Check if animation is playing by name
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern bool PluginIsPlayingName(IntPtr path);
+
+        /// <summary>
+        /// Check if animation is playing by type
+        /// </summary>
+        /// <param name="deviceType"></param>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        public static extern bool PluginIsPlayingType(int deviceType, int device);
+
+        /// <summary>
+        /// Play composite animation by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="loop"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginPlayComposite(IntPtr name, bool loop);
+
+        /// <summary>
+        /// Stop composite animation by name
+        /// </summary>
+        /// <param name="name"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginStopComposite(IntPtr name);
+
         #region Helpers (handle path conversions)
+
+        /// <summary>
+        /// Helper to convert string to IntPtr
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private static IntPtr GetIntPtr(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return IntPtr.Zero;
+            }
+            FileInfo fi = new FileInfo(path);
+            byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName + "\0");
+            IntPtr lpData = Marshal.AllocHGlobal(array.Length);
+            Marshal.Copy(array, 0, lpData, array.Length);
+            return lpData;
+        }
+
+        /// <summary>
+        /// Helper to recycle the IntPtr
+        /// </summary>
+        /// <param name="lpData"></param>
+        private static void FreeIntPtr(IntPtr lpData)
+        {
+            if (lpData != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(lpData);
+            }
+        }
 
         /// <summary>
         /// Open an animation file
@@ -481,96 +981,88 @@ namespace ChromaSDK
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static int OpenAnimation(string path)
+        private static int OpenAnimation(string animation)
         {
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(animation))
             {
                 return - 1;
             }
 #if VERBOSE_LOGGING
-            Debug.Log(string.Format("OpenAnimation: {0}", path));
+            Debug.Log(string.Format("OpenAnimation: {0}", animation));
 #endif
-            FileInfo fi = new FileInfo(path);
-            if (fi.Exists)
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            int animationId = 1;
+            try
             {
-                byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName+"\0");
-                IntPtr lpData = Marshal.AllocHGlobal(array.Length);
-                Marshal.Copy(array, 0, lpData, array.Length);
-                int animationId = 1;
-                try
+                if (lpData != IntPtr.Zero)
                 {
                     animationId = PluginOpenAnimation(lpData);
                 }
-                catch (Exception)
-                {
-                }
-                Marshal.FreeHGlobal(lpData);
-                return animationId;
             }
-            return -1;
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to open animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+            return animationId;
         }
 
         /// <summary>
         /// Edit an animation file
-        /// Returns -1 if animation nott found
+        /// Returns -1 if animation not found
         /// Returns 0 on success
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static int PluginEditAnimation(string path)
+        public static int PluginEditAnimation(string animation)
         {
             Init();
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(animation))
             {
                 return -1;
             }
-            FileInfo fi = new FileInfo(path);
-            if (fi.Exists)
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            int animationId = 1;
+            try
             {
-                byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName+"\0");
-                IntPtr lpData = Marshal.AllocHGlobal(array.Length);
-                Marshal.Copy(array, 0, lpData, array.Length);
-                int animationId = 1;
-                try
+                if (lpData != IntPtr.Zero)
                 {
                     animationId = PluginOpenEditorDialog(lpData);
                 }
-                catch (Exception)
-                {
-                }
-                Marshal.FreeHGlobal(lpData);
-                return animationId;
             }
-            Debug.LogError(string.Format("EditAnimation: Animation does not exist! {0}", path));
-            return -1;
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to edi animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+            return animationId;
         }
 
-        public static int PluginSaveAnimation(int animationId, string path)
+        public static int PluginSaveAnimation(int animationId, string animation)
         {
             Init();
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(animation))
             {
                 return -1;
             }
-            FileInfo fi = new FileInfo(path);
-            if (fi.Exists)
+            int result = -1;
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
             {
-                byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName + "\0");
-                IntPtr lpData = Marshal.AllocHGlobal(array.Length);
-                Marshal.Copy(array, 0, lpData, array.Length);
-                int result = -1;
-                try
+                if (lpData != IntPtr.Zero)
                 {
                     result = PluginSaveAnimation(animationId, lpData);
                 }
-                catch (Exception)
-                {
-                }
-                Marshal.FreeHGlobal(lpData);
-                return result;
             }
-            Debug.LogError(string.Format("SaveAnimation: Animation does not exist! {0}", path));
-            return -1;
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to save animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+            return result;
         }
 
         public enum DeviceType
@@ -641,10 +1133,10 @@ namespace ChromaSDK
             return PluginGetMaxColumn((int)device);
         }
 
-        public static int CreateAnimation(string path, Device device)
+        public static int CreateAnimation(string animation, Device device)
         {
             Init();
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(animation))
             {
                 return -1;
             }
@@ -677,12 +1169,21 @@ namespace ChromaSDK
                     d = 2;
                     break;
             }
-            FileInfo fi = new FileInfo(path);
-            byte[] array = ASCIIEncoding.ASCII.GetBytes(fi.FullName + "\0");
-            IntPtr lpData = Marshal.AllocHGlobal(array.Length);
-            Marshal.Copy(array, 0, lpData, array.Length);
-            int result = PluginCreateAnimation(lpData, dt, d);
-            Marshal.FreeHGlobal(lpData);
+            int result = -1;
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    result = PluginCreateAnimation(lpData, dt, d);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to create animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
             return result;
         }
 
@@ -814,15 +1315,24 @@ namespace ChromaSDK
             return animationId;
         }
 
-        public static int GetFrameCount(string animation)
+        public static int GetFrameCountName(string animation)
         {
-            int animationId = GetAnimation(animation);
-            if (animationId >= 0)
+            int result = -1;
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
             {
-                int result = PluginGetFrameCount(animationId);
-                return result;
+                if (lpData != IntPtr.Zero)
+                {
+                    result = PluginGetFrameCountName(lpData);
+                }
             }
-            return animationId;
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to get frame count: {0} exception={1}", path, ex));
+            }
+            FreeIntPtr(lpData);
+            return result;
         }
 
         /// <summary>
@@ -865,11 +1375,11 @@ namespace ChromaSDK
 
         #endregion
 
-#if VERBOSE_LOGGING
-        #region Handle Debug.Log from unmanged code
-
         [DllImport(DLL_NAME)]
         private static extern void PluginSetLogDelegate(IntPtr logDelegate);
+
+#if VERBOSE_LOGGING
+        #region Handle Debug.Log from unmanged code
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void DebugLogDelegate(string text);
@@ -895,13 +1405,17 @@ namespace ChromaSDK
         }
 
         #endregion
+#endif
 
         static UnityNativeChromaSDK()
         {
+#if VERBOSE_LOGGING
             SetupLogMechanism();
-        }
-
+#else
+            // Call the API passing along the function pointer.
+            PluginSetLogDelegate(IntPtr.Zero);
 #endif
+        }
 
         /// <summary>
         /// Get the streaming path for the animation given the relative path from Assets/StreamingAssets
@@ -914,33 +1428,26 @@ namespace ChromaSDK
         }
 
         /// <summary>
-        /// Dictionary of loaded animation, key is animation name, value is animation id
-        /// </summary>
-        private static Dictionary<string, int> _sLoadedAnimations = new Dictionary<string, int>();
-
-        /// <summary>
-        /// Close the animation,
-        /// returns animation id upon success
-        /// returns -1 on failure
+        /// Close the animation
         /// </summary>
         /// <param name="animation"></param>
         /// <returns></returns>
-        public static int CloseAnimation(string animation)
+        public static void CloseAnimationName(string animation)
         {
-            int animationId = GetAnimation(animation);
-            if (animationId >= 0)
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
             {
-                int result = PluginCloseAnimation(animationId);
-                if (result >= 0)
+                if (lpData != IntPtr.Zero)
                 {
-                    if (_sLoadedAnimations.ContainsKey(animation))
-                    {
-                        _sLoadedAnimations.Remove(animation);
-                    }
+                    PluginCloseAnimationName(lpData);
                 }
-                return result;
             }
-            return animationId;
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to close animation: {0} exception={1}", path, ex));
+            }
+            FreeIntPtr(lpData);
         }
 
         /// Reverse the frames for a chroma animation, returns -1 on failure, otherwise returns the animation id
@@ -1306,5 +1813,5 @@ namespace ChromaSDK
         }
 
 #endif
+        }
     }
-}

@@ -19,7 +19,7 @@ public class UnityNativeChromaSDKPlayOnDestroy : MonoBehaviour
 		}
 
         string animationName = UnityNativeChromaSDK.GetAnimationNameWithExtension(AnimationName);
-        UnityNativeChromaSDK.PlayAnimation(animationName);
+        UnityNativeChromaSDK.PlayAnimationName(animationName);
     }
 
     private void Awake()
