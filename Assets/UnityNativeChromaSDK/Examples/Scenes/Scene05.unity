@@ -92,6 +92,24 @@ RenderTexture:
     m_Aniso: 0
     m_MipBias: 0
     m_WrapMode: 1
+--- !u!84 &110738623
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_Width: 256
+  m_Height: 256
+  m_DepthFormat: 2
+  m_ColorFormat: 0
+  m_IsCubemap: 0
+  m_MipMap: 0
+  m_SRGB: 0
+  m_TextureSettings:
+    m_FilterMode: 1
+    m_Aniso: 0
+    m_MipBias: 0
+    m_WrapMode: 1
 --- !u!1 &944486729
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,24 +242,6 @@ Behaviour:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1456005978}
   m_Enabled: 1
---- !u!84 &1636554297
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 
-  m_Width: 256
-  m_Height: 256
-  m_DepthFormat: 2
-  m_ColorFormat: 0
-  m_IsCubemap: 0
-  m_MipMap: 0
-  m_SRGB: 0
-  m_TextureSettings:
-    m_FilterMode: 1
-    m_Aniso: 0
-    m_MipBias: 0
-    m_WrapMode: 1
 --- !u!1 &1730195910
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,7 +267,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1730195910}
   m_LocalRotation: {x: -.707106829, y: -0, z: 0, w: -.707106829}
-  m_LocalPosition: {x: -223.71199, y: 832.164673, z: 8.4550581}
+  m_LocalPosition: {x: -2771.77051, y: 6140.4541, z: -1433.79724}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -288,16 +288,16 @@ Camera:
     width: 1
     height: 1
   near clip plane: .100000001
-  far clip plane: 9999
+  far clip plane: 99999
   field of view: 60
   orthographic: 1
-  orthographic size: 285.164307
+  orthographic size: 2547.86865
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 1636554297}
+  m_TargetTexture: {fileID: 110738623}
   m_HDR: 0
 --- !u!92 &1730195914
 Behaviour:

@@ -4,7 +4,7 @@ using UnityEngine;
 public class UnityNativeChromaSDKExample08 : MonoBehaviour
 {
     private const string SOURCE_ANIMATION = "Fire_Keyboard.chroma";
-    private const string TARGET_ANIMATION = "Random_Keyboard.chroma";
+    private const string TARGET_ANIMATION = "BaseLayer_Keyboard.chroma";
 
     private void OnGUI()
     {

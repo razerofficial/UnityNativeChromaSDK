@@ -717,8 +717,7 @@ class ChromaCaptureWindow : EditorWindow
                 if (animationId >= 0)
                 {
                     UnityNativeChromaSDK.PluginResetAnimation(animationId);
-                    string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
                 }
             }
         }
@@ -746,8 +745,7 @@ class ChromaCaptureWindow : EditorWindow
                 int animationId = GetAnimation(animationName);
                 if (animationId >= 0)
                 {
-                    string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
                 }
             }
         }
@@ -756,8 +754,8 @@ class ChromaCaptureWindow : EditorWindow
             int animationId = GetAnimation();
             if (animationId >= 0)
             {
-                string path = UnityNativeChromaSDK.GetStreamingPath(GetAnimationName());
-                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                string animationName = GetAnimationName();
+                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
             }
         }
     }
@@ -829,8 +827,7 @@ class ChromaCaptureWindow : EditorWindow
                 if (animationId >= 0)
                 {
                     CaptureFrame(animationId);
-                    string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
                     OnClickSave();
                     ++_mCaptureIndex;
                 }
@@ -884,8 +881,7 @@ class ChromaCaptureWindow : EditorWindow
                 if (animationId >= 0)
                 {
                     UnityNativeChromaSDK.PluginOverrideFrameDuration(animationId, _mOverrideTime);
-                    string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
                 }
             }
         }
@@ -895,8 +891,8 @@ class ChromaCaptureWindow : EditorWindow
             if (animationId >= 0)
             {
                 UnityNativeChromaSDK.PluginOverrideFrameDuration(animationId, _mOverrideTime);
-                string path = UnityNativeChromaSDK.GetStreamingPath(GetAnimationName());
-                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                string animationName = GetAnimationName();
+                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
             }
         }
     }
@@ -1321,8 +1317,7 @@ class ChromaCaptureWindow : EditorWindow
                             if (doSave)
                             {
                                 int animationId = GetAnimation();
-                                string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
                             }
                             int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
                             GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
@@ -1560,8 +1555,7 @@ class ChromaCaptureWindow : EditorWindow
                             if (animationId >= 0)
                             {
                                 UnityNativeChromaSDK.Reverse(animationName);
-                                string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
                                 UnityNativeChromaSDK.CloseAnimationName(animationName);
                                 UnityNativeChromaSDK.PlayAnimationName(animationName);
                             }
@@ -1573,8 +1567,7 @@ class ChromaCaptureWindow : EditorWindow
                             if (animationId >= 0)
                             {
                                 UnityNativeChromaSDK.MirrorHorizontally(animationName);
-                                string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
                                 UnityNativeChromaSDK.CloseAnimationName(animationName);
                                 UnityNativeChromaSDK.PlayAnimationName(animationName);
                             }
@@ -1586,8 +1579,7 @@ class ChromaCaptureWindow : EditorWindow
                             if (animationId >= 0)
                             {
                                 UnityNativeChromaSDK.MirrorVertically(animationName);
-                                string path = UnityNativeChromaSDK.GetStreamingPath(animationName);
-                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, path);
+                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
                                 UnityNativeChromaSDK.CloseAnimationName(animationName);
                                 UnityNativeChromaSDK.PlayAnimationName(animationName);
                             }
