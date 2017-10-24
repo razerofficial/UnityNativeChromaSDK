@@ -32,6 +32,8 @@ public class UnityNativeChromaSDKExample08 : MonoBehaviour
         if (GUILayout.Button("Show Hotkeys", GUILayout.Height(60)))
         {
             UnityNativeChromaSDK.CloseAnimationName(TARGET_ANIMATION);
+
+            // copy colors from another animation
             UnityNativeChromaSDK.CopyKeysColorAllFramesName(SOURCE_ANIMATION, TARGET_ANIMATION,
                 new int[] {
                     (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_W,
@@ -39,6 +41,17 @@ public class UnityNativeChromaSDKExample08 : MonoBehaviour
                     (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_S,
                     (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_D,
                     (int)UnityNativeChromaSDK.Keyboard.RZLED.RZLED_LOGO});
+
+            // set static colors
+            UnityNativeChromaSDK.SetKeysColorAllFramesName(TARGET_ANIMATION,
+                new int[] {
+                    (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_I,
+                    (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_J,
+                    (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_K,
+                    (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_L,
+                    (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_ENTER},
+                Color.red);
+
             UnityNativeChromaSDK.PlayAnimationName(TARGET_ANIMATION, true);
         }
 
