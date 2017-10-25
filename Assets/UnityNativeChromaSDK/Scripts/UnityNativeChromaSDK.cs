@@ -960,6 +960,45 @@ namespace ChromaSDK
         [DllImport(DLL_NAME)]
         private static extern void PluginStopComposite(IntPtr name);
 
+        /// <summary>
+        /// Set the current frame
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="frameId"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginSetCurrentFrameName(IntPtr path, int frameId);
+
+        /// <summary>
+        /// Pause the animation
+        /// </summary>
+        /// <param name="path"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginPauseAnimationName(IntPtr path);
+
+        /// <summary>
+        /// Check if the animation is paused
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern bool PluginIsAnimationPausedName(IntPtr path);
+
+        /// <summary>
+        /// Does the animation have loop on?
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        [DllImport(DLL_NAME)]
+        private static extern bool PluginHasAnimationLoopName(IntPtr path);
+
+        /// <summary>
+        /// Resume the animation
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="loop"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginResumeAnimationName(IntPtr path, bool loop);
+
         #region Helpers (handle path conversions)
 
         /// <summary>
@@ -1371,6 +1410,100 @@ namespace ChromaSDK
             }
             FreeIntPtr(lpData);
             return result;
+        }
+
+        public static void SetCurrentFrameName(string animation, int frameId)
+        {
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginSetCurrentFrameName(lpData, frameId);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to set current frame: {0} exception={1}", path, ex));
+            }
+            FreeIntPtr(lpData);
+        }
+
+        public static bool IsAnimationPausedName(string animation)
+        {
+            bool result = false;
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    result = PluginIsAnimationPausedName(lpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to get is animation paused: {0} exception={1}", path, ex));
+            }
+            FreeIntPtr(lpData);
+            return result;
+        }
+
+        public static bool HasAnimationLoopName(string animation)
+        {
+            bool result = false;
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    result = PluginHasAnimationLoopName(lpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to get has animation loop: {0} exception={1}", path, ex));
+            }
+            FreeIntPtr(lpData);
+            return result;
+        }
+
+        public static void PauseAnimationName(string animation)
+        {
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginPauseAnimationName(lpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to pause animation: {0} exception={1}", path, ex));
+            }
+            FreeIntPtr(lpData);
+        }
+
+        public static void ResumeAnimationName(string animation, bool loop)
+        {
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginResumeAnimationName(lpData, loop);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to resume animation: {0} exception={1}", path, ex));
+            }
+            FreeIntPtr(lpData);
         }
 
         /// <summary>
