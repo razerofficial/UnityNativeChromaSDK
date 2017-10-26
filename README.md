@@ -263,6 +263,14 @@ Image plane capture example
 
 Show `PlayAndDeactivate` script
 
-** Example07**
+**Example07**
 
 Show `PlayOnDestroy` script
+
+**Example08**
+
+`SetKeys` and `CopyKeys` can be used to highlight keys on top of an animated base layer.
+
+**Example09**
+
+Chroma animations can be paused and resumed with looping ON or OFF.
