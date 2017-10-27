@@ -57,24 +57,15 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUI.enabled = isInitialized;
         if (GUILayout.Button("PLAY", GUILayout.Height(30)))
         {
-            foreach (string animation in _mAnimations)
-            {
-                UnityNativeChromaSDK.PlayAnimationName(animation);
-            }
+            UnityNativeChromaSDK.PlayComposite("Random", false);
         }
         if (GUILayout.Button("LOOP", GUILayout.Height(30)))
         {
-            foreach (string animation in _mAnimations)
-            {
-                UnityNativeChromaSDK.PlayAnimationName(animation, true);
-            }
+            UnityNativeChromaSDK.PlayComposite("Random", true);
         }
         if (GUILayout.Button("STOP", GUILayout.Height(30)))
         {
-            foreach (string animation in _mAnimations)
-            {
-                UnityNativeChromaSDK.StopAnimationName(animation);
-            }
+            UnityNativeChromaSDK.StopComposite("Random");
         }
         if (GUILayout.Button("RELOAD", GUILayout.Height(30)))
         {

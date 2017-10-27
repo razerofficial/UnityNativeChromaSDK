@@ -126,6 +126,8 @@ Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/Unit
 <a name="assets"></a>
 ## Assets
 
+`Chroma` animations are loaded from the [`StreamingAssets`](https://docs.unity3d.com/Manual/StreamingAssets.html) folder.
+
 Use the `GameObject->ChromaSDK` menu to create `Chroma` animations.
 
 ![image_1](images/image_1.png)
@@ -138,6 +140,29 @@ Editing `Chroma` animations will open the `Chroma` editor dialog.
 
 <a name="api"></a>
 ## API
+
+* [CloseAnimationName](#CloseAnimationName)
+* [CopyKeysColorAllFramesName](#CopyKeysColorAllFramesName)
+* [EditAnimation](#EditAnimation)
+* [GetCurrentFrameName](#GetCurrentFrameName)
+* [GetFrameCountName](#GetFrameCountName)
+* [HasAnimationLoopName](#HasAnimationLoopName)
+* [Init](#Init)
+* [IsAnimationPausedName](#IsAnimationPausedName)
+* [IsPlaying](#IsPlaying)
+* [PauseAnimationName](#PauseAnimationName)
+* [PlayAnimationName](#PlayAnimationName)
+* [PlayComposite](#PlayComposite)
+* [PluginIsInitialized](#PluginIsInitialized)
+* [PluginIsPlatformSupported](#PluginIsPlatformSupported)
+* [ResumeAnimationName](#ResumeAnimationName)
+* [SetCurrentFrameName](#SetCurrentFrameName)
+* [SetKeysColorAllFramesName](#SetKeysColorAllFramesName)
+* [StopAnimationName](#StopAnimationName)
+* [StopAnimationType](#StopAnimationType)
+* [StopComposite](#StopComposite)
+* [Uninit](#Uninit)
+
 
 Add the `ChromaSDK` namespace.
 
@@ -153,70 +178,262 @@ The `API` is only available on the `Windows Editor` and `Windows Standalone` pla
 #endif
 ```
 
-The native plugin should be initialized on `Awake`. `-1` indicates failure, otherwise success.
+
+<a name="Init"></a>
+**Init**
+
+The native plugin should be initialized on `Awake`. `0` indicates success, otherwise failure.
 
 ```charp
 private void Awake()
 {
-    bool isInitialized = UnityNativeChromaSDK.PluginIsInitialized();
-    if (!isInitialized)
-    {
-        int result = UnityNativeChromaSDK.PluginInit();
-    }
+    UnityNativeChromaSDK.Init();
 }
 ```
 
-The native plugin should be uninitialized on `Quit`. `-1` indicates failure, otherwise success.
+
+<a name="Uninit"></a>
+**Uninit**
+
+The native plugin should be uninitialized on `Quit`. `0` indicates success, otherwise failure.
 
 ```charp
 private void OnApplicationQuit()
 {
-    bool isInitialized = UnityNativeChromaSDK.PluginIsInitialized();
-    if (isInitialized)
-    {
-        int result = UnityNativeChromaSDK.PluginUninit();
-    }
+    UnityNativeChromaSDK.Uninit();
 }
 ```
 
-`Chroma` animations are initially loaded by path. Be sure to reference the [`StreamingAssets`](https://docs.unity3d.com/Manual/StreamingAssets.html) folder.
 
-```csharp
-string GetStreamingPath(string animation)
-{
-   return string.Format("{0}/{1}", Application.streamingAssetsPath, animation);
-}
+<a name="PluginIsInitialized"></a>
+**PluginIsInitialized**
+
+Returns true if the plugin has been initialized. Returns false if the plugin is uninitialized.
+
+```charp
+bool isInitialized = UnityNativeChromaSDK.PluginIsInitialized();
 ```
 
-`Chroma` animations only need to be opened once. Upon opening successfully, an identifier zero or greator will be returned that can be referenced to `Play/Stop/Close`.
 
-```csharp
-int animationid = UnityNativeChromaSDK.OpenAnimation(path);
+<a name="PlayAnimationName"></a>
+**PlayAnimationName**
+
+The animation will play with looping `ON` or `OFF`.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+bool loop = true;
+UnityNativeChromaSDK.PlayAnimationName(animation, loop);
 ```
 
-Once loaded, the `Chroma` animation can be `played` using the `id`. `-1` will indicate a failure, otherwise the `id` will be returned. `Play` will start animation playback.
 
-```csharp
-int result = UnityNativeChromaSDK.PluginPlayAnimation(animationId);
+<a name="StopAnimationName"></a>
+**StopAnimationName**
+
+The animation will stop playing.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+UnityNativeChromaSDK.StopAnimationName(animation);
 ```
 
-Once loaded, the `Chroma` animation can be `stopped` using the `id`. `-1` will indicate a failure, otherwise the `id` will be returned. `Stop` will stop the animation playback.
 
-```csharp
-int result = UnityNativeChromaSDK.PluginStopAnimation(animationId);
+<a name="StopAnimationType"></a>
+**StopAnimationType**
+
+Stop playing animations by type.
+
+```charp
+UnityNativeChromaSDK.StopAnimationType(UnityNativeChromaSDK.Device.ChromaLink);
+UnityNativeChromaSDK.StopAnimationType(UnityNativeChromaSDK.Device.Headset);
+UnityNativeChromaSDK.StopAnimationType(UnityNativeChromaSDK.Device.Keyboard);
+UnityNativeChromaSDK.StopAnimationType(UnityNativeChromaSDK.Device.Keypad);
+UnityNativeChromaSDK.StopAnimationType(UnityNativeChromaSDK.Device.Mouse);
+UnityNativeChromaSDK.StopAnimationType(UnityNativeChromaSDK.Device.Mousepad);
 ```
 
-Once loaded, the `Chroma` animation can be `closed` using the `id`. `-1` will indicate a failure, otherwise the `id` will be returned. Once closed, the animation can no longer be referenced by that `id`.
 
-```csharp
-int result = UnityNativeChromaSDK.PluginCloseAnimation(animationId);
+<a name="CloseAnimationName"></a>
+**CloseAnimationName**
+
+The animation will be closed so that it can be reloaded from disk.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+UnityNativeChromaSDK.CloseAnimationName(animation);
 ```
 
-`Chroma` animations can be edited via path. `-1` will indicate a failure, otherwise `0` will be returned. Edit will open the `Chroma` editor dialog.
 
-```csharp
-int result = UnityNativeChromaSDK.EditAnimation(path);
+<a name="EditAnimation"></a>
+**EditAnimation**
+
+The animation will open in the editor dialog. Only one animation can be edited at a time.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+UnityNativeChromaSDK.EditAnimation(animation);
 ```
+
+
+<a name="GetFrameCountName"></a>
+**GetFrameCountName**
+
+Get the frame count of the animation.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+int frameCount = UnityNativeChromaSDK.GetFrameCountName(animation);
+```
+
+
+<a name="CopyKeysColorAllFramesName"></a>
+**CopyKeysColorAllFramesName**
+
+Copy a set of key colors from the source animation to the target animation for all frames.
+
+```charp
+string sourceAnimation = "Fire_Keyboard.chroma";
+string targetAnimation = "Random_Keyboard.chroma";
+UnityNativeChromaSDK.CopyKeysColorAllFramesName(sourceAnimation, targetAnimation,
+    new int[] {
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_W,
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_A,
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_S,
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_D,
+        (int)UnityNativeChromaSDK.Keyboard.RZLED.RZLED_LOGO});
+```
+
+
+<a name="SetKeysColorAllFramesName"></a>
+**SetKeysColorAllFramesName**
+
+Assign a set of key colors to a static color for all animation frames.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+Color color = Color.red;
+UnityNativeChromaSDK.SetKeysColorAllFramesName(animation,
+    new int[] {
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_I,
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_J,
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_K,
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_L,
+        (int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_ENTER},
+    color);
+```
+
+
+<a name="GetCurrentFrameName"></a>
+**GetCurrentFrameName**
+
+Get the current frame of the animation.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+int currentFrame = UnityNativeChromaSDK.GetCurrentFrameName(animation)
+```
+
+
+<a name="SetCurrentFrameName"></a>
+**SetCurrentFrameName**
+
+Set the current frame of the animation.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+int frameId = 0;
+UnityNativeChromaSDK.SetCurrentFrameName(animation, frameId);
+```
+
+
+<a name="IsAnimationPausedName"></a>
+**IsAnimationPausedName**
+
+Check if the animation is paused.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+bool isPaused = UnityNativeChromaSDK.IsAnimationPausedName(animation);
+```
+
+
+<a name="HasAnimationLoopName"></a>
+**HasAnimationLoopName**
+
+Check if the animation has loop `ON` or `OFF`.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+bool loop = UnityNativeChromaSDK.HasAnimationLoopName(animation);
+```
+
+
+<a name="PauseAnimationName"></a>
+**PauseAnimationName**
+
+Pause the animation.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+UnityNativeChromaSDK.PauseAnimationName(animation);
+```
+
+
+<a name="ResumeAnimationName"></a>
+**ResumeAnimationName**
+
+Resume playing the animation with loop `ON` or `OFF`.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+bool loop = true;
+UnityNativeChromaSDK.ResumeAnimationName(animation, loop);
+```
+
+
+<a name="PlayComposite"></a>
+**PlayComposite**
+
+Play a set of animations with loop `ON` or `OFF`. A set includes ChromaLink, Headset, Keyboard, Keypad, Mouse, and Mousepad.
+
+```charp
+string composite = "Random";
+bool loop = true;
+UnityNativeChromaSDK.PlayComposite(composite, loop);
+```
+
+
+<a name="StopComposite"></a>
+**StopComposite**
+
+Stop playing a set of animations.
+
+```charp
+string composite = "Random";
+UnityNativeChromaSDK.StopComposite(composite);
+```
+
+
+<a name="IsPlaying"></a>
+**IsPlaying**
+
+Check if an animation is playing.
+
+```charp
+string animation = "Random_Keyboard.chroma";
+bool isPlaying = UnityNativeChromaSDK.IsPlaying(animation);
+```
+
+
+<a name="PluginIsPlatformSupported"></a>
+**PluginIsPlatformSupported**
+
+Check if the current platform supports playing Chroma.
+
+```charp
+bool isPlatformSupported = UnityNativeChromaSDK.PluginIsPlatformSupported();
+```
+
 
 <a name="examples"></a>
 ## Examples

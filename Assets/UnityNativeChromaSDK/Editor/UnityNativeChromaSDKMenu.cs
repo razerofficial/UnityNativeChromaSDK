@@ -21,8 +21,9 @@ public class UnityNativeChromaSDKMenu : MonoBehaviour
         path = EditorUtility.SaveFilePanel("Chroma Animation", path, "Animation", "chroma");
         if (!string.IsNullOrEmpty(path))
         {
-            UnityNativeChromaSDK.CreateAnimation(path, UnityNativeChromaSDK.Device.ChromaLink);
-            UnityNativeChromaSDK.PluginEditAnimation(path);
+            string animation = Path.GetFileName(path);
+            UnityNativeChromaSDK.CreateAnimation(animation, UnityNativeChromaSDK.Device.ChromaLink);
+            UnityNativeChromaSDK.EditAnimation(animation);
             AssetDatabase.Refresh();
         }
     }
@@ -36,12 +37,8 @@ public class UnityNativeChromaSDKMenu : MonoBehaviour
             string path = AssetDatabase.GetAssetPath(activeObject);
             if (!string.IsNullOrEmpty(path))
             {
-                FileInfo fi = new FileInfo(path);
-                //Debug.Log(fi.Extension);
-                if (fi.Extension == ".chroma")
-                {
-                    UnityNativeChromaSDK.PluginEditAnimation(path);
-                }
+                string animation = Path.GetFileName(path);
+                UnityNativeChromaSDK.EditAnimation(animation);
             }
         }
 

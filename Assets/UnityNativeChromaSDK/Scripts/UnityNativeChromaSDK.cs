@@ -24,7 +24,7 @@ namespace ChromaSDK
 		/// <returns></returns>
 		public static string GetVersion()
 		{
-			return "1.8";
+			return "1.9";
 		}
 
         /// <summary>
@@ -231,6 +231,55 @@ namespace ChromaSDK
             catch (Exception ex)
             {
                 Debug.LogError(string.Format("Failed to play animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+        }
+
+        /// <summary>
+        /// Play composite animation with loop ON or OFF
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="loop"></param>
+        public static void PlayComposite(string name, bool loop)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(name);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginPlayComposite(lpData, loop);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to play composite: {0} exception={1}", name, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+        }
+
+        /// <summary>
+        /// Stop composite animation
+        /// </summary>
+        /// <param name="name"></param>
+        public static void StopComposite(string name)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(name);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginStopComposite(lpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to stop composite: {0} exception={1}", name, ex));
             }
             FreeIntPtr(lpData);
 #endif
@@ -626,12 +675,12 @@ namespace ChromaSDK
         public static extern bool PluginIsDialogOpen();
 
         /// <summary>
-        /// Open the editor dialog
+        /// Open the editor dialog and play animation on open
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
-        private static extern int PluginOpenEditorDialog(IntPtr path);
+        private static extern int PluginOpenEditorDialogAndPlay(IntPtr path);
 
         /// <summary>
         /// Open a chroma animation, returns -1 if failed to open,
@@ -1060,38 +1109,6 @@ namespace ChromaSDK
             catch (Exception ex)
             {
                 Debug.LogError(string.Format("Failed to open animation: {0} exception={1}", animation, ex));
-            }
-            FreeIntPtr(lpData);
-            return animationId;
-        }
-
-        /// <summary>
-        /// Edit an animation file
-        /// Returns -1 if animation not found
-        /// Returns 0 on success
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static int PluginEditAnimation(string animation)
-        {
-            Init();
-            if (string.IsNullOrEmpty(animation))
-            {
-                return -1;
-            }
-            string path = GetStreamingPath(animation);
-            IntPtr lpData = GetIntPtr(path);
-            int animationId = 1;
-            try
-            {
-                if (lpData != IntPtr.Zero)
-                {
-                    animationId = PluginOpenEditorDialog(lpData);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError(string.Format("Failed to edi animation: {0} exception={1}", animation, ex));
             }
             FreeIntPtr(lpData);
             return animationId;
@@ -1662,9 +1679,27 @@ namespace ChromaSDK
         /// returns 0 on success
         public static int EditAnimation(string animation)
         {
+            Init();
+            if (string.IsNullOrEmpty(animation))
+            {
+                return -1;
+            }
             string path = GetStreamingPath(animation);
-            int result = PluginEditAnimation(path);
-            return result;
+            IntPtr lpData = GetIntPtr(path);
+            int animationId = 1;
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    animationId = PluginOpenEditorDialogAndPlay(lpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to edi animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+            return animationId;
         }
 
         /// <summary>
