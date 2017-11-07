@@ -1,5 +1,6 @@
-﻿#define SHOW_LAYOUT_IN_SCENE_VIEW
+﻿//#define SHOW_LAYOUT_IN_SCENE_VIEW
 //#define SHOW_TEMP_TEXTURE
+//#define SAVE_DEBUG_TEXTURE
 
 using ChromaSDK;
 using Eric5h5;
@@ -478,6 +479,18 @@ class ChromaCaptureWindow : EditorWindow
                 _mTempTexture.Apply();
                 RenderTexture.active = null;
                 Color[] pixels = _mTempTexture.GetPixels();
+#if SAVE_DEBUG_TEXTURE
+                Texture2D saveTexture = new Texture2D(_mTempTexture.width, _mTempTexture.height, TextureFormat.RGB24, false);
+                saveTexture.SetPixels(pixels);
+                saveTexture.Apply();
+                byte[] png = saveTexture.EncodeToPNG();
+                using (FileStream fs = File.Open("DebugTexture.png", FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+                {
+                    fs.Write(png, 0, png.Length);
+                    fs.Flush();
+                }
+                Object.DestroyImmediate(saveTexture, true);
+#endif
                 colors = UnityNativeChromaSDK.CreateColors2D(device);
                 int[] maskColors = GetMaskColors();
                 int index = 0;

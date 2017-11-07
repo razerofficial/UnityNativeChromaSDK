@@ -1715,6 +1715,19 @@ namespace ChromaSDK
             return blue | green | red;
         }
 
+        /// <summary>
+        /// Convert Unity Color to RGB int
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static int ToRGB(Color color)
+        {
+            int red = (int)(Mathf.Clamp01(color.b) * 255);
+            int green = (int)(Mathf.Clamp01(color.g) * 255) << 8;
+            int blue = (int)(Mathf.Clamp01(color.r) * 255) << 16;
+            return blue | green | red;
+        }
+
         public class Keyboard
         {
             //! Definitions of keys.
