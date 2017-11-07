@@ -1,4 +1,4 @@
-﻿//#define SHOW_LAYOUT_IN_SCENE_VIEW
+﻿#define SHOW_LAYOUT_IN_SCENE_VIEW
 //#define SHOW_TEMP_TEXTURE
 //#define SAVE_DEBUG_TEXTURE
 
@@ -54,6 +54,9 @@ class ChromaCaptureWindow : EditorWindow
     private Color _mColorLayout = Color.white;
 
     private bool _mToggleLoop = false;
+
+    // use key presses to activate capture
+    bool _mCaptureKeyDetected = false;
 
     enum Modes
     {
@@ -975,6 +978,14 @@ class ChromaCaptureWindow : EditorWindow
 #if SHOW_LAYOUT_IN_SCENE_VIEW
     private void OnSceneGUI(SceneView sceneView)
     {
+        Event current = Event.current;
+        if (null != current &&
+            current.type == EventType.keyUp &&
+            current.keyCode == KeyCode.F1)
+        {
+            _mCaptureKeyDetected = true;
+        }
+
         if (_mToggleLayout)
         {
             // Do your drawing here using Handles.
@@ -1372,8 +1383,10 @@ class ChromaCaptureWindow : EditorWindow
                     OnClick1Frame();
                     OnClickUnload();
                 }
-                if (GUILayout.Button(_mCapturing ? "Stop" : "Start"))
+                if (_mCaptureKeyDetected ||
+                    GUILayout.Button(_mCapturing ? "Stop" : "Start"))
                 {
+                    _mCaptureKeyDetected = false;
                     MakeAnimationReady();
 
                     _mCapturing = !_mCapturing;
