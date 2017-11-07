@@ -92,7 +92,7 @@ RenderTexture:
     m_Aniso: 0
     m_MipBias: 0
     m_WrapMode: 1
---- !u!84 &110738623
+--- !u!84 &224963010
 RenderTexture:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -150,7 +150,7 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 2100000, guid: d2697502a6636f94b98613f3b5a40b5a, type: 2}
+  - {fileID: 2100000, guid: 93331d63cc013434894e3e17b6269b11, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -266,8 +266,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1730195910}
-  m_LocalRotation: {x: -.707106829, y: -0, z: 0, w: -.707106829}
-  m_LocalPosition: {x: -2771.77051, y: 6140.4541, z: -1433.79724}
+  m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106829}
+  m_LocalPosition: {x: 161.928558, y: 931.373291, z: -207.693161}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -280,7 +280,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
+  m_BackGroundColor: {r: 0, g: .501960814, b: .172549024, a: 1}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -291,13 +291,13 @@ Camera:
   far clip plane: 99999
   field of view: 60
   orthographic: 1
-  orthographic size: 2547.86865
+  orthographic size: 834.122131
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 110738623}
+  m_TargetTexture: {fileID: 224963010}
   m_HDR: 0
 --- !u!92 &1730195914
 Behaviour:
