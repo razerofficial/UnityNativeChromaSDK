@@ -13,6 +13,7 @@ class ChromaMaterialWindow : EditorWindow
     private string _mMaterialPath = string.Empty;
 
     private bool _mIsPlaying = false;
+    private bool _mKeyDetected = false;
 
     private DateTime _mTimer = DateTime.MinValue;
     private int _mFrameIndex = 0;
@@ -31,6 +32,8 @@ class ChromaMaterialWindow : EditorWindow
 
     private void OnEnable()
     {
+        SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+
         if (EditorPrefs.HasKey(KEY_TEXTURE_PATH))
         {
             _mTexturePath = EditorPrefs.GetString(KEY_TEXTURE_PATH);
@@ -39,6 +42,22 @@ class ChromaMaterialWindow : EditorWindow
         if (EditorPrefs.HasKey(KEY_MATERIAL_PATH))
         {
             _mMaterialPath = EditorPrefs.GetString(KEY_MATERIAL_PATH);
+        }
+    }
+
+    private void OnDisable()
+    {
+        SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+    }
+
+    private void OnSceneGUI(SceneView sceneView)
+    {
+        Event current = Event.current;
+        if (null != current &&
+            current.type == EventType.keyUp &&
+            current.keyCode == KeyCode.F1)
+        {
+            _mKeyDetected = true;
         }
     }
 
@@ -91,24 +110,28 @@ class ChromaMaterialWindow : EditorWindow
         if (!diTexture.Exists ||
             !fiMaterial.Exists)
         {
-            EditorGUIUtility.ExitGUI();
+            GUIUtility.ExitGUI();
             return;
         }
 
         if (_mIsPlaying)
         {
-            if (GUILayout.Button("Stop", GUILayout.Height(40)))
+            if (GUILayout.Button("Stop", GUILayout.Height(40)) ||
+                _mKeyDetected)
             {
                 _mIsPlaying = false;
-                EditorGUIUtility.ExitGUI();
+                _mKeyDetected = false;
+                GUIUtility.ExitGUI();
                 return;
             }
         }
         else
         {
-            if (GUILayout.Button("Start", GUILayout.Height(40)))
+            if (GUILayout.Button("Start", GUILayout.Height(40)) ||
+                _mKeyDetected)
             {
                 _mIsPlaying = true;
+                _mKeyDetected = false;
 
                 FileInfo[] textures = diTexture.GetFiles("*.png");
                 _mListTextures = new List<FileInfo>(textures);
@@ -127,7 +150,7 @@ class ChromaMaterialWindow : EditorWindow
 
                 _mFrameIndex = -1;
 
-                EditorGUIUtility.ExitGUI();
+                GUIUtility.ExitGUI();
                 return;
             }
         }

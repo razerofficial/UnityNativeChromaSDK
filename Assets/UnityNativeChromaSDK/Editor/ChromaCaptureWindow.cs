@@ -1383,8 +1383,8 @@ class ChromaCaptureWindow : EditorWindow
                     OnClick1Frame();
                     OnClickUnload();
                 }
-                if (_mCaptureKeyDetected ||
-                    GUILayout.Button(_mCapturing ? "Stop" : "Start"))
+                if (GUILayout.Button(_mCapturing ? "Stop" : "Start") ||
+                    _mCaptureKeyDetected)
                 {
                     _mCaptureKeyDetected = false;
                     MakeAnimationReady();
