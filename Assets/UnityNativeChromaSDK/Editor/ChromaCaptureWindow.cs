@@ -50,6 +50,8 @@ class ChromaCaptureWindow : EditorWindow
     private DateTime _mTimerAlign = DateTime.MinValue;
 
     private bool _mSample = false;
+    int _mSampleRangeX = 1;
+    int _mSampleRangeY = 1;
 
     private bool _mToggleLayout = false;
     private UnityNativeChromaSDK.Device _mDeviceLayout = UnityNativeChromaSDK.Device.Keyboard;
@@ -350,11 +352,10 @@ class ChromaCaptureWindow : EditorWindow
 
     private Color GetSampleColor(Color[] colors, int x, int y)
     {
-        const int range = 2;
-        int minX = x - range;
-        int maxX = x + range;
-        int minY = y - range;
-        int maxY = y + range;
+        int minX = x - _mSampleRangeX;
+        int maxX = x + _mSampleRangeX;
+        int minY = y - _mSampleRangeY;
+        int maxY = y + _mSampleRangeY;
 
         List< Color> colorList = new List<Color>();
 
@@ -363,7 +364,14 @@ class ChromaCaptureWindow : EditorWindow
             for (int j = minY; j <= maxY; ++j)
             {
                 Color c = GetColor(colors, i, j);
-                colorList.Add(c);
+                
+                //ignore dark colors
+                if (c.r > 0.5f ||
+                    c.g > 0.5f ||
+                    c.b > 0.5)
+                {
+                    colorList.Add(c);
+                }
             }
         }
 
@@ -381,6 +389,7 @@ class ChromaCaptureWindow : EditorWindow
                 avg += v;
             }
             avg /= (float)colorList.Count;
+            Color color = Color.black;
             color.r = avg.x;
             color.g = avg.y;
             color.b = avg.z;
@@ -389,6 +398,7 @@ class ChromaCaptureWindow : EditorWindow
         */
 
         //combine like colors
+        /*
         for (int i = 0; i < colorList.Count; ++i)
         {
             Color c1 = colorList[i];
@@ -398,7 +408,7 @@ class ChromaCaptureWindow : EditorWindow
             {
                 Color c2 = colorList[j];
                 Vector3 v2 = new Vector3(c2.r, c2.g, c2.b);
-                if (Vector3.Distance(v1, v2) < 0.25f)
+                if (Vector3.Distance(v1, v2) < 0.5f)
                 {
                     colorList.RemoveAt(j);
                     continue;
@@ -406,21 +416,22 @@ class ChromaCaptureWindow : EditorWindow
                 ++j;
             }
         }
+        */
 
         //count colors
         Dictionary<int, int> colorCount = new Dictionary<int, int>();
 
         foreach (Color c in colorList)
         {
-                ///*
-                if (c.r < 0.1f &&
-                    c.g < 0.1f &&
-                    c.b < 0.1f)
-                {
-                    //too dark
-                }
-                else
-                //*/
+            ///*
+            if (c.r < 0.1f &&
+                c.g < 0.1f &&
+                c.b < 0.1f)
+            {
+                //too dark
+            }
+            else
+            //*/
             {
                 int bgrInt = UnityNativeChromaSDK.ToBGR(c);
 
@@ -1381,6 +1392,14 @@ class ChromaCaptureWindow : EditorWindow
                 GUI.enabled = true;
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
+
+                if (_mSample)
+                {
+                    int sampleRangeX = EditorGUILayout.IntField("SampleX", _mSampleRangeX);
+                    _mSampleRangeX = Mathf.Min(sampleRangeX, 16);
+                    int sampleRangeY = EditorGUILayout.IntField("SampleY", _mSampleRangeY);
+                    _mSampleRangeY = Mathf.Min(sampleRangeY, 16);
+                }
 
                 animationName = GetAnimationName();
 
