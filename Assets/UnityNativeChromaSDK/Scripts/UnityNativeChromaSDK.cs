@@ -1703,6 +1703,19 @@ namespace ChromaSDK
         }
 
         /// <summary>
+        /// Convert BGR int to Unity Color
+        /// </summary>
+        /// <param name="bgrInt"></param>
+        /// <returns></returns>
+        public static Color ToColor(int bgrInt)
+        {
+            int red = bgrInt & 0xFF;
+            int green = (bgrInt & 0xFF00) >> 8;
+            int blue = (bgrInt & 0xFF0000) >> 16;
+            return new Color(red / 255f, green / 255f, blue / 255f, 1f);
+        }
+
+        /// <summary>
         /// Convert Unity Color to BGR int
         /// </summary>
         /// <param name="color"></param>

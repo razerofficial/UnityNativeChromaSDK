@@ -16,6 +16,7 @@ class ChromaMaterialWindow : EditorWindow
     private bool _mKeyDetected = false;
 
     private DateTime _mTimer = DateTime.MinValue;
+    private float _mRate = 0.1f;
     private int _mFrameIndex = 0;
 
     private List<FileInfo> _mListTextures = null;
@@ -114,6 +115,9 @@ class ChromaMaterialWindow : EditorWindow
             return;
         }
 
+        float rate = EditorGUILayout.FloatField("Rate", _mRate);
+        _mRate = Mathf.Max(0.1f, rate);
+
         if (_mIsPlaying)
         {
             if (GUILayout.Button("Stop", GUILayout.Height(40)) ||
@@ -157,11 +161,13 @@ class ChromaMaterialWindow : EditorWindow
 
         EditorGUILayout.LabelField("Frame Index", _mFrameIndex.ToString());
 
-        if (_mIsPlaying && _mListTextures.Count > 0)
+        if (_mIsPlaying &&
+            null != _mListTextures &&
+            _mListTextures.Count > 0)
         {
             if (_mTimer < DateTime.Now)
             {
-                _mTimer = DateTime.Now + TimeSpan.FromSeconds(0.1f);
+                _mTimer = DateTime.Now + TimeSpan.FromSeconds(_mRate);
                 _mFrameIndex = (_mFrameIndex + 1) % _mListTextures.Count;
 
                 Material material = (Material)AssetDatabase.LoadAssetAtPath(_mMaterialPath, typeof(Material));

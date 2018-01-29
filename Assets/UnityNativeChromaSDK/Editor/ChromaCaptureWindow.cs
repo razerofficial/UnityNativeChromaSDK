@@ -49,6 +49,10 @@ class ChromaCaptureWindow : EditorWindow
     private bool _mAutoAlignWithView = false;
     private DateTime _mTimerAlign = DateTime.MinValue;
 
+    private bool _mSample = false;
+    int _mSampleRangeX = 1;
+    int _mSampleRangeY = 1;
+
     private bool _mToggleLayout = false;
     private UnityNativeChromaSDK.Device _mDeviceLayout = UnityNativeChromaSDK.Device.Keyboard;
     private Color _mColorLayout = Color.white;
@@ -335,6 +339,152 @@ class ChromaCaptureWindow : EditorWindow
         return Color.black;
     }
 
+    private Color GetColor(Color[] colors, int x, int y)
+    {
+        int index = (RENDER_TEXTURE_SIZE - 1 - y) * RENDER_TEXTURE_SIZE + x;
+        if (index >= 0 &&
+            index < colors.Length)
+        {
+            return colors[index];
+        }
+        return Color.black;
+    }
+
+    private Color GetSampleColor(Color[] colors, int x, int y)
+    {
+        int minX = x - _mSampleRangeX;
+        int maxX = x + _mSampleRangeX;
+        int minY = y - _mSampleRangeY;
+        int maxY = y + _mSampleRangeY;
+
+        List< Color> colorList = new List<Color>();
+
+        for (int i = minX; i <= maxX; ++i)
+        {
+            for (int j = minY; j <= maxY; ++j)
+            {
+                Color c = GetColor(colors, i, j);
+                
+                //ignore dark colors
+                if (c.r > 0.5f ||
+                    c.g > 0.5f ||
+                    c.b > 0.5)
+                {
+                    colorList.Add(c);
+                }
+            }
+        }
+
+        // average colors
+        /*
+        if (colorList.Count > 0)
+        {
+            Vector3 avg = Vector3.zero;
+            foreach (Color c in colorList)
+            {
+                Vector3 v = Vector3.zero;
+                v.x = c.r;
+                v.y = c.g;
+                v.z = c.b;
+                avg += v;
+            }
+            avg /= (float)colorList.Count;
+            Color color = Color.black;
+            color.r = avg.x;
+            color.g = avg.y;
+            color.b = avg.z;
+            return color;
+        }
+        */
+
+        //combine like colors
+        /*
+        for (int i = 0; i < colorList.Count; ++i)
+        {
+            Color c1 = colorList[i];
+            Vector3 v1 = new Vector3(c1.r, c1.g, c1.b);
+            int j = i + 1;
+            while (j < colorList.Count)
+            {
+                Color c2 = colorList[j];
+                Vector3 v2 = new Vector3(c2.r, c2.g, c2.b);
+                if (Vector3.Distance(v1, v2) < 0.5f)
+                {
+                    colorList.RemoveAt(j);
+                    continue;
+                }
+                ++j;
+            }
+        }
+        */
+
+        //count colors
+        Dictionary<int, int> colorCount = new Dictionary<int, int>();
+
+        foreach (Color c in colorList)
+        {
+            ///*
+            if (c.r < 0.1f &&
+                c.g < 0.1f &&
+                c.b < 0.1f)
+            {
+                //too dark
+            }
+            else
+            //*/
+            {
+                int bgrInt = UnityNativeChromaSDK.ToBGR(c);
+
+                if (colorCount.ContainsKey(bgrInt))
+                {
+                    ++colorCount[bgrInt];
+                }
+                else
+                {
+                    colorCount[bgrInt] = 1;
+                }
+            }
+        }
+
+        // sort colors
+
+        List<int> list = new List<int>();
+        foreach (KeyValuePair<int, int> kvp in colorCount)
+        {
+            /*
+            color = UnityNativeChromaSDK.ToColor(kvp.Key);
+            Debug.Log(string.Format("RGB({0},{1},{2}) {3}",
+                        Mathf.Floor(color.r * 255),
+                        Mathf.Floor(color.g * 255),
+                        Mathf.Floor(color.b * 255),
+                        kvp.Value));
+            */
+
+            list.Add(kvp.Key);
+        }
+        list.Sort(delegate (int a, int b)
+        {
+            //Color c1 = UnityNativeChromaSDK.ToColor(a);
+            //Color c2 = UnityNativeChromaSDK.ToColor(b);
+            //Vector3 v1 = new Vector3(c1.r, c1.g, c1.b);
+            //Vector3 v2 = new Vector3(c2.r, c2.g, c2.b);
+            //return v1.magnitude.CompareTo(v2.magnitude);
+            //float t1 = c1.r + c1.g + c1.b;
+            //float t2 = c2.r + c2.g + c2.b;
+            //return -t1.CompareTo(t2);
+            return colorCount[a].CompareTo(colorCount[b]);
+        });
+
+        if (list.Count > 0)
+        {
+            return UnityNativeChromaSDK.ToColor(list[0]);
+        }
+        else
+        {
+            return Color.black;
+        }
+    }
+
     private Color GetKeyboardColor(Color[] colors, int key)
     {
         if (!_mKeyboardTextureMapping.ContainsKey(key))
@@ -343,13 +493,14 @@ class ChromaCaptureWindow : EditorWindow
         }
 
         Point point = _mKeyboardTextureMapping[key];
-
-        int index = (RENDER_TEXTURE_SIZE - 1 - point._mY) * RENDER_TEXTURE_SIZE + point._mX;
-        if (index < colors.Length)
+        if (_mSample)
         {
-            return colors[index];
+            return GetSampleColor(colors, point._mX, point._mY);
         }
-        return Color.black;
+        else
+        {
+            return GetColor(colors, point._mX, point._mY);
+        }
     }
 
     private Color GetMouseColor(Color[] colors, int led)
@@ -1237,9 +1388,18 @@ class ChromaCaptureWindow : EditorWindow
                     _mAutoAlignWithView = autoAlignWithView;
                     EditorPrefs.SetBool(KEY_AUTO_ALIGN, _mAutoAlignWithView);
                 }
+                _mSample = GUILayout.Toggle(_mSample, "Sample");
                 GUI.enabled = true;
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
+
+                if (_mSample)
+                {
+                    int sampleRangeX = EditorGUILayout.IntField("SampleX", _mSampleRangeX);
+                    _mSampleRangeX = Mathf.Min(sampleRangeX, 16);
+                    int sampleRangeY = EditorGUILayout.IntField("SampleY", _mSampleRangeY);
+                    _mSampleRangeY = Mathf.Min(sampleRangeY, 16);
+                }
 
                 animationName = GetAnimationName();
 
