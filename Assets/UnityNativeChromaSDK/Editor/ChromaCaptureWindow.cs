@@ -1508,7 +1508,7 @@ class ChromaCaptureWindow : EditorWindow
                             int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
                             GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
 
-                            if (_mFrameCap >= 0 &&
+                            if (_mFrameCap > 0 &&
                                 frameCount >= _mFrameCap)
                             {
                                 _mCapturing = false;
@@ -1529,7 +1529,7 @@ class ChromaCaptureWindow : EditorWindow
                             GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
                             GUILayout.EndHorizontal();
 
-                            if (_mFrameCap >= 0 &&
+                            if (_mFrameCap > 0 &&
                                 frameCount >= _mFrameCap)
                             {
                                 detectFrameCap = true;
