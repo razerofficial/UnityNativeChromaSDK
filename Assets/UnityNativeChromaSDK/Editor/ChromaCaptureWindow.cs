@@ -17,6 +17,7 @@ class ChromaCaptureWindow : EditorWindow
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
     private const string KEY_ANIMATION = "ChromaSDKAnimationPath";
     private const string KEY_CAMERA = "ChromaSDKCameraPath";
+    private const string KEY_FRAME_CAP = "ChromaSDKFrameCap";
     private const string KEY_PARTICLE = "ChromaSDKParticleSystemPath";
     private const string KEY_AUTO_ALIGN = "ChromaSDKAutoAlign";
     private const string KEY_LAYOUT = "ChromaSDKLayout";
@@ -33,6 +34,7 @@ class ChromaCaptureWindow : EditorWindow
     private Texture2D _mTempTexture = null;
     private Object _mMask = null;
     private float _mInterval = 0.1f;
+    private int _mFrameCap = 0;
     private ParticleSystem _mParticleSystem = null;
     private bool _mCapturing = false;
     private DateTime _mTimerCapture = DateTime.MinValue;
@@ -1505,6 +1507,12 @@ class ChromaCaptureWindow : EditorWindow
                             }
                             int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
                             GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
+
+                            if (_mFrameCap >= 0 &&
+                                frameCount >= _mFrameCap)
+                            {
+                                _mCapturing = false;
+                            }
                         }
                     }
                 }
@@ -1512,6 +1520,7 @@ class ChromaCaptureWindow : EditorWindow
                 {
                     if (!string.IsNullOrEmpty(animationName))
                     {
+                        bool detectFrameCap = false;
                         for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
                         {
                             animationName = GetCompositeName(device);
@@ -1519,8 +1528,27 @@ class ChromaCaptureWindow : EditorWindow
                             GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                             GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
                             GUILayout.EndHorizontal();
+
+                            if (_mFrameCap >= 0 &&
+                                frameCount >= _mFrameCap)
+                            {
+                                detectFrameCap = true;
+                            }
+                        }
+
+                        if (_mCapturing &&
+                            detectFrameCap)
+                        {
+                            _mCapturing = false;
                         }
                     }
+                }
+
+                int frameCap = EditorGUILayout.IntField("Frame Cap:", _mFrameCap);
+                if (_mFrameCap != frameCap)
+                {
+                    _mFrameCap = frameCap;
+                    EditorPrefs.SetInt(KEY_FRAME_CAP, _mFrameCap);
                 }
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
