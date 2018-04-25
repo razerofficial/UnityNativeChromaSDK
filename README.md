@@ -44,7 +44,7 @@
 <a name="prerequisites"></a>
 ## Prerequisites
 - Install [Synapse](http://developer.razerzone.com/works-with-chroma/download/)
-- Install [Chroma SDK 2.5.3](http://developer.razerzone.com/works-with-chroma/download/)
+- Synapse will install the Chroma SDK when a Chroma enabled device is connected
 - Install [Microsoft Visual C++ Redistributable for Visual Studio 2017](https://www.visualstudio.com/downloads/)
 
 
