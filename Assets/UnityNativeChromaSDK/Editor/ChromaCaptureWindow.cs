@@ -1617,9 +1617,13 @@ private void OnGUI()
                             GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
 
                             if (_mFrameCap > 0 &&
-                                frameCount >= _mFrameCap)
+                                frameCount >= _mFrameCap &&
+                                _mCapturing)
                             {
                                 _mCapturing = false;
+                                Debug.Log("Capturing stopped by the frame cap.");
+                                OnClickSave();
+                                OnClickUnload();
                             }
                         }
                     }
@@ -1648,6 +1652,9 @@ private void OnGUI()
                             detectFrameCap)
                         {
                             _mCapturing = false;
+                            Debug.Log("Capturing stopped by the frame cap.");
+                            OnClickSave();
+                            OnClickUnload();
                         }
                     }
                 }
