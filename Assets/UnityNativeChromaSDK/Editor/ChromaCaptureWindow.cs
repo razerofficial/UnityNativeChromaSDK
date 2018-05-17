@@ -1668,10 +1668,11 @@ private void OnGUI()
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                 float interval = EditorGUILayout.FloatField("Capture Interval", _mInterval);
-                if (interval >= 0.1f)
+                if (interval < 0.033f)
                 {
-                    _mInterval = interval;
+                    interval = 0.033f;
                 }
+                _mInterval = interval;
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
@@ -1716,9 +1717,9 @@ private void OnGUI()
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
                 GUILayout.Label("Override Time (ALL FRAMES):");
                 _mOverrideTime = EditorGUILayout.FloatField(_mOverrideTime);
-                if (_mOverrideTime < 0.1f)
+                if (_mOverrideTime < 0.033f)
                 {
-                    _mOverrideTime = 0.1f;
+                    _mOverrideTime = 0.033f;
                 }
                 if (GUILayout.Button("Set", GUILayout.Width(50)))
                 {
