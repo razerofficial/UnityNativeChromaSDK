@@ -632,7 +632,8 @@ namespace ChromaSDK
             IntPtr targetLpData = GetIntPtr(targetPath);
             try
             {
-                if (sourceLpData != IntPtr.Zero)
+                if (sourceLpData != IntPtr.Zero &&
+                    targetLpData != IntPtr.Zero)
                 {
                     int frameCount = GetFrameCountName(targetAnimation);
                     foreach (int rzkey in keys)
@@ -650,6 +651,89 @@ namespace ChromaSDK
             }
             FreeIntPtr(sourceLpData);
             FreeIntPtr(targetLpData);
+#endif
+        }
+
+        /// <summary>
+        /// Copy color from a source animation to a target animation for a set of keys that aren't black for all frames
+        /// </summary>
+        /// <param name="sourceAnimation"></param>
+        /// <param name="targetAnimation"></param>
+        /// <param name="frameId"></param>
+        /// <param name="keys"></param>
+        public static void CopyNonZeroAllKeysAllFramesName(string sourceAnimation, string targetAnimation)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string sourcePath = GetStreamingPath(sourceAnimation);
+            string targetPath = GetStreamingPath(targetAnimation);
+            IntPtr sourceLpData = GetIntPtr(sourcePath);
+            IntPtr targetLpData = GetIntPtr(targetPath);
+            try
+            {
+                if (sourceLpData != IntPtr.Zero &&
+                    targetLpData != IntPtr.Zero)
+                {
+                    PluginCopyNonZeroAllKeysAllFramesName(sourceLpData, targetLpData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to copy nonzero keys color: source={0} target={1} exception={2}", sourceAnimation, targetAnimation, ex));
+            }
+            FreeIntPtr(sourceLpData);
+            FreeIntPtr(targetLpData);
+#endif
+        }
+
+        /// <summary>
+        /// Offset the RGB color for keys that are not black for all frames
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <param name="red"></param>
+        /// <param name="green"></param>
+        /// <param name="blue"></param>
+		public static void OffsetNonZeroColorsAllFramesName(string animation, int red, int green, int blue)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginOffsetNonZeroColorsAllFramesName(lpData, red, green, blue);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to offset nonzero color animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
+#endif
+        }
+
+        /// <summary>
+        /// Multiple the color intensity of all frames
+        /// </summary>
+        /// <param name="animation"></param>
+        /// <param name="intensity"></param>
+		public static void MultiplyIntensityAllFramesName(string animation, float intensity)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            string path = GetStreamingPath(animation);
+            IntPtr lpData = GetIntPtr(path);
+            try
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    PluginMultiplyIntensityAllFramesName(lpData, intensity);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(string.Format("Failed to multiply intensity animation: {0} exception={1}", animation, ex));
+            }
+            FreeIntPtr(lpData);
 #endif
         }
 
@@ -856,6 +940,38 @@ namespace ChromaSDK
         /// <param name="rzkey"></param>
         [DllImport(DLL_NAME)]
         private static extern void PluginCopyKeyColorName(IntPtr sourcePath, IntPtr targetPath, int frameId, int rzkey);
+
+        /// <summary>
+        /// Copy from a source animation to set a target key color for nonzero colors for a frame
+        /// </summary>
+        /// <param name="sourcePath"></param>
+        /// <param name="targetPath"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginCopyNonZeroAllKeysAllFramesName(IntPtr sourcePath, IntPtr targetPath);
+
+        /// <summary>
+        /// Clear all playing animations
+        /// </summary>
+        [DllImport(DLL_NAME)]
+        public static extern void PluginClearAll();
+
+        /// <summary>
+        /// Offset all nonzero keys that aren't black for all frames
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="red"></param>
+        /// <param name="green"></param>
+        /// <param name="blue"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginOffsetNonZeroColorsAllFramesName(IntPtr path, int red, int green, int blue);
+
+        /// <summary>
+        /// Multiply the color intensity of all frames
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="intensity"></param>
+        [DllImport(DLL_NAME)]
+        private static extern void PluginMultiplyIntensityAllFramesName(IntPtr path, float intensity);
 
         /// <summary>
         /// Get the Max Leds for 1D Devices
