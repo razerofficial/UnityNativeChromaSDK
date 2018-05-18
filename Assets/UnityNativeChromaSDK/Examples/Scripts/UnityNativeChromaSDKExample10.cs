@@ -91,7 +91,7 @@ public class UnityNativeChromaSDKExample10 : MonoBehaviour
         UnityNativeChromaSDK.CloseAnimationName(layer2);
         // turn animation green
         UnityNativeChromaSDK.OffsetNonZeroColorsAllFramesName(layer2, -127, 127, -127); //animation starts with 127,127,127 so adding -127,127,-127 results in 0,255,0 or green
-                                                                                              // set intensity
+        // set intensity
         UnityNativeChromaSDK.MultiplyIntensityAllFramesName(layer2, _mEffectIntensity);
         UnityNativeChromaSDK.CopyNonZeroAllKeysAllFramesName(layer2, baseLayer);
 
@@ -135,7 +135,7 @@ public class UnityNativeChromaSDKExample10 : MonoBehaviour
         UnityNativeChromaSDK.CloseAnimationName(layer2);
         // turn animation red
         UnityNativeChromaSDK.OffsetNonZeroColorsAllFramesName(layer2, 127, -127, -127); //animation starts with 127,127,127 so adding 127,-127,-127 results in 255,0,0 or red
-                                                                                              // set intensity
+        // set intensity
         UnityNativeChromaSDK.MultiplyIntensityAllFramesName(layer2, _mEffectIntensity);
         UnityNativeChromaSDK.CopyNonZeroAllKeysAllFramesName(layer2, baseLayer);
 
@@ -178,7 +178,7 @@ public class UnityNativeChromaSDKExample10 : MonoBehaviour
         UnityNativeChromaSDK.CloseAnimationName(layer2);
         // turn animation blue
         UnityNativeChromaSDK.OffsetNonZeroColorsAllFramesName(layer2, -127, -127, 127); //animation starts with 127,127,127 so adding -127,-127,127 results in 0,0,255 or blue
-                                                                                        // set intensity
+        // set intensity
         UnityNativeChromaSDK.MultiplyIntensityAllFramesName(layer2, _mEffectIntensity);
         UnityNativeChromaSDK.CopyNonZeroAllKeysAllFramesName(layer2, baseLayer);
 
