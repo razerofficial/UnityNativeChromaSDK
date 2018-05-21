@@ -153,6 +153,7 @@ Editing `Chroma` animations will open the `Chroma` editor dialog.
 
 * [CloseAnimationName](#CloseAnimationName)
 * [CopyKeysColorAllFramesName](#CopyKeysColorAllFramesName)
+* [CopyNonZeroAllKeysAllFramesName](#CopyNonZeroAllKeysAllFramesName)
 * [EditAnimation](#EditAnimation)
 * [GetCurrentFrameName](#GetCurrentFrameName)
 * [GetFrameCountName](#GetFrameCountName)
@@ -160,6 +161,8 @@ Editing `Chroma` animations will open the `Chroma` editor dialog.
 * [Init](#Init)
 * [IsAnimationPausedName](#IsAnimationPausedName)
 * [IsPlaying](#IsPlaying)
+* [MultiplyIntensityAllFramesName](#MultiplyIntensityAllFramesName)
+* [OffsetNonZeroColorsAllFramesName](#OffsetNonZeroColorsAllFramesName)
 * [PauseAnimationName](#PauseAnimationName)
 * [PlayAnimationName](#PlayAnimationName)
 * [PlayComposite](#PlayComposite)
@@ -173,6 +176,7 @@ Editing `Chroma` animations will open the `Chroma` editor dialog.
 * [StopComposite](#StopComposite)
 * [Uninit](#Uninit)
 
+---
 
 Add the `ChromaSDK` namespace.
 
@@ -188,6 +192,7 @@ The `API` is only available on the `Windows Editor` and `Windows Standalone` pla
 #endif
 ```
 
+---
 
 <a name="Init"></a>
 **Init**
@@ -201,6 +206,7 @@ private void Awake()
 }
 ```
 
+---
 
 <a name="Uninit"></a>
 **Uninit**
@@ -214,6 +220,7 @@ private void OnApplicationQuit()
 }
 ```
 
+---
 
 <a name="PluginIsInitialized"></a>
 **PluginIsInitialized**
@@ -224,6 +231,7 @@ Returns true if the plugin has been initialized. Returns false if the plugin is 
 bool isInitialized = UnityNativeChromaSDK.PluginIsInitialized();
 ```
 
+---
 
 <a name="PlayAnimationName"></a>
 **PlayAnimationName**
@@ -236,6 +244,7 @@ bool loop = true;
 UnityNativeChromaSDK.PlayAnimationName(animation, loop);
 ```
 
+---
 
 <a name="StopAnimationName"></a>
 **StopAnimationName**
@@ -247,6 +256,7 @@ string animation = "Random_Keyboard.chroma";
 UnityNativeChromaSDK.StopAnimationName(animation);
 ```
 
+---
 
 <a name="StopAnimationType"></a>
 **StopAnimationType**
@@ -262,6 +272,7 @@ UnityNativeChromaSDK.StopAnimationType(UnityNativeChromaSDK.Device.Mouse);
 UnityNativeChromaSDK.StopAnimationType(UnityNativeChromaSDK.Device.Mousepad);
 ```
 
+---
 
 <a name="CloseAnimationName"></a>
 **CloseAnimationName**
@@ -273,6 +284,7 @@ string animation = "Random_Keyboard.chroma";
 UnityNativeChromaSDK.CloseAnimationName(animation);
 ```
 
+---
 
 <a name="EditAnimation"></a>
 **EditAnimation**
@@ -284,6 +296,7 @@ string animation = "Random_Keyboard.chroma";
 UnityNativeChromaSDK.EditAnimation(animation);
 ```
 
+---
 
 <a name="GetFrameCountName"></a>
 **GetFrameCountName**
@@ -295,6 +308,7 @@ string animation = "Random_Keyboard.chroma";
 int frameCount = UnityNativeChromaSDK.GetFrameCountName(animation);
 ```
 
+---
 
 <a name="CopyKeysColorAllFramesName"></a>
 **CopyKeysColorAllFramesName**
@@ -313,6 +327,7 @@ UnityNativeChromaSDK.CopyKeysColorAllFramesName(sourceAnimation, targetAnimation
         (int)UnityNativeChromaSDK.Keyboard.RZLED.RZLED_LOGO});
 ```
 
+---
 
 <a name="SetKeysColorAllFramesName"></a>
 **SetKeysColorAllFramesName**
@@ -332,6 +347,7 @@ UnityNativeChromaSDK.SetKeysColorAllFramesName(animation,
     color);
 ```
 
+---
 
 <a name="GetCurrentFrameName"></a>
 **GetCurrentFrameName**
@@ -343,6 +359,7 @@ string animation = "Random_Keyboard.chroma";
 int currentFrame = UnityNativeChromaSDK.GetCurrentFrameName(animation)
 ```
 
+---
 
 <a name="SetCurrentFrameName"></a>
 **SetCurrentFrameName**
@@ -355,6 +372,7 @@ int frameId = 0;
 UnityNativeChromaSDK.SetCurrentFrameName(animation, frameId);
 ```
 
+---
 
 <a name="IsAnimationPausedName"></a>
 **IsAnimationPausedName**
@@ -366,6 +384,7 @@ string animation = "Random_Keyboard.chroma";
 bool isPaused = UnityNativeChromaSDK.IsAnimationPausedName(animation);
 ```
 
+---
 
 <a name="HasAnimationLoopName"></a>
 **HasAnimationLoopName**
@@ -377,6 +396,7 @@ string animation = "Random_Keyboard.chroma";
 bool loop = UnityNativeChromaSDK.HasAnimationLoopName(animation);
 ```
 
+---
 
 <a name="PauseAnimationName"></a>
 **PauseAnimationName**
@@ -388,6 +408,7 @@ string animation = "Random_Keyboard.chroma";
 UnityNativeChromaSDK.PauseAnimationName(animation);
 ```
 
+---
 
 <a name="ResumeAnimationName"></a>
 **ResumeAnimationName**
@@ -400,6 +421,7 @@ bool loop = true;
 UnityNativeChromaSDK.ResumeAnimationName(animation, loop);
 ```
 
+---
 
 <a name="PlayComposite"></a>
 **PlayComposite**
@@ -412,6 +434,7 @@ bool loop = true;
 UnityNativeChromaSDK.PlayComposite(composite, loop);
 ```
 
+---
 
 <a name="StopComposite"></a>
 **StopComposite**
@@ -423,6 +446,7 @@ string composite = "Random";
 UnityNativeChromaSDK.StopComposite(composite);
 ```
 
+---
 
 <a name="IsPlaying"></a>
 **IsPlaying**
@@ -434,6 +458,7 @@ string animation = "Random_Keyboard.chroma";
 bool isPlaying = UnityNativeChromaSDK.IsPlaying(animation);
 ```
 
+---
 
 <a name="PluginIsPlatformSupported"></a>
 **PluginIsPlatformSupported**
@@ -444,6 +469,52 @@ Check if the current platform supports playing Chroma.
 bool isPlatformSupported = UnityNativeChromaSDK.PluginIsPlatformSupported();
 ```
 
+---
+
+<a name="MultiplyIntensityAllFramesName"></a>
+**MultiplyIntensityAllFramesName**
+
+The `MultiplyIntensityAllFramesName` method multiplies a color intensity for all frames of an animation. This is useful to control the intensity of a layer. `0.0` results in a completely black layer. `0.5` would half the color values for all frames.
+
+```charp
+string baseLayer = "EnvironmentSnow_Keyboard.chroma";
+
+// reload the animation
+UnityNativeChromaSDK.CloseAnimationName(baseLayer);
+
+// set the intensity of the layer
+UnityNativeChromaSDK.MultiplyIntensityAllFramesName(baseLayer, _mBaseIntensity);
+```
+
+---
+
+<a name="OffsetNonZeroColorsAllFramesName"></a>
+**OffsetNonZeroColorsAllFramesName**
+
+The `OffsetNonZeroColorsAllFrames` method offsets the RGB values for all frames in the animation that aren't black. This method allows a gray animation layer to be tinted to any color while keeping the black colors black. Red, green, blue use expected values `0` to `255`.
+
+```charp
+string layer2 = "RingGray_Keyboard.chroma";
+
+// reload the animation
+UnityNativeChromaSDK.CloseAnimationName(layer2);
+
+//animation starts with 127,127,127 so adding -127,127,-127 results in 0,255,0 or green
+UnityNativeChromaSDK.OffsetNonZeroColorsAllFramesName(layer2, -127, 127, -127);
+```
+
+---
+
+<a name="CopyNonZeroAllKeysAllFramesName"></a>
+**CopyNonZeroAllKeysAllFramesName**
+
+The `CopyNonZeroAllKeysAllFramesName` method copies all non-black colors for all frames from a source animation to a target animation. This is useful for combining multiple layers into a base layer.
+
+```charp
+UnityNativeChromaSDK.CopyNonZeroAllKeysAllFramesName(sourceAnimation, targetAnimation);
+```
+
+---
 
 <a name="examples"></a>
 ## Examples
@@ -451,7 +522,7 @@ bool isPlatformSupported = UnityNativeChromaSDK.PluginIsPlatformSupported();
 **Example01**
 
 [UnityNativeChromaSDKExample01.cs](Assets/UnityNativeChromaSDK/Examples/Scripts/UnityNativeChromaSDKExample01.cs) has a GUI example to play/stop/edit `Chroma` animations at runtime.
- 
+
  ![image_3](images/image_3.png)
 
 **Example02**
@@ -469,7 +540,7 @@ The `AnimationName` field references a `.chroma` asset `filename` from the [`Str
 The `.chroma` extension on the `AnimationName` field is optional.
 
 The `UnityNativeChromaSDKPlayOnEnable.cs` script will play the animation when the `OnEnable` event fires.
- 
+
 The `UnityNativeChromaSDKPlayOnEnable.cs` script will stop the animation when the `OnDisable` event fires.
 
 ![image_5](images/image_5.png)
@@ -501,3 +572,7 @@ Show `PlayOnDestroy` script
 **Example09**
 
 Chroma animations can be paused and resumed with looping ON or OFF.
+
+**Example10**
+
+Chroma animations support independent layering.
