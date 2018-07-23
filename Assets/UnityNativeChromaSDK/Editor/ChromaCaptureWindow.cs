@@ -1261,364 +1261,398 @@ class ChromaCaptureWindow : EditorWindow
         }
     }
 
-private void OnGUI()
+    private void OnGUI()
     {
-        // run actions on main thread
-        while (_mMainThreadActions.Count > 0)
-        {
-            Action item = _mMainThreadActions[0];
-            item.Invoke();
-            _mMainThreadActions.RemoveAt(0);
-        }
-
-        // handle unfocusing controls
-        GUI.SetNextControlName("");
-
-        string animationName = string.Empty;
-
         Rect rect;
 
-        RestoreSelection();
-        SaveSelection();
-
-        UnityNativeChromaSDK.Init();
-
-        _mMainThreadActions.Add(() =>
+        if (UnityNativeChromaSDK.PluginIsInitialized())
         {
-            DoAlignWithView();
-        });
 
-        _mMainThreadActions.Add(() =>
-        {
-            DoCapture();
-        });
-
-        GameObject activeGameObject = Selection.activeGameObject;
-        if (activeGameObject)
-        {
-            ParticleSystem particleSystem = activeGameObject.GetComponent<ParticleSystem>();
-            if (particleSystem)
+            // run actions on main thread
+            while (_mMainThreadActions.Count > 0)
             {
-                _mParticleSystem = particleSystem;
+                Action item = _mMainThreadActions[0];
+                item.Invoke();
+                _mMainThreadActions.RemoveAt(0);
             }
-        }
+
+            // handle unfocusing controls
+            GUI.SetNextControlName("");
+
+            string animationName = string.Empty;
+
+            RestoreSelection();
+            SaveSelection();
+
+            UnityNativeChromaSDK.Init();
+
+            _mMainThreadActions.Add(() =>
+            {
+                DoAlignWithView();
+            });
+
+            _mMainThreadActions.Add(() =>
+            {
+                DoCapture();
+            });
+
+            GameObject activeGameObject = Selection.activeGameObject;
+            if (activeGameObject)
+            {
+                ParticleSystem particleSystem = activeGameObject.GetComponent<ParticleSystem>();
+                if (particleSystem)
+                {
+                    _mParticleSystem = particleSystem;
+                }
+            }
 
 #if SHOW_TEMP_TEXTURE
-        _mTempTexture = (Texture2D)EditorGUILayout.ObjectField("TempTexture", _mTempTexture, typeof(Texture2D), true);
+            _mTempTexture = (Texture2D)EditorGUILayout.ObjectField("TempTexture", _mTempTexture, typeof(Texture2D), true);
 #endif
 
-        if (string.IsNullOrEmpty(_mAnimation))
-        {
-            _mAnimation = string.Empty;
-        }
+            if (string.IsNullOrEmpty(_mAnimation))
+            {
+                _mAnimation = string.Empty;
+            }
 
-        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-        GUILayout.Label("Mode:");
-        GUI.enabled = _mMode != Modes.Normal;
-        if (GUILayout.Button("Normal"))
-        {
-            _mMode = Modes.Normal;
-        }
-        GUI.enabled = _mMode != Modes.Composite;
-        if (GUILayout.Button("Composite"))
-        {
-            _mMode = Modes.Composite;
-        }
-        GUI.enabled = _mMode != Modes.Playback;
-        if (GUILayout.Button("Playback"))
-        {
-            _mMode = Modes.Playback;
-        }
-        GUI.enabled = true;
-        GUILayout.EndHorizontal();
-
-        if (_mMode == Modes.Composite)
-        {
             GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-            GUILayout.FlexibleSpace();
-            GUILayout.Label("Make Composite:");
-            if (GUILayout.Button("PlayOnEnable"))
+            GUILayout.Label("Mode:");
+            GUI.enabled = _mMode != Modes.Normal;
+            if (GUILayout.Button("Normal"))
             {
-                ClickPlayOnEnable();
+                _mMode = Modes.Normal;
             }
-            if (GUILayout.Button("PlayAndDeactivate"))
+            GUI.enabled = _mMode != Modes.Composite;
+            if (GUILayout.Button("Composite"))
             {
-                ClickPlayAndDeactivate();
+                _mMode = Modes.Composite;
             }
-            if (GUILayout.Button("PlayOnDestroy"))
+            GUI.enabled = _mMode != Modes.Playback;
+            if (GUILayout.Button("Playback"))
             {
-                ClickPlayOnDestroy();
+                _mMode = Modes.Playback;
             }
-            GUILayout.FlexibleSpace();
+            GUI.enabled = true;
             GUILayout.EndHorizontal();
-        }
 
-        switch (_mMode)
-        {
-            case Modes.Normal:
-            case Modes.Composite:
-
+            if (_mMode == Modes.Composite)
+            {
                 GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                _mAnimation = EditorGUILayout.TextField("Animation Name:", _mAnimation);
-                if (GUILayout.Button("x", GUILayout.Width(30)))
+                GUILayout.FlexibleSpace();
+                GUILayout.Label("Make Composite:");
+                if (GUILayout.Button("PlayOnEnable"))
                 {
-                    _mAnimation = string.Empty;
-                    if (EditorPrefs.HasKey(KEY_ANIMATION))
-                    {
-                        EditorPrefs.DeleteKey(KEY_ANIMATION);
-                    }
-                    GUI.FocusControl("");
+                    ClickPlayOnEnable();
                 }
-                GUILayout.EndHorizontal();
-
-                _mRenderCamera = (Camera)EditorGUILayout.ObjectField("RenderCamera:", _mRenderCamera, typeof(Camera), true);
-
-                Object mask = (Object)EditorGUILayout.ObjectField("Mask", _mMask, typeof(Object), true);
-                if (mask != _mMask)
+                if (GUILayout.Button("PlayAndDeactivate"))
                 {
-                    _mMask = mask;
-                    if (mask)
-                    {
-                        animationName = GetAnimationName(mask.name);
-                        int animationId = GetAnimation(animationName);
-                        if (animationId >= 0)
-                        {
-                            EditorPrefs.SetString(KEY_MASK, animationName);
-                        }
-                    }
+                    ClickPlayAndDeactivate();
                 }
-
-                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                GUILayout.Label("Select:");
-                GUI.enabled = !string.IsNullOrEmpty(_mAnimation);
-                if (GUILayout.Button("Animation"))
+                if (GUILayout.Button("PlayOnDestroy"))
                 {
-                    Selection.activeGameObject = null;
-                    string path = string.Format("Assets/StreamingAssets/{0}", GetAnimationName());
-                    if (File.Exists(path))
-                    {
-                        Selection.activeObject = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
-                    }
-                    else
-                    {
-                        Selection.activeObject = null;
-                    }
+                    ClickPlayOnDestroy();
                 }
-                GUI.enabled = null != _mRenderCamera;
-                if (GUILayout.Button("Camera"))
-                {
-                    Selection.activeObject = null;
-                    Selection.activeGameObject = _mRenderCamera.gameObject;
-                }
-                GUI.enabled = null != _mParticleSystem;
-                if (GUILayout.Button("ParticleSystem"))
-                {
-                    Selection.activeGameObject = null;
-                    Selection.activeObject = _mParticleSystem;
-                }
-                GUI.enabled = true;
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                GUILayout.Label("Camera:");
-                GUI.enabled = null != _mRenderCamera;
-                if (GUILayout.Button("Align With View"))
-                {
-                    OnClickAlignWithView();
-                }
-                bool autoAlignWithView = GUILayout.Toggle(_mAutoAlignWithView, "Auto");
-                if (_mAutoAlignWithView != autoAlignWithView)
-                {
-                    _mAutoAlignWithView = autoAlignWithView;
-                    EditorPrefs.SetBool(KEY_AUTO_ALIGN, _mAutoAlignWithView);
-                }
-                _mSample = GUILayout.Toggle(_mSample, "Sample");
-                GUI.enabled = true;
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
+            }
 
-                if (_mSample)
-                {
-                    int sampleRangeX = EditorGUILayout.IntField("SampleX", _mSampleRangeX);
-                    _mSampleRangeX = Mathf.Min(sampleRangeX, 16);
-                    int sampleRangeY = EditorGUILayout.IntField("SampleY", _mSampleRangeY);
-                    _mSampleRangeY = Mathf.Min(sampleRangeY, 16);
-                }
+            switch (_mMode)
+            {
+                case Modes.Normal:
+                case Modes.Composite:
 
-                animationName = GetAnimationName();
-
-                if (!string.IsNullOrEmpty(animationName))
-                {
                     GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                    GUILayout.Label("Animation:");
-                    if (GUILayout.Button("Reset"))
+                    _mAnimation = EditorGUILayout.TextField("Animation Name:", _mAnimation);
+                    if (GUILayout.Button("x", GUILayout.Width(30)))
                     {
-                        OnClickReset();
-                    }
-                    if (GUILayout.Button("Close"))
-                    {
-                        OnClickClose();
-                    }
-                    if (_mMode == Modes.Normal)
-                    {
-                        if (GUILayout.Button("Edit"))
+                        _mAnimation = string.Empty;
+                        if (EditorPrefs.HasKey(KEY_ANIMATION))
                         {
-                            OnClickEdit();
+                            EditorPrefs.DeleteKey(KEY_ANIMATION);
                         }
+                        GUI.FocusControl("");
                     }
                     GUILayout.EndHorizontal();
-                }
 
-                if (_mMode == Modes.Normal)
-                {
-                    if (string.IsNullOrEmpty(animationName))
+                    _mRenderCamera = (Camera)EditorGUILayout.ObjectField("RenderCamera:", _mRenderCamera, typeof(Camera), true);
+
+                    Object mask = (Object)EditorGUILayout.ObjectField("Mask", _mMask, typeof(Object), true);
+                    if (mask != _mMask)
                     {
-                        GUILayout.Label("Name: (Not Set)");
+                        _mMask = mask;
+                        if (mask)
+                        {
+                            animationName = GetAnimationName(mask.name);
+                            int animationId = GetAnimation(animationName);
+                            if (animationId >= 0)
+                            {
+                                EditorPrefs.SetString(KEY_MASK, animationName);
+                            }
+                        }
                     }
-                    else
+
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                    GUILayout.Label("Select:");
+                    GUI.enabled = !string.IsNullOrEmpty(_mAnimation);
+                    if (GUILayout.Button("Animation"))
                     {
-                        GUILayout.Label(string.Format("Name: {0}", animationName));
+                        Selection.activeGameObject = null;
+                        string path = string.Format("Assets/StreamingAssets/{0}", GetAnimationName());
+                        if (File.Exists(path))
+                        {
+                            Selection.activeObject = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
+                        }
+                        else
+                        {
+                            Selection.activeObject = null;
+                        }
                     }
+                    GUI.enabled = null != _mRenderCamera;
+                    if (GUILayout.Button("Camera"))
+                    {
+                        Selection.activeObject = null;
+                        Selection.activeGameObject = _mRenderCamera.gameObject;
+                    }
+                    GUI.enabled = null != _mParticleSystem;
+                    if (GUILayout.Button("ParticleSystem"))
+                    {
+                        Selection.activeGameObject = null;
+                        Selection.activeObject = _mParticleSystem;
+                    }
+                    GUI.enabled = true;
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                    GUILayout.Label("Camera:");
+                    GUI.enabled = null != _mRenderCamera;
+                    if (GUILayout.Button("Align With View"))
+                    {
+                        OnClickAlignWithView();
+                    }
+                    bool autoAlignWithView = GUILayout.Toggle(_mAutoAlignWithView, "Auto");
+                    if (_mAutoAlignWithView != autoAlignWithView)
+                    {
+                        _mAutoAlignWithView = autoAlignWithView;
+                        EditorPrefs.SetBool(KEY_AUTO_ALIGN, _mAutoAlignWithView);
+                    }
+                    _mSample = GUILayout.Toggle(_mSample, "Sample");
+                    GUI.enabled = true;
+                    GUILayout.FlexibleSpace();
+                    GUILayout.EndHorizontal();
+
+                    if (_mSample)
+                    {
+                        int sampleRangeX = EditorGUILayout.IntField("SampleX", _mSampleRangeX);
+                        _mSampleRangeX = Mathf.Min(sampleRangeX, 16);
+                        int sampleRangeY = EditorGUILayout.IntField("SampleY", _mSampleRangeY);
+                        _mSampleRangeY = Mathf.Min(sampleRangeY, 16);
+                    }
+
+                    animationName = GetAnimationName();
+
                     if (!string.IsNullOrEmpty(animationName))
                     {
-                        UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationName);
-                        GUILayout.Label(string.Format("Device: {0}", device));
-                        if (device != UnityNativeChromaSDK.Device.Invalid)
+                        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                        GUILayout.Label("Animation:");
+                        if (GUILayout.Button("Reset"))
                         {
-                            GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                            Color oldColor = GUI.color;
-                            Color selectedColor = Color.green;
+                            OnClickReset();
+                        }
+                        if (GUILayout.Button("Close"))
+                        {
+                            OnClickClose();
+                        }
+                        if (_mMode == Modes.Normal)
+                        {
+                            if (GUILayout.Button("Edit"))
+                            {
+                                OnClickEdit();
+                            }
+                        }
+                        GUILayout.EndHorizontal();
+                    }
 
-                            GUI.enabled = device != UnityNativeChromaSDK.Device.ChromaLink;
-                            if (!GUI.enabled)
+                    if (_mMode == Modes.Normal)
+                    {
+                        if (string.IsNullOrEmpty(animationName))
+                        {
+                            GUILayout.Label("Name: (Not Set)");
+                        }
+                        else
+                        {
+                            GUILayout.Label(string.Format("Name: {0}", animationName));
+                        }
+                        if (!string.IsNullOrEmpty(animationName))
+                        {
+                            UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationName);
+                            GUILayout.Label(string.Format("Device: {0}", device));
+                            if (device != UnityNativeChromaSDK.Device.Invalid)
                             {
-                                GUI.color = selectedColor;
-                            }
-                            else
-                            {
-                                GUI.color = oldColor;
-                            }
-                            if (GUILayout.Button("ChromaLink"))
-                            {
-                                _mMainThreadActions.Add(() =>
+                                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                                Color oldColor = GUI.color;
+                                Color selectedColor = Color.green;
+
+                                GUI.enabled = device != UnityNativeChromaSDK.Device.ChromaLink;
+                                if (!GUI.enabled)
                                 {
-                                    UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.ChromaLink);
-                                    int animationId = GetAnimation();
-                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                });
-                            }
-                            GUI.color = oldColor;
-
-                            GUI.enabled = device != UnityNativeChromaSDK.Device.Headset;
-                            if (!GUI.enabled)
-                            {
-                                GUI.color = selectedColor;
-                            }
-                            else
-                            {
-                                GUI.color = oldColor;
-                            }
-                            if (GUILayout.Button("Headset"))
-                            {
-                                _mMainThreadActions.Add(() =>
+                                    GUI.color = selectedColor;
+                                }
+                                else
                                 {
-                                    UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Headset);
-                                    int animationId = GetAnimation();
-                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                });
-                            }
-                            GUI.color = oldColor;
-
-                            GUI.enabled = device != UnityNativeChromaSDK.Device.Keyboard;
-                            if (!GUI.enabled)
-                            {
-                                GUI.color = selectedColor;
-                            }
-                            else
-                            {
-                                GUI.color = oldColor;
-                            }
-                            if (GUILayout.Button("Keyboard"))
-                            {
-                                _mMainThreadActions.Add(() =>
+                                    GUI.color = oldColor;
+                                }
+                                if (GUILayout.Button("ChromaLink"))
                                 {
-                                    UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Keyboard);
-                                    int animationId = GetAnimation();
-                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                });
-                            }
-                            GUI.color = oldColor;
-
-                            GUILayout.EndHorizontal();
-                            GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                            GUI.enabled = device != UnityNativeChromaSDK.Device.Keypad;
-                            if (!GUI.enabled)
-                            {
-                                GUI.color = selectedColor;
-                            }
-                            else
-                            {
+                                    _mMainThreadActions.Add(() =>
+                                    {
+                                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.ChromaLink);
+                                        int animationId = GetAnimation();
+                                        UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    });
+                                }
                                 GUI.color = oldColor;
-                            }
-                            if (GUILayout.Button("Keypad"))
-                            {
-                                _mMainThreadActions.Add(() =>
-                                {
-                                    UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Keypad);
-                                    int animationId = GetAnimation();
-                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                });
-                            }
-                            GUI.color = oldColor;
 
-                            GUI.enabled = device != UnityNativeChromaSDK.Device.Mouse;
-                            if (!GUI.enabled)
-                            {
-                                GUI.color = selectedColor;
-                            }
-                            else
-                            {
+                                GUI.enabled = device != UnityNativeChromaSDK.Device.Headset;
+                                if (!GUI.enabled)
+                                {
+                                    GUI.color = selectedColor;
+                                }
+                                else
+                                {
+                                    GUI.color = oldColor;
+                                }
+                                if (GUILayout.Button("Headset"))
+                                {
+                                    _mMainThreadActions.Add(() =>
+                                    {
+                                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Headset);
+                                        int animationId = GetAnimation();
+                                        UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    });
+                                }
                                 GUI.color = oldColor;
-                            }
-                            if (GUILayout.Button("Mouse"))
-                            {
-                                _mMainThreadActions.Add(() =>
-                                {
-                                    UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Mouse);
-                                    int animationId = GetAnimation();
-                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                });
-                            }
-                            GUI.color = oldColor;
 
-                            GUI.enabled = device != UnityNativeChromaSDK.Device.Mousepad;
-                            if (!GUI.enabled)
-                            {
-                                GUI.color = selectedColor;
-                            }
-                            else
-                            {
+                                GUI.enabled = device != UnityNativeChromaSDK.Device.Keyboard;
+                                if (!GUI.enabled)
+                                {
+                                    GUI.color = selectedColor;
+                                }
+                                else
+                                {
+                                    GUI.color = oldColor;
+                                }
+                                if (GUILayout.Button("Keyboard"))
+                                {
+                                    _mMainThreadActions.Add(() =>
+                                    {
+                                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Keyboard);
+                                        int animationId = GetAnimation();
+                                        UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    });
+                                }
                                 GUI.color = oldColor;
-                            }
-                            if (GUILayout.Button("Mousepad"))
-                            {
-                                _mMainThreadActions.Add(() =>
+
+                                GUILayout.EndHorizontal();
+                                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                                GUI.enabled = device != UnityNativeChromaSDK.Device.Keypad;
+                                if (!GUI.enabled)
                                 {
-                                    UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Mousepad);
-                                    int animationId = GetAnimation();
-                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                });
+                                    GUI.color = selectedColor;
+                                }
+                                else
+                                {
+                                    GUI.color = oldColor;
+                                }
+                                if (GUILayout.Button("Keypad"))
+                                {
+                                    _mMainThreadActions.Add(() =>
+                                    {
+                                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Keypad);
+                                        int animationId = GetAnimation();
+                                        UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    });
+                                }
+                                GUI.color = oldColor;
+
+                                GUI.enabled = device != UnityNativeChromaSDK.Device.Mouse;
+                                if (!GUI.enabled)
+                                {
+                                    GUI.color = selectedColor;
+                                }
+                                else
+                                {
+                                    GUI.color = oldColor;
+                                }
+                                if (GUILayout.Button("Mouse"))
+                                {
+                                    _mMainThreadActions.Add(() =>
+                                    {
+                                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Mouse);
+                                        int animationId = GetAnimation();
+                                        UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    });
+                                }
+                                GUI.color = oldColor;
+
+                                GUI.enabled = device != UnityNativeChromaSDK.Device.Mousepad;
+                                if (!GUI.enabled)
+                                {
+                                    GUI.color = selectedColor;
+                                }
+                                else
+                                {
+                                    GUI.color = oldColor;
+                                }
+                                if (GUILayout.Button("Mousepad"))
+                                {
+                                    _mMainThreadActions.Add(() =>
+                                    {
+                                        UnityNativeChromaSDK.SetDevice(animationName, UnityNativeChromaSDK.Device.Mousepad);
+                                        int animationId = GetAnimation();
+                                        UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    });
+                                }
+                                GUI.color = oldColor;
+
+                                GUILayout.EndHorizontal();
+                                GUI.enabled = true;
+                                int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
+                                GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
+
+                                if (_mFrameCap > 0 &&
+                                    frameCount >= _mFrameCap &&
+                                    _mCapturing)
+                                {
+                                    _mCapturing = false;
+                                    Debug.Log("Capturing stopped by the frame cap.");
+                                    OnClickSave();
+                                    OnClickUnload();
+                                }
                             }
-                            GUI.color = oldColor;
+                        }
+                    }
+                    else if (_mMode == Modes.Composite)
+                    {
+                        if (!string.IsNullOrEmpty(animationName))
+                        {
+                            bool detectFrameCap = false;
+                            for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                            {
+                                animationName = GetCompositeName(device);
+                                int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
+                                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                                GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
+                                GUILayout.EndHorizontal();
 
-                            GUILayout.EndHorizontal();
-                            GUI.enabled = true;
-                            int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
-                            GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
+                                if (_mFrameCap > 0 &&
+                                    frameCount >= _mFrameCap)
+                                {
+                                    detectFrameCap = true;
+                                }
+                            }
 
-                            if (_mFrameCap > 0 &&
-                                frameCount >= _mFrameCap &&
-                                _mCapturing)
+                            if (_mCapturing &&
+                                detectFrameCap)
                             {
                                 _mCapturing = false;
                                 Debug.Log("Capturing stopped by the frame cap.");
@@ -1627,302 +1661,272 @@ private void OnGUI()
                             }
                         }
                     }
-                }
-                else if (_mMode == Modes.Composite)
-                {
-                    if (!string.IsNullOrEmpty(animationName))
+
+                    int frameCap = EditorGUILayout.IntField("Frame Cap:", _mFrameCap);
+                    if (_mFrameCap != frameCap)
                     {
-                        bool detectFrameCap = false;
-                        for (UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.Device.ChromaLink; device < UnityNativeChromaSDK.Device.MAX; ++device)
+                        _mFrameCap = frameCap;
+                        EditorPrefs.SetInt(KEY_FRAME_CAP, _mFrameCap);
+                    }
+
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                    float interval = EditorGUILayout.FloatField("Capture Interval", _mInterval);
+                    if (interval < 0.033f)
+                    {
+                        interval = 0.033f;
+                    }
+                    _mInterval = interval;
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                    GUILayout.Label("Capture:");
+                    GUI.enabled = null != _mRenderCamera && !string.IsNullOrEmpty(_mAnimation);
+                    if (GUILayout.Button("1 Frame"))
+                    {
+                        _mMainThreadActions.Add(() =>
                         {
-                            animationName = GetCompositeName(device);
+                            if (_mAutoAlignWithView)
+                            {
+                                OnClickAlignWithView();
+                            }
+                            OnClick1Frame();
+                            OnClickUnload();
+                        });
+                    }
+                    if (GUILayout.Button(_mCapturing ? "Stop" : "Start") ||
+                        _mCaptureKeyDetected)
+                    {
+                        _mMainThreadActions.Add(() =>
+                        {
+                            _mCaptureKeyDetected = false;
+                            MakeAnimationReady();
+
+                            _mCapturing = !_mCapturing;
+                            if (_mCapturing)
+                            {
+                                OnClickReset();
+                                _mCaptureIndex = 0;
+                            }
+                            else
+                            {
+                                OnClickSave();
+                                OnClickUnload();
+                            }
+                        });
+                    }
+                    GUI.enabled = true;
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                    GUILayout.Label("Override Time (ALL FRAMES):");
+                    _mOverrideTime = EditorGUILayout.FloatField(_mOverrideTime);
+                    if (_mOverrideTime < 0.033f)
+                    {
+                        _mOverrideTime = 0.033f;
+                    }
+                    if (GUILayout.Button("Set", GUILayout.Width(50)))
+                    {
+                        OnClickSetOverrideTime();
+                    }
+                    GUILayout.EndHorizontal();
+
+                    if (!string.IsNullOrEmpty(animationName) &&
+                        _mRenderCamera)
+                    {
+                        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                        GUILayout.Label("Layout");
+                        if (GUILayout.Button("C"))
+                        {
+                            if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.ChromaLink)
+                            {
+                                _mToggleLayout = !_mToggleLayout;
+                                EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                            }
+                            _mDeviceLayout = UnityNativeChromaSDK.Device.ChromaLink;
+                        }
+                        if (GUILayout.Button("K"))
+                        {
+                            if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
+                            {
+                                _mToggleLayout = !_mToggleLayout;
+                                EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                            }
+                            _mDeviceLayout = UnityNativeChromaSDK.Device.Keyboard;
+                        }
+                        if (GUILayout.Button("M"))
+                        {
+                            if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Mouse)
+                            {
+                                _mToggleLayout = !_mToggleLayout;
+                                EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                            }
+                            _mDeviceLayout = UnityNativeChromaSDK.Device.Mouse;
+                        }
+                        if (GUILayout.Button("MP"))
+                        {
+                            if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
+                            {
+                                _mToggleLayout = !_mToggleLayout;
+                                EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
+                            }
+                            _mDeviceLayout = UnityNativeChromaSDK.Device.Mousepad;
+                        }
+                        _mColorLayout = EditorGUILayout.ColorField(_mColorLayout);
+                        GUILayout.EndHorizontal();
+                    }
+
+                    rect = GUILayoutUtility.GetLastRect();
+                    if (_mRenderCamera)
+                    {
+                        if (null == _mRenderTexture)
+                        {
+                            _mRenderTexture = new RenderTexture(RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE, 24, RenderTextureFormat.ARGB32);
+                            _mRenderCamera.targetTexture = _mRenderTexture;
+                        }
+                        _mRenderCamera.Render();
+                        rect.y += 30;
+                        DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
+
+                        if (_mToggleLayout)
+                        {
+                            if (_sKeyboardTexture)
+                            {
+                                Color oldColor = GUI.color;
+                                GUI.color = _mColorLayout;
+                                const int border = 2;
+                                rect = new Rect(rect.x + border, rect.y + border, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
+                            
+                                switch (_mDeviceLayout)
+                                {
+                                    case UnityNativeChromaSDK.Device.ChromaLink:
+                                    case UnityNativeChromaSDK.Device.Headset:
+                                        if (_sChromaLinkTexture)
+                                        {
+                                            GUI.DrawTexture(rect, _sChromaLinkTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                        }
+                                        break;
+                                    case UnityNativeChromaSDK.Device.Keyboard:
+                                        if (_sKeyboardTexture)
+                                        {
+                                            GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                        }
+                                        break;
+                                    case UnityNativeChromaSDK.Device.Mouse:
+                                        if (_sMouseTexture)
+                                        {
+                                            GUI.DrawTexture(rect, _sMouseTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                        }
+                                        break;
+                                    case UnityNativeChromaSDK.Device.Mousepad:
+                                        if (_sMousepadTexture)
+                                        {
+                                            GUI.DrawTexture(rect, _sMousepadTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
+                                        }
+                                        break;
+                                }
+
+                                GUI.color = oldColor;
+                            }
+                        }
+                    }
+                    break;
+
+                case Modes.Playback:
+                    if (IsAnimationSelected())
+                    {
+                        if (Selection.activeObject)
+                        {
+                            animationName = GetAnimationName(Selection.activeObject.name);
+                            if (_mLastPlaybackName != animationName)
+                            {
+                                UnityNativeChromaSDK.StopAnimationName(_mLastPlaybackName);
+                                _mLastPlaybackName = animationName;
+                                UnityNativeChromaSDK.PlayAnimationName(animationName);
+                            }
                             int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
+                            UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationName);
+                            GUILayout.Label(string.Format("Name: {0}", animationName));
+                            GUILayout.Label(string.Format("Device: {0}", device));
+                            GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
+                            bool isPlaying = UnityNativeChromaSDK.IsPlaying(animationName);
+                            GUILayout.Label(string.Format("Is Playing: {0}", isPlaying));
                             GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                            GUILayout.Label(string.Format("{0}: {1} frames - ({2})", device, frameCount, animationName));
+                            GUILayout.Label("Loop:");
+                            bool loop = GUILayout.Toggle(_mToggleLoop, "");
+                            if (loop != _mToggleLoop)
+                            {
+                                _mToggleLoop = loop;
+                                EditorPrefs.SetBool(KEY_LOOP, _mToggleLoop);
+                            }
+                            GUILayout.FlexibleSpace();
+                            if (_mToggleLoop && !isPlaying)
+                            {
+                                UnityNativeChromaSDK.PlayAnimationName(animationName);
+                            }
+                            GUILayout.EndHorizontal();
+                            GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                            if (GUILayout.Button("Play"))
+                            {
+                                UnityNativeChromaSDK.PlayAnimationName(animationName);
+                            }
+                            if (GUILayout.Button("loop"))
+                            {
+                                UnityNativeChromaSDK.PlayAnimationName(animationName, true);
+                            }
+                            if (GUILayout.Button("Stop"))
+                            {
+                                UnityNativeChromaSDK.StopAnimationName(animationName);
+                            }
+                            if (GUILayout.Button("Reload"))
+                            {
+                                UnityNativeChromaSDK.CloseAnimationName(animationName);
+                            }
                             GUILayout.EndHorizontal();
 
-                            if (_mFrameCap > 0 &&
-                                frameCount >= _mFrameCap)
+                            GUILayout.Label("Edit:");
+                            if (GUILayout.Button("Edit"))
                             {
-                                detectFrameCap = true;
+                                UnityNativeChromaSDK.EditAnimation(animationName);
                             }
-                        }
-
-                        if (_mCapturing &&
-                            detectFrameCap)
-                        {
-                            _mCapturing = false;
-                            Debug.Log("Capturing stopped by the frame cap.");
-                            OnClickSave();
-                            OnClickUnload();
-                        }
-                    }
-                }
-
-                int frameCap = EditorGUILayout.IntField("Frame Cap:", _mFrameCap);
-                if (_mFrameCap != frameCap)
-                {
-                    _mFrameCap = frameCap;
-                    EditorPrefs.SetInt(KEY_FRAME_CAP, _mFrameCap);
-                }
-
-                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                float interval = EditorGUILayout.FloatField("Capture Interval", _mInterval);
-                if (interval < 0.033f)
-                {
-                    interval = 0.033f;
-                }
-                _mInterval = interval;
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                GUILayout.Label("Capture:");
-                GUI.enabled = null != _mRenderCamera && !string.IsNullOrEmpty(_mAnimation);
-                if (GUILayout.Button("1 Frame"))
-                {
-                    _mMainThreadActions.Add(() =>
-                    {
-                        if (_mAutoAlignWithView)
-                        {
-                            OnClickAlignWithView();
-                        }
-                        OnClick1Frame();
-                        OnClickUnload();
-                    });
-                }
-                if (GUILayout.Button(_mCapturing ? "Stop" : "Start") ||
-                    _mCaptureKeyDetected)
-                {
-                    _mMainThreadActions.Add(() =>
-                    {
-                        _mCaptureKeyDetected = false;
-                        MakeAnimationReady();
-
-                        _mCapturing = !_mCapturing;
-                        if (_mCapturing)
-                        {
-                            OnClickReset();
-                            _mCaptureIndex = 0;
-                        }
-                        else
-                        {
-                            OnClickSave();
-                            OnClickUnload();
-                        }
-                    });
-                }
-                GUI.enabled = true;
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                GUILayout.Label("Override Time (ALL FRAMES):");
-                _mOverrideTime = EditorGUILayout.FloatField(_mOverrideTime);
-                if (_mOverrideTime < 0.033f)
-                {
-                    _mOverrideTime = 0.033f;
-                }
-                if (GUILayout.Button("Set", GUILayout.Width(50)))
-                {
-                    OnClickSetOverrideTime();
-                }
-                GUILayout.EndHorizontal();
-
-                if (!string.IsNullOrEmpty(animationName) &&
-                    _mRenderCamera)
-                {
-                    GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                    GUILayout.Label("Layout");
-                    if (GUILayout.Button("C"))
-                    {
-                        if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.ChromaLink)
-                        {
-                            _mToggleLayout = !_mToggleLayout;
-                            EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
-                        }
-                        _mDeviceLayout = UnityNativeChromaSDK.Device.ChromaLink;
-                    }
-                    if (GUILayout.Button("K"))
-                    {
-                        if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Keyboard)
-                        {
-                            _mToggleLayout = !_mToggleLayout;
-                            EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
-                        }
-                        _mDeviceLayout = UnityNativeChromaSDK.Device.Keyboard;
-                    }
-                    if (GUILayout.Button("M"))
-                    {
-                        if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Mouse)
-                        {
-                            _mToggleLayout = !_mToggleLayout;
-                            EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
-                        }
-                        _mDeviceLayout = UnityNativeChromaSDK.Device.Mouse;
-                    }
-                    if (GUILayout.Button("MP"))
-                    {
-                        if (!_mToggleLayout || _mDeviceLayout == UnityNativeChromaSDK.Device.Mousepad)
-                        {
-                            _mToggleLayout = !_mToggleLayout;
-                            EditorPrefs.SetBool(KEY_LAYOUT, _mToggleLayout);
-                        }
-                        _mDeviceLayout = UnityNativeChromaSDK.Device.Mousepad;
-                    }
-                    _mColorLayout = EditorGUILayout.ColorField(_mColorLayout);
-                    GUILayout.EndHorizontal();
-                }
-
-                rect = GUILayoutUtility.GetLastRect();
-                if (_mRenderCamera)
-                {
-                    if (null == _mRenderTexture)
-                    {
-                        _mRenderTexture = new RenderTexture(RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE, 24, RenderTextureFormat.ARGB32);
-                        _mRenderCamera.targetTexture = _mRenderTexture;
-                    }
-                    _mRenderCamera.Render();
-                    rect.y += 30;
-                    DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
-
-                    if (_mToggleLayout)
-                    {
-                        if (_sKeyboardTexture)
-                        {
-                            Color oldColor = GUI.color;
-                            GUI.color = _mColorLayout;
-                            const int border = 2;
-                            rect = new Rect(rect.x + border, rect.y + border, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
-                            
-                            switch (_mDeviceLayout)
+                            if (GUILayout.Button("Reverse Animation"))
                             {
-                                case UnityNativeChromaSDK.Device.ChromaLink:
-                                case UnityNativeChromaSDK.Device.Headset:
-                                    if (_sChromaLinkTexture)
-                                    {
-                                        GUI.DrawTexture(rect, _sChromaLinkTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                                    }
-                                    break;
-                                case UnityNativeChromaSDK.Device.Keyboard:
-                                    if (_sKeyboardTexture)
-                                    {
-                                        GUI.DrawTexture(rect, _sKeyboardTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                                    }
-                                    break;
-                                case UnityNativeChromaSDK.Device.Mouse:
-                                    if (_sMouseTexture)
-                                    {
-                                        GUI.DrawTexture(rect, _sMouseTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                                    }
-                                    break;
-                                case UnityNativeChromaSDK.Device.Mousepad:
-                                    if (_sMousepadTexture)
-                                    {
-                                        GUI.DrawTexture(rect, _sMousepadTexture, ScaleMode.ScaleAndCrop, true, 1.0f);
-                                    }
-                                    break;
+                                int animationId = GetAnimation(animationName);
+                                if (animationId >= 0)
+                                {
+                                    UnityNativeChromaSDK.Reverse(animationName);
+                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    UnityNativeChromaSDK.CloseAnimationName(animationName);
+                                    UnityNativeChromaSDK.PlayAnimationName(animationName);
+                                }
                             }
 
-                            GUI.color = oldColor;
-                        }
-                    }
-                }
-                break;
-
-            case Modes.Playback:
-                if (IsAnimationSelected())
-                {
-                    if (Selection.activeObject)
-                    {
-                        animationName = GetAnimationName(Selection.activeObject.name);
-                        if (_mLastPlaybackName != animationName)
-                        {
-                            UnityNativeChromaSDK.StopAnimationName(_mLastPlaybackName);
-                            _mLastPlaybackName = animationName;
-                            UnityNativeChromaSDK.PlayAnimationName(animationName);
-                        }
-                        int frameCount = UnityNativeChromaSDK.GetFrameCountName(animationName);
-                        UnityNativeChromaSDK.Device device = UnityNativeChromaSDK.GetDevice(animationName);
-                        GUILayout.Label(string.Format("Name: {0}", animationName));
-                        GUILayout.Label(string.Format("Device: {0}", device));
-                        GUILayout.Label(string.Format("Frame Count: {0}", frameCount));
-                        bool isPlaying = UnityNativeChromaSDK.IsPlaying(animationName);
-                        GUILayout.Label(string.Format("Is Playing: {0}", isPlaying));
-                        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                        GUILayout.Label("Loop:");
-                        bool loop = GUILayout.Toggle(_mToggleLoop, "");
-                        if (loop != _mToggleLoop)
-                        {
-                            _mToggleLoop = loop;
-                            EditorPrefs.SetBool(KEY_LOOP, _mToggleLoop);
-                        }
-                        GUILayout.FlexibleSpace();
-                        if (_mToggleLoop && !isPlaying)
-                        {
-                            UnityNativeChromaSDK.PlayAnimationName(animationName);
-                        }
-                        GUILayout.EndHorizontal();
-                        GUILayout.BeginHorizontal(GUILayout.Width(position.width));
-                        if (GUILayout.Button("Play"))
-                        {
-                            UnityNativeChromaSDK.PlayAnimationName(animationName);
-                        }
-                        if (GUILayout.Button("loop"))
-                        {
-                            UnityNativeChromaSDK.PlayAnimationName(animationName, true);
-                        }
-                        if (GUILayout.Button("Stop"))
-                        {
-                            UnityNativeChromaSDK.StopAnimationName(animationName);
-                        }
-                        if (GUILayout.Button("Reload"))
-                        {
-                            UnityNativeChromaSDK.CloseAnimationName(animationName);
-                        }
-                        GUILayout.EndHorizontal();
-
-                        GUILayout.Label("Edit:");
-                        if (GUILayout.Button("Edit"))
-                        {
-                            UnityNativeChromaSDK.EditAnimation(animationName);
-                        }
-                        if (GUILayout.Button("Reverse Animation"))
-                        {
-                            int animationId = GetAnimation(animationName);
-                            if (animationId >= 0)
+                            if (GUILayout.Button("Mirror Animation Horizontally"))
                             {
-                                UnityNativeChromaSDK.Reverse(animationName);
-                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                UnityNativeChromaSDK.CloseAnimationName(animationName);
-                                UnityNativeChromaSDK.PlayAnimationName(animationName);
+                                int animationId = GetAnimation(animationName);
+                                if (animationId >= 0)
+                                {
+                                    UnityNativeChromaSDK.MirrorHorizontally(animationName);
+                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    UnityNativeChromaSDK.CloseAnimationName(animationName);
+                                    UnityNativeChromaSDK.PlayAnimationName(animationName);
+                                }
                             }
-                        }
 
-                        if (GUILayout.Button("Mirror Animation Horizontally"))
-                        {
-                            int animationId = GetAnimation(animationName);
-                            if (animationId >= 0)
+                            if (GUILayout.Button("Mirror Animation Vertically"))
                             {
-                                UnityNativeChromaSDK.MirrorHorizontally(animationName);
-                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                UnityNativeChromaSDK.CloseAnimationName(animationName);
-                                UnityNativeChromaSDK.PlayAnimationName(animationName);
-                            }
-                        }
-
-                        if (GUILayout.Button("Mirror Animation Vertically"))
-                        {
-                            int animationId = GetAnimation(animationName);
-                            if (animationId >= 0)
-                            {
-                                UnityNativeChromaSDK.MirrorVertically(animationName);
-                                UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
-                                UnityNativeChromaSDK.CloseAnimationName(animationName);
-                                UnityNativeChromaSDK.PlayAnimationName(animationName);
+                                int animationId = GetAnimation(animationName);
+                                if (animationId >= 0)
+                                {
+                                    UnityNativeChromaSDK.MirrorVertically(animationName);
+                                    UnityNativeChromaSDK.PluginSaveAnimation(animationId, animationName);
+                                    UnityNativeChromaSDK.CloseAnimationName(animationName);
+                                    UnityNativeChromaSDK.PlayAnimationName(animationName);
+                                }
                             }
                         }
                     }
-                }
-                break;
+                    break;
+            }
         }
 
         rect = new Rect(0, position.height - 40, 75, 40);
@@ -1930,6 +1934,12 @@ private void OnGUI()
         {
             UnityNativeChromaSDK.Uninit();
             UnityNativeChromaSDK.Init();
+        }
+
+        rect = new Rect(90, position.height - 40, 75, 40);
+        if (GUI.Button(rect, "Uninit"))
+        {
+            UnityNativeChromaSDK.Uninit();
         }
 
         rect = new Rect(position.width - 40, position.height - 20, 100, 40);
