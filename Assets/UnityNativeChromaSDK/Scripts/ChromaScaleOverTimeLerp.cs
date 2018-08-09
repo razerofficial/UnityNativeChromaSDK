@@ -4,10 +4,10 @@ using UnityEngine;
 #if UNITY_EDITOR
 [ExecuteInEditMode]
 #endif
-public class ChromaRotateOverTimeLerp : MonoBehaviour
+public class ChromaScaleOverTimeLerp : MonoBehaviour
 {
-    public Vector3 _mRotationStart = Vector3.zero;
-	public Vector3 _mRotationEnd = Vector3.zero;
+	public Vector3 _mScaleStart = Vector3.one;
+	public Vector3 _mScaleEnd = Vector3.one;
     public float _mSpeed = 1f;
     private DateTime _mTimer = DateTime.Now;
 	private float _mTime = 0;
@@ -24,10 +24,10 @@ public class ChromaRotateOverTimeLerp : MonoBehaviour
         _mTimer = DateTime.Now;
 		_mTime += _mSpeed * elapsed;
 		float t = 1 - Mathf.Abs(Mathf.Cos(Mathf.PI * _mTime));
-		Vector3 rot;
-		rot.x = Mathf.Lerp(_mRotationStart.x, _mRotationEnd.x, t);
-		rot.y = Mathf.Lerp(_mRotationStart.y, _mRotationEnd.y, t);
-		rot.z = Mathf.Lerp(_mRotationStart.z, _mRotationEnd.z, t);
-        transform.localRotation = Quaternion.Euler(rot.x, rot.y, rot.z);
+		Vector3 scale;
+		scale.x = Mathf.Lerp(_mScaleStart.x, _mScaleEnd.x, t);
+		scale.y = Mathf.Lerp(_mScaleStart.y, _mScaleEnd.y, t);
+		scale.z = Mathf.Lerp(_mScaleStart.z, _mScaleEnd.z, t);
+        transform.localScale = scale;
     }
 }
