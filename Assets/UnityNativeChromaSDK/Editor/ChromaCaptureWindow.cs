@@ -28,7 +28,7 @@ class ChromaCaptureWindow : EditorWindow
     private readonly string _mVersionString = string.Format("{0}", UnityNativeChromaSDK.GetVersion());
 
     // Offset the scene view so the layout is in the right spot
-    private static Rect _sLayoutOffset = Rect.zero;
+    private static Rect _sLayoutOffset = new Rect(0, 0, 0, 0);
 
     private const int RENDER_TEXTURE_SIZE = 256;
 
@@ -1163,8 +1163,8 @@ class ChromaCaptureWindow : EditorWindow
                 int centerWidth = screenWidth / 2;
                 int centerHeight = screenHeight / 2;
                 Rect rect = new Rect(
-                    centerWidth - size / 2 + (int)_sLayoutOffset.left,
-                    centerHeight - size / 2 + (int)_sLayoutOffset.top,
+                    centerWidth - size / 2 + (int)_sLayoutOffset.xMin,
+                    centerHeight - size / 2 + (int)_sLayoutOffset.yMin,
                     size, size);
                 switch (_mDeviceLayout)
                 {
