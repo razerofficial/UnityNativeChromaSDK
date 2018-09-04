@@ -24,7 +24,7 @@ namespace ChromaSDK
 		/// <returns></returns>
 		public static string GetVersion()
 		{
-			return "1.10";
+			return "1.11";
 		}
 
         /// <summary>

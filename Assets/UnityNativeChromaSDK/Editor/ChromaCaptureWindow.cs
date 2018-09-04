@@ -27,6 +27,9 @@ class ChromaCaptureWindow : EditorWindow
 
     private readonly string _mVersionString = string.Format("{0}", UnityNativeChromaSDK.GetVersion());
 
+    // Offset the scene view so the layout is in the right spot
+    private static Rect _sLayoutOffset = Rect.zero;
+
     private const int RENDER_TEXTURE_SIZE = 256;
 
     private string _mAnimation = null;
@@ -98,8 +101,9 @@ class ChromaCaptureWindow : EditorWindow
     private static void OpenPanel()
     {
         ChromaCaptureWindow window = GetWindow<ChromaCaptureWindow>();
-        if (null == window)
+        if (null != window)
         {
+            window.minSize = new Vector2(275, 480);
             window.name = "Capture Chroma Window";
         }
     }
@@ -1150,12 +1154,18 @@ class ChromaCaptureWindow : EditorWindow
 
             if (_mRenderCamera)
             {
+                int screenWidth = Screen.width + (int)_sLayoutOffset.width;
+                int screenHeight = Screen.height + (int)_sLayoutOffset.height;
+
                 Color oldColor = GUI.color;
                 GUI.color = _mColorLayout;
-                int size = Mathf.Min(Screen.width, Screen.height);
-                int centerWidth = Screen.width / 2;
-                int centerHeight = Screen.height / 2;
-                Rect rect = new Rect(centerWidth - size / 2, centerHeight - size / 2, size, size);
+                int size = Mathf.Min(screenWidth, screenHeight);
+                int centerWidth = screenWidth / 2;
+                int centerHeight = screenHeight / 2;
+                Rect rect = new Rect(
+                    centerWidth - size / 2 + (int)_sLayoutOffset.left,
+                    centerHeight - size / 2 + (int)_sLayoutOffset.top,
+                    size, size);
                 switch (_mDeviceLayout)
                 {
                     case UnityNativeChromaSDK.Device.ChromaLink:
@@ -1775,6 +1785,8 @@ class ChromaCaptureWindow : EditorWindow
                         GUILayout.EndHorizontal();
                     }
 
+                    _sLayoutOffset = EditorGUILayout.RectField("Offset", _sLayoutOffset);
+
                     rect = GUILayoutUtility.GetLastRect();
                     if (_mRenderCamera)
                     {
@@ -1784,7 +1796,7 @@ class ChromaCaptureWindow : EditorWindow
                             _mRenderCamera.targetTexture = _mRenderTexture;
                         }
                         _mRenderCamera.Render();
-                        rect.y += 30;
+                        rect.y += rect.height + 10;
                         DisplayRenderTexture((int)rect.y, RENDER_TEXTURE_SIZE, RENDER_TEXTURE_SIZE);
 
                         if (_mToggleLayout)
