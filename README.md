@@ -76,6 +76,11 @@ Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/Unit
 
 7 Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/UnityNativeChromaSDK/releases/tag/1.0) into your project.
 
+**Import Unity Package**
+
+<a target="_blank" href="https://www.youtube.com/watch?v=pmtuaSLXeME"><img src="https://img.youtube.com/vi/pmtuaSLXeME/0.jpg"/></a>
+
+
 8 Create `Chroma` animations from the `Assets/ChromaSDK/Create Chroma Animation` menu item. This will open a file save dialog and create a chroma animation file when saved.
 
 9 Edit `Chroma` animations by selecting a `Chroma` animation in the `Object Hierarchy` and select the `Assets/ChromaSDK/Edit Chroma Animation` menu item.
