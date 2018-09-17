@@ -1320,6 +1320,16 @@ namespace ChromaSDK
                 _sKeyMapping[KeyCode.Minus] = (int)Keyboard.RZKEY.RZKEY_OEM_2;
                 _sKeyMapping[KeyCode.Period] = (int)Keyboard.RZKEY.RZKEY_OEM_10;
                 _sKeyMapping[KeyCode.Slash] = (int)Keyboard.RZKEY.RZKEY_OEM_11;
+                _sKeyMapping[KeyCode.Alpha0] = (int)Keyboard.RZKEY.RZKEY_0;
+                _sKeyMapping[KeyCode.Alpha1] = (int)Keyboard.RZKEY.RZKEY_1;
+                _sKeyMapping[KeyCode.Alpha2] = (int)Keyboard.RZKEY.RZKEY_2;
+                _sKeyMapping[KeyCode.Alpha3] = (int)Keyboard.RZKEY.RZKEY_3;
+                _sKeyMapping[KeyCode.Alpha4] = (int)Keyboard.RZKEY.RZKEY_4;
+                _sKeyMapping[KeyCode.Alpha5] = (int)Keyboard.RZKEY.RZKEY_5;
+                _sKeyMapping[KeyCode.Alpha6] = (int)Keyboard.RZKEY.RZKEY_6;
+                _sKeyMapping[KeyCode.Alpha7] = (int)Keyboard.RZKEY.RZKEY_7;
+                _sKeyMapping[KeyCode.Alpha8] = (int)Keyboard.RZKEY.RZKEY_8;
+                _sKeyMapping[KeyCode.Alpha9] = (int)Keyboard.RZKEY.RZKEY_9;
                 _sKeyMapping[KeyCode.Colon] = (int)Keyboard.RZKEY.RZKEY_OEM_7;
                 _sKeyMapping[KeyCode.Semicolon] = (int)Keyboard.RZKEY.RZKEY_OEM_7;
                 _sKeyMapping[KeyCode.Less] = (int)Keyboard.RZKEY.RZKEY_OEM_9;
