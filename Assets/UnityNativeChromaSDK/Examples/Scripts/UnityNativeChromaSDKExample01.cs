@@ -2,7 +2,7 @@ using ChromaSDK;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-#if !UNITY_3 && !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_2 && !UNITY_3_3 && !UNITY_3_4 && !UNITY_3_5
+#if !UNITY_3 && !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_2 && !UNITY_3_3 && !UNITY_3_4 && !UNITY_3_5 && !UNITY_4 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3 && !UNITY_4_4 && !UNITY_4_5 && !UNITY_4_6 && !UNITY_4_7
 using UnityEngine.SceneManagement;
 #endif
 
@@ -41,7 +41,7 @@ public class UnityNativeChromaSDKExample01 : MonoBehaviour
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Load Scene 2"))
         {
-#if UNITY_3 || UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5
+#if UNITY_3 || UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
             Application.LoadLevel(1);
 #else
             SceneManager.LoadScene(1);
