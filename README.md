@@ -95,6 +95,17 @@ Import [UnityNativeChromaSDK.unitypackage](https://github.com/razerofficial/Unit
 <a name="tutorials"></a>
 ## Tutorials
 
+**Convert Video to Chroma Animation**
+
+* Step 1: Capture video with a tool like `Camtasia` and export the video as a GIF image sequence.
+
+* Step 2: Convert the GIF to a PNG image sequence. I use the online tool [onlineconverter.com](https://www.onlineconverter.com/gif-to-png) to convert the GIF to an image sequence.
+
+* Step 3: Use the `Chroma Material Window` to play the image sequence on a material.
+
+* Step 4: Capture the material on a plane with the Unity Capture tool.
+
+
 [Razer Chroma Playlist](https://www.youtube.com/playlist?list=PL4mjXeDqRBMRE19MjB8aiNPRnm_nYtct7)
 
 
