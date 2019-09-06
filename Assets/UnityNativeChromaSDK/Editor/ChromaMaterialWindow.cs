@@ -116,7 +116,7 @@ class ChromaMaterialWindow : EditorWindow
         }
 
         float rate = EditorGUILayout.FloatField("Rate", _mRate);
-        _mRate = Mathf.Max(0.1f, rate);
+        _mRate = Mathf.Max(0.033f, rate);
 
         if (_mIsPlaying)
         {
