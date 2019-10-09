@@ -2,7 +2,7 @@
 
 **Table of Contents**
 
-* [Related](#related)
+* [See also](see-also)
 * [Frameworks supported](#frameworks-supported)
 * [Prerequisites](#prerequisites)
 * [Dependencies](#dependencies)
@@ -14,7 +14,11 @@
 * [Examples](#examples)
 
 <a name="related"></a>
-## Related
+## See Also
+
+**Docs:**
+
+- [Chroma Animation Guide](http://chroma.razer.com/ChromaGuide/) - Visual examples of the Chroma Animation API methods
 
 **Apps:**
 
