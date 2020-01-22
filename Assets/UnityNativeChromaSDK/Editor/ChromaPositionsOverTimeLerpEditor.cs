@@ -38,9 +38,13 @@ public class ChromaPositionsOverTimeLerpEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        if (Input.GetKeyUp(KeyCode.P))
+        if (GUILayout.Button("Clear Points"))
         {
-            Debug.Log("Add Point");
+            if (target)
+            {
+                ChromaPositionsOverTimeLerp item = (ChromaPositionsOverTimeLerp)target;
+                item._mPositions = new Vector3[0];
+            }
         }
         if (GUILayout.Button("Add Point"))
         {
