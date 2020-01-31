@@ -1113,12 +1113,15 @@ class ChromaCaptureWindow : EditorWindow
         if (EditorPrefs.HasKey(KEY_MASK))
         {
             string mask = EditorPrefs.GetString(KEY_MASK);
-            string animationName = GetAnimationName(mask);
-            int animationId = GetAnimation(animationName);
-            if (animationId >= 0)
+            if (!string.IsNullOrEmpty(mask))
             {
-                string path = string.Format("Assets/StreamingAssets/{0}", animationName);
-                _mMask = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
+                string animationName = GetAnimationName(mask);
+                int animationId = GetAnimation(animationName);
+                if (animationId >= 0)
+                {
+                    string path = string.Format("Assets/StreamingAssets/{0}", animationName);
+                    _mMask = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
+                }
             }
         }
 
@@ -1397,6 +1400,13 @@ class ChromaCaptureWindow : EditorWindow
                             if (animationId >= 0)
                             {
                                 EditorPrefs.SetString(KEY_MASK, animationName);
+                            }
+                        }
+                        else
+                        {
+                            if (EditorPrefs.HasKey(KEY_MASK))
+                            {
+                                EditorPrefs.DeleteKey(KEY_MASK);
                             }
                         }
                     }
