@@ -1076,7 +1076,11 @@ class ChromaCaptureWindow : EditorWindow
     private void OnEnable()
     {
 #if SHOW_LAYOUT_IN_SCENE_VIEW
+    #if UNITY_2019
+        SceneView.duringSceneGui += this.OnSceneGUI;
+    #else
         SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+    #endif
 #endif
         SetupTextureMapping();
 
