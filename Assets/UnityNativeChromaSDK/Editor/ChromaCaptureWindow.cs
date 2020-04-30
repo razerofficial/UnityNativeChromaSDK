@@ -274,7 +274,7 @@ class ChromaCaptureWindow : EditorWindow
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD2] = new Point(218, 46);
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD3] = new Point(228, 46);
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_NUMPAD_ENTER] = new Point(238, 60);
-        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LCTRL] = new Point(11, 66);
+        _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LCTRL] = new Point(29, 66);
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LWIN] = new Point(27, 66);
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_LALT] = new Point(39, 66);
         _mKeyboardTextureMapping[(int)UnityNativeChromaSDK.Keyboard.RZKEY.RZKEY_SPACE] = new Point(88, 66);
