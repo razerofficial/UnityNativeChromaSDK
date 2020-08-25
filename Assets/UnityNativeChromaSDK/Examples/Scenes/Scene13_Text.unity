@@ -92,7 +92,7 @@ RenderTexture:
     m_Aniso: 0
     m_MipBias: 0
     m_WrapMode: 1
---- !u!84 &820424739
+--- !u!84 &1172522030
 RenderTexture:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -213,8 +213,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1730195910}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 52.25, y: -11.4990234, z: -106.294617}
+  m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106829}
+  m_LocalPosition: {x: -26.5535564, y: 47.4553795, z: -16.1508179}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -238,13 +238,13 @@ Camera:
   far clip plane: 99999
   field of view: 60
   orthographic: 1
-  orthographic size: 32.6981926
+  orthographic size: 15.7668571
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 820424739}
+  m_TargetTexture: {fileID: 1172522030}
   m_HDR: 0
 --- !u!92 &1730195914
 Behaviour:
@@ -270,6 +270,7 @@ GameObject:
   - 4: {fileID: 1787763338}
   - 102: {fileID: 1787763340}
   - 23: {fileID: 1787763339}
+  - 114: {fileID: 1787763341}
   m_Layer: 0
   m_Name: New Text
   m_TagString: Untagged
@@ -283,8 +284,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1787763337}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 26.1500015, y: -5.74951172, z: 0}
+  m_LocalRotation: {x: .707106829, y: 1.12005337e-15, z: -1.12005337e-15, w: .707106829}
+  m_LocalPosition: {x: -278.434082, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -313,7 +314,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1787763337}
-  m_Text: Hello World
+  m_Text: H E L L O   W O R L D
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -323,3 +324,15 @@ TextMesh:
   m_FontSize: 100
   m_FontStyle: 0
   m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1787763341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1787763337}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed1ddc6c850c7724d8aa724f99555c6e, type: 1}
+  m_Name: 
+  _mDirection: {x: -6, y: 0, z: 0}
+  _mSpeed: 1
