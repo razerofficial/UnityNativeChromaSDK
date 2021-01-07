@@ -3,6 +3,7 @@
 **Table of Contents**
 
 * [See also](#see-also)
+* [Quick Start](#quick-start)
 * [Frameworks supported](#frameworks-supported)
 * [Prerequisites](#prerequisites)
 * [Dependencies](#dependencies)
@@ -39,6 +40,23 @@
 - [UE4_XDK_SampleApp](https://github.com/razerofficial/UE4_XDK_SampleApp) - UE4 Chroma samples and runtime module with Blueprint library for the ChromaSDK
 
 - [UnityNativeChromaSDK](https://github.com/RazerOfficial/UnityNativeChromaSDK) - Unity native library for the ChromaSDK
+
+
+## Quick Start ##
+
+* Install [Synapse](https://www.razer.com/synapse-3)
+
+* Make sure the Chroma Connect module is installed.
+
+![image_7](images/image_7.png)
+
+* If you don't have Chroma hardware, you can see Chroma effects with the [Chroma Emulator](https://github.com/razerofficial/ChromaEmulator)
+
+* This project is the Unity capture tool for authoring Chroma animations.
+
+* This repo also has the docs on the [Unity Chroma API](#api)
+
+* Head over to the [Unity Sample App](https://github.com/razerofficial/Unity_SampleApp) to see the sample code with animations that correspond to the [Chroma Animation Guide](http://chroma.razer.com/ChromaGuide/)
 
 
 <a name="frameworks-supported"></a>
