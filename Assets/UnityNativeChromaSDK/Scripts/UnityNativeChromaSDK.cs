@@ -756,6 +756,7 @@ namespace ChromaSDK
         /// </summary>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
+        [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool PluginIsDialogOpen();
 
         /// <summary>
