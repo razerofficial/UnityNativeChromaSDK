@@ -12,7 +12,7 @@ public class ChromaMaterialOffsetOverTime : MonoBehaviour
     private MeshRenderer _mRenderer = null;
     private Material _mMaterial = null;
 
-    private void Awake()
+    private void OnEnable()
     {
         _mRenderer = GetComponent<MeshRenderer>();
         if (_mRenderer == null)
@@ -27,10 +27,7 @@ public class ChromaMaterialOffsetOverTime : MonoBehaviour
             enabled = false;
             return;
         }
-    }
-
-    private void OnEnable()
-    {
+        
         _mTimer = DateTime.Now;
     }
 

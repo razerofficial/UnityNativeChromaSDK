@@ -743,12 +743,14 @@ namespace ChromaSDK
         /// Is the platform supported?
         /// </summary>
         [DllImport(DLL_NAME)]
+        [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool PluginIsPlatformSupported();
 
         /// <summary>
         /// Is the plugin initialized
         /// </summary>
         [DllImport(DLL_NAME)]
+        [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool PluginIsInitialized();
 
         /// <summary>
@@ -806,6 +808,7 @@ namespace ChromaSDK
         /// <param name="animationId"></param>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
+        [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool PluginIsPlaying(int animationId);
 
         /// <summary>
@@ -1100,6 +1103,7 @@ namespace ChromaSDK
         /// <param name="path"></param>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool PluginIsPlayingName(IntPtr path);
 
         /// <summary>
@@ -1109,6 +1113,7 @@ namespace ChromaSDK
         /// <param name="device"></param>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
+        [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool PluginIsPlayingType(int deviceType, int device);
 
         /// <summary>
@@ -1147,6 +1152,7 @@ namespace ChromaSDK
         /// <param name="path"></param>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool PluginIsAnimationPausedName(IntPtr path);
 
         /// <summary>
@@ -1155,6 +1161,7 @@ namespace ChromaSDK
         /// <param name="path"></param>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool PluginHasAnimationLoopName(IntPtr path);
 
         /// <summary>
