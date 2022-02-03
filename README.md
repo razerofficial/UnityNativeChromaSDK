@@ -1,3 +1,7 @@
+# Deprecated
+
+**Note: This version of the Unity plugin is deprecated. See [Unity_SampleApp](https://github.com/razerofficial/Unity_SampleApp) for the latest Unity plugin.**
+
 # UnityNativeChromaSDK - Unity native library for the ChromaSDK
 
 **Table of Contents**
