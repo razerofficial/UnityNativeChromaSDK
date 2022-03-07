@@ -2,7 +2,9 @@
 
 * Note: Visit the [Chroma Animation Guide](https://chroma.razer.com/ChromaGuide/) to find the latest supported plugin for Chroma RGB.
 
-* Note: This version of the Unity plugin is deprecated. See [Unity_SampleApp](https://github.com/razerofficial/Unity_SampleApp) for the latest Unity plugin.
+* Note: This version of the Unity plugin is deprecated.
+
+* Note: Go to [Unity_SampleApp](https://github.com/razerofficial/Unity_SampleApp) for the latest Unity plugin.
 
 # UnityNativeChromaSDK - Unity native library for the ChromaSDK
 
